@@ -7,9 +7,8 @@
   min-height: 0;
 }
 
-/* Translucent so mango's blur shows through */
 window#waybar {
-  background-color: rgba(32, 32, 32, 0.5);
+  background-color: rgba(32, 32, 32, 0.85);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   color: #ffffff;
 }
