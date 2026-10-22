@@ -276,6 +276,8 @@ Scope {
     PanelWindow { // qmllint disable uncreatable-type
         id: window
 
+        // Follows focus: a mapped surface stays on the monitor it was made on
+        screen: Compositor.focusedScreen()
         // Stays mapped while closed, just empty and click-through: mapping a
         // surface again took ~40 ms each open
         mask: Region {

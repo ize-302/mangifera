@@ -97,6 +97,9 @@ PanelWindow { // qmllint disable uncreatable-type
         event.accepted = true;
     }
 
+    // Stays mapped, so it'd stay on the monitor it was made on (even once
+    // that's switched off) without following focus
+    screen: Compositor.focusedScreen()
     // Stays mapped while closed, just empty and click-through: mapping a
     // surface again took ~40 ms each open
     mask: Region {
