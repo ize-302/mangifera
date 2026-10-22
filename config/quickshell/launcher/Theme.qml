@@ -249,6 +249,9 @@ Singleton {
     readonly property int animationDuration: 120
     // Panels fading and rising in: short, so they feel instant
     readonly property int appearDuration: 70
+    // Launchers sliding up out of the bar and back down into it
+    readonly property int launcherSlide: 40
+    readonly property int launcherSlideDuration: 140
 
     // For entries with Terminal=true
     readonly property list<string> terminal: ["alacritty", "-e"]

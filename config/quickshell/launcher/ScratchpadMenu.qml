@@ -168,6 +168,14 @@ Scope {
             root.open = !root.open;
         }
 
+        function openScratchpadMenu(): void {
+            root.open = true;
+        }
+
+        function closeScratchpadMenu(): void {
+            root.open = false;
+        }
+
         function tap(): void {
             root.tap();
         }

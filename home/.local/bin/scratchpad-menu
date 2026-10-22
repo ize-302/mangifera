@@ -1,8 +1,10 @@
 #!/bin/bash
-# scratchpad-menu [--tap]
+# scratchpad-menu [--tap|--open|--close]
 # Toggles the Quickshell scratchpad menu. --tap counts a lone Super tap; the
-# second of two quick taps toggles it.
+# second of two quick taps toggles it. --open and --close only open or close it.
 toggle=(scratchpad toggleScratchpadMenu)
 [ "$1" = --tap ] && toggle=(scratchpad tap)
+[ "$1" = --open ] && toggle=(scratchpad openScratchpadMenu)
+[ "$1" = --close ] && toggle=(scratchpad closeScratchpadMenu)
 
 exec ~/.local/bin/launcher-call "${toggle[@]}"

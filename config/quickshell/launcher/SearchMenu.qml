@@ -120,8 +120,10 @@ PanelWindow { // qmllint disable uncreatable-type
     margins.bottom: window.floating && window.aboveBar ? Theme.centredGap : 0
 
     onOpenChanged: {
-        if (!open)
+        if (!open) {
+            panel.disappear();
             return;
+        }
 
         input.text = "";
         window.view.currentIndex = 0;
@@ -135,8 +137,10 @@ PanelWindow { // qmllint disable uncreatable-type
     Glass {
         id: panel
 
-        visible: window.open
+        visible: window.open || hiding
         floating: window.floating
+        slideDistance: Theme.launcherSlide
+        slideDuration: Theme.launcherSlideDuration
         cornerRadius: window.cornerRadius
         fullWidth: window.strip
         color: window.panelColor
@@ -286,8 +290,9 @@ PanelWindow { // qmllint disable uncreatable-type
 
                     anchors.fill: parent
                     visible: !window.strip
-                    // Empty while closed: rows for every app took tens of MB
-                    model: window.strip || !window.open ? [] : window.results
+                    // Empty while closed: rows for every app took tens of MB.
+                    // Kept while sliding away so it doesn't blank mid-slide.
+                    model: window.strip || !(window.open || panel.hiding) ? [] : window.results
                     spacing: Theme.rowSpacing
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
