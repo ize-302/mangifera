@@ -215,26 +215,6 @@ if [ ! -d "$tpm" ] && { [ -z "$keep_tmux" ] || grep -q 'plugins/tpm/tpm' "$tmux_
   fi
 fi
 
-# --- Zen browser --------------------------------------------------------------
-
-# Zen stops painting on a hidden tag, so pages jump when the tag comes back.
-# Profile folders have random names, so the pref goes in each one's user.js.
-zen_pref='user_pref("widget.wayland.vsync.keep-firing-at-idle", true);'
-for zen_dir in "$HOME/.zen" "$HOME/.config/zen"; do
-  [ -f "$zen_dir/profiles.ini" ] || continue
-  while IFS= read -r path; do
-    case "$path" in /*) profile=$path ;; *) profile="$zen_dir/$path" ;; esac
-    [ -d "$profile" ] || continue
-    grep -qxF "$zen_pref" "$profile/user.js" 2>/dev/null && continue
-    say "Keeping Zen painting on hidden tags ($(basename "$profile"))"
-    if [ -n "$dry" ]; then
-      echo "    would add to: $profile/user.js"
-    else
-      echo "$zen_pref" >>"$profile/user.js"
-    fi
-  done < <(sed -n 's/^Path=//p' "$zen_dir/profiles.ini")
-done
-
 # --- Login screen -------------------------------------------------------------
 
 # SDDM can't read $HOME, so the theme needs a root-owned copy
