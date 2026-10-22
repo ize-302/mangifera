@@ -66,6 +66,10 @@ Singleton {
     readonly property string powerSleepIcon: String.fromCodePoint(0xf04b2)
     readonly property string powerRestartIcon: String.fromCodePoint(0xf0709)
     readonly property string powerShutDownIcon: String.fromCodePoint(0xf0425)
+    readonly property string recordNoSoundIcon: String.fromCodePoint(0xf0581)
+    readonly property string recordDesktopIcon: String.fromCodePoint(0xf0f5f)
+    readonly property string recordMicIcon: String.fromCodePoint(0xf036c)
+    readonly property string recordBothIcon: String.fromCodePoint(0xf08b4)
     readonly property int powerIconSize: 26
     readonly property int powerTileWidth: 72
     readonly property int powerTilePadding: 8

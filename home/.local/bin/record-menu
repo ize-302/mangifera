@@ -1,0 +1,10 @@
+#!/bin/bash
+# Stops the running screen recording, or toggles the Quickshell menu that
+# picks the sound to record with, starting its daemon if needed.
+if pgrep -x wf-recorder >/dev/null; then
+	exec ~/.local/bin/record-toggle
+fi
+
+toggle=(record toggleRecordMenu)
+
+exec ~/.local/bin/launcher-call "${toggle[@]}"

@@ -1,25 +1,45 @@
 #!/bin/bash
-# record-toggle [--sound|--desktop]
+# record-toggle [--none|--desktop|--mic|--both]
 # Starts recording a slurp-picked area to ~/Videos/Recordings, or stops the
-# running one. --sound adds the mic, --desktop the playing audio.
+# running one. --desktop adds the playing audio, --mic (or --sound) the
+# default mic, --both the two mixed. With no option it only stops.
 dir=~/Videos/Recordings
 
 bar() {
 	pkill -RTMIN+12 -x waybar
 }
 
+# Audio modules loaded for --both
+modules=()
+unload() {
+	for m in "${modules[@]}"; do
+		pactl unload-module "$m"
+	done
+	modules=()
+}
+
 if pgrep -x wf-recorder >/dev/null; then
 	# The starting run handles the rest
 	pkill -INT wf-recorder
-else
+elif [ $# -gt 0 ]; then
 	audio_args=()
 	case "$1" in
-	-s | --sound)
+	-m | --mic | -s | --sound)
 		audio_args=(--audio)
 		;;
 	-d | --desktop)
 		default_sink="$(pactl get-default-sink)"
 		audio_args=(--audio="${default_sink}.monitor")
+		;;
+	-b | --both)
+		# wf-recorder takes one source, so mix the mic and the playing audio
+		# into a sink of their own while recording
+		default_sink="$(pactl get-default-sink)"
+		trap unload EXIT
+		modules+=("$(pactl load-module module-null-sink sink_name=record_mix sink_properties=device.description=Recording)")
+		modules+=("$(pactl load-module module-loopback source=@DEFAULT_SOURCE@ sink=record_mix latency_msec=20)")
+		modules+=("$(pactl load-module module-loopback source="${default_sink}.monitor" sink=record_mix latency_msec=20)")
+		audio_args=(--audio=record_mix.monitor)
 		;;
 	esac
 
@@ -31,6 +51,7 @@ else
 	sleep 0.3
 	bar
 	wait
+	unload
 	bar
 
 	if [ ! -s "$file" ]; then
