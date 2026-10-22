@@ -94,7 +94,11 @@ ShellRoot {
             required property var modelData
 
             screen: modelData
-            visible: root.anyOpen
+            // Stays mapped, click-through while no menu is open: mapping it
+            // with each menu delayed the menu's first frame
+            mask: Region {
+                item: root.anyOpen ? catcher : null
+            }
             color: "transparent"
             exclusionMode: ExclusionMode.Ignore
 
@@ -250,7 +254,38 @@ ShellRoot {
         suppressed: controlPanel.open || notificationCenter.open
     }
 
+    // Every IpcHandler, for calls over the socket
+    readonly property list<QtObject> handlers: [launcherIpc, powerMenu.ipc, clipboardMenu.ipc, scratchpadMenu.ipc, keybindMenu.ipc, controlPanel.ipc, notificationCenter.ipc, datePanel.ipc, pomodoro.ipc, notifications.ipc]
+
+    // `line` is "<target> <function> [argument]", as `qs ipc call` takes
+    function call(line) {
+        const [target, name, ...rest] = line.trim().split(" ");
+        const handler = handlers.find(handler => handler.target === target);
+        if (handler && typeof handler[name] === "function")
+            handler[name](...(rest.length ? [rest.join(" ")] : []));
+    }
+
+    // ~/.local/bin/launcher-call writes a call here. Much quicker than
+    // `qs ipc call`, which starts a whole Qt client each time.
+    SocketServer {
+        active: true
+        path: Quickshell.env("XDG_RUNTIME_DIR") + "/mangifera-launcher.sock"
+        handler: Socket {
+            id: client
+
+            parser: SplitParser {
+                // Closing first stops a peer closed warning each call
+                onRead: line => {
+                    root.call(line);
+                    client.connected = false;
+                }
+            }
+        }
+    }
+
     IpcHandler {
+        id: launcherIpc
+
         target: "launcher"
 
         function toggleAppMenu(): void {

@@ -36,7 +36,7 @@ Rectangle {
             property: glass.fromRight ? "x" : "y"
             from: 16
             to: 0
-            duration: Theme.animationDuration
+            duration: Theme.appearDuration
             easing.type: Easing.OutCubic
         }
         NumberAnimation {
@@ -44,7 +44,7 @@ Rectangle {
             property: "opacity"
             from: 0
             to: 1
-            duration: Theme.animationDuration
+            duration: Theme.appearDuration
         }
     }
 

@@ -41,8 +41,8 @@ run() {
 repo_packages=(
   # Compositor; jq parses mmsg output
   mangowm jq
-  # Shell, bar, lock, wallpaper
-  quickshell qt6-5compat waybar swayidle swaylock swaybg
+  # Shell, bar, lock, wallpaper; socat calls the launcher daemon
+  quickshell qt6-5compat socat waybar swayidle swaylock swaybg
   # Screenshots, recording and the clipboard
   grim slurp swappy wf-recorder wl-clipboard cliphist
   # Portals: wlr for screen sharing, gtk for the rest

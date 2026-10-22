@@ -30,7 +30,11 @@ Scope {
     onOpenChanged: if (open)
         lister.running = true
 
+    // Also called over the launcher socket (shell.qml)
+    property alias ipc: ipcHandler
+
     IpcHandler {
+        id: ipcHandler
         target: "clipboard"
 
         function toggleClipboardMenu(): void {

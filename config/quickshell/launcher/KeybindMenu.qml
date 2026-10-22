@@ -228,10 +228,22 @@ Scope {
         return [groups.slice(0, best), groups.slice(best)].filter(column => column.length > 0);
     }
 
-    onOpenChanged: if (open)
-        lister.running = true
+    onOpenChanged: {
+        if (!open)
+            return;
+
+        lister.running = true;
+        input.text = "";
+        scroller.contentY = 0;
+        input.forceActiveFocus();
+        panel.appear();
+    }
+
+    // Also called over the launcher socket (shell.qml)
+    property alias ipc: ipcHandler
 
     IpcHandler {
+        id: ipcHandler
         target: "keybinds"
 
         function toggleKeybindMenu(): void {
@@ -264,7 +276,11 @@ Scope {
     PanelWindow { // qmllint disable uncreatable-type
         id: window
 
-        visible: root.open
+        // Stays mapped while closed, just empty and click-through: mapping a
+        // surface again took ~40 ms each open
+        mask: Region {
+            item: root.open ? panel : null
+        }
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
         implicitWidth: panel.width
@@ -276,17 +292,7 @@ Scope {
 
         WlrLayershell.namespace: "launcher-shadow"
         WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
-
-        onVisibleChanged: {
-            if (!visible)
-                return;
-
-            input.text = "";
-            scroller.contentY = 0;
-            input.forceActiveFocus();
-            panel.appear();
-        }
+        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
         Glass {
             id: panel
@@ -295,6 +301,7 @@ Scope {
             property real lockedWidth: 0
             property real lockedHeight: 0
 
+            visible: root.open
             floating: true
             width: Math.max(sheet.width, title.implicitWidth, lockedWidth) + Theme.keybindPadding * 2
             height: bar.height + scroller.height + Theme.keybindPadding

@@ -145,7 +145,11 @@ Scope {
         onTriggered: root.placeWaited = true
     }
 
+    // Also called over the launcher socket (shell.qml)
+    property alias ipc: ipcHandler
+
     IpcHandler {
+        id: ipcHandler
         target: "notificationCenter"
 
         function toggleNotificationCenter(): void {

@@ -157,7 +157,11 @@ Scope {
         onTriggered: clientWatcher.running = true
     }
 
+    // Also called over the launcher socket (shell.qml)
+    property alias ipc: ipcHandler
+
     IpcHandler {
+        id: ipcHandler
         target: "scratchpad"
 
         function toggleScratchpadMenu(): void {

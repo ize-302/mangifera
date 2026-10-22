@@ -247,6 +247,8 @@ Singleton {
     readonly property int doNotDisturbMorning: 8
 
     readonly property int animationDuration: 120
+    // Panels fading and rising in: short, so they feel instant
+    readonly property int appearDuration: 70
 
     // For entries with Terminal=true
     readonly property list<string> terminal: ["alacritty", "-e"]

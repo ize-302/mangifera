@@ -1,0 +1,24 @@
+#!/bin/bash
+# launcher-call <target> <function> [argument]
+# Calls a function of the Quickshell launcher daemon, like
+# `qs -c launcher ipc call`, but over the daemon's socket: no Qt client to
+# start, so menus open at once. Starts the daemon if needed.
+socket=${XDG_RUNTIME_DIR:-/run/user/$(id -u)}/mangifera-launcher.sock
+
+send() {
+	printf '%s\n' "$*" | socat -t1 - "UNIX-CONNECT:$socket" >/dev/null 2>&1
+}
+
+send "$@" && exit 0
+
+# A daemon from before the socket existed
+qs -c launcher ipc call "$@" >/dev/null 2>&1 && exit 0
+
+if qs -c launcher -d >/dev/null 2>&1; then
+	for _ in {1..20}; do
+		send "$@" && exit 0
+		sleep 0.1
+	done
+fi
+
+exit 1

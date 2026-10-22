@@ -47,7 +47,20 @@ Scope {
         Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/power-menu", entry.id]);
     }
 
+    // Also called over the launcher socket (shell.qml)
+    property alias ipc: ipcHandler
+
+    onOpenChanged: {
+        if (!open)
+            return;
+
+        current = 0;
+        tiles.forceActiveFocus();
+        panel.appear();
+    }
+
     IpcHandler {
+        id: ipcHandler
         target: "power"
 
         function togglePowerMenu(): void {
@@ -67,7 +80,11 @@ Scope {
     }
 
     PanelWindow { // qmllint disable uncreatable-type
-        visible: root.open
+        // Stays mapped while closed, just empty and click-through: mapping a
+        // surface again took ~40 ms each open
+        mask: Region {
+            item: root.open ? panel : null
+        }
         color: "transparent"
         exclusionMode: ExclusionMode.Normal
         implicitWidth: panel.width
@@ -76,22 +93,14 @@ Scope {
         // No shadow, like the bar. Only the bottom anchored: centred across
         WlrLayershell.namespace: "launcher"
         WlrLayershell.layer: WlrLayer.Overlay
-        WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+        WlrLayershell.keyboardFocus: root.open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
         anchors.bottom: true
         margins.bottom: Theme.centredGap
-
-        onVisibleChanged: {
-            if (!visible)
-                return;
-
-            root.current = 0;
-            tiles.forceActiveFocus();
-            panel.appear();
-        }
 
         Glass {
             id: panel
 
+            visible: root.open
             floating: true
             color: Theme.powerColor
             width: tiles.width + Theme.powerPanelPadding * 2

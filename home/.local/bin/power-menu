@@ -19,15 +19,6 @@ if [ $# -gt 0 ]; then
 	exit
 fi
 
-toggle=(qs -c launcher ipc call power togglePowerMenu)
+toggle=(power togglePowerMenu)
 
-"${toggle[@]}" >/dev/null 2>&1 && exit 0
-
-if qs -c launcher -d >/dev/null 2>&1; then
-	for _ in {1..20}; do
-		"${toggle[@]}" >/dev/null 2>&1 && exit 0
-		sleep 0.1
-	done
-fi
-
-exit 1
+exec ~/.local/bin/launcher-call "${toggle[@]}"

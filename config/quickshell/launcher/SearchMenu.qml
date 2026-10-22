@@ -97,7 +97,11 @@ PanelWindow { // qmllint disable uncreatable-type
         event.accepted = true;
     }
 
-    visible: open
+    // Stays mapped while closed, just empty and click-through: mapping a
+    // surface again took ~40 ms each open
+    mask: Region {
+        item: window.open ? panel : null
+    }
     color: "transparent"
     exclusionMode: ExclusionMode.Normal
     implicitWidth: strip ? screen.width : Math.round(screen.width * panelWidth)
@@ -105,7 +109,7 @@ PanelWindow { // qmllint disable uncreatable-type
 
     WlrLayershell.namespace: shadow ? "launcher-shadow" : "launcher"
     WlrLayershell.layer: WlrLayer.Overlay
-    WlrLayershell.keyboardFocus: WlrKeyboardFocus.Exclusive
+    WlrLayershell.keyboardFocus: open ? WlrKeyboardFocus.Exclusive : WlrKeyboardFocus.None
 
     // No edges anchored: the layer shell centres it
     anchors {
@@ -115,12 +119,15 @@ PanelWindow { // qmllint disable uncreatable-type
     }
     margins.bottom: window.floating && window.aboveBar ? Theme.centredGap : 0
 
-    onVisibleChanged: {
-        if (!visible)
+    onOpenChanged: {
+        if (!open)
             return;
 
         input.text = "";
         window.view.currentIndex = 0;
+        // The strip keeps its scroll while closed
+        if (strip)
+            cards.positionViewAtBeginning();
         (searchable ? input : keys).forceActiveFocus();
         panel.appear();
     }
@@ -128,6 +135,7 @@ PanelWindow { // qmllint disable uncreatable-type
     Glass {
         id: panel
 
+        visible: window.open
         floating: window.floating
         cornerRadius: window.cornerRadius
         fullWidth: window.strip
@@ -219,8 +227,9 @@ PanelWindow { // qmllint disable uncreatable-type
                     anchors.fill: parent
                     visible: window.strip
                     orientation: ListView.Horizontal
-                    // Empty while closed, so no delegates are kept around
-                    model: window.strip && window.open ? window.results : []
+                    // Kept while closed: rebuilding the cards and decoding
+                    // their previews delayed each open by up to ~90 ms
+                    model: window.strip ? window.results : []
                     clip: true
                     boundsBehavior: Flickable.StopAtBounds
                     highlightMoveDuration: 0
