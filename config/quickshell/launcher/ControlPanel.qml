@@ -411,7 +411,7 @@ Scope {
     // Never pushes past 100%, but leaves a volume already past it there
     function step(row, direction) {
         const value = row.node.audio.volume;
-        const next = Math.round((value + direction * Theme.volumeStep) * 20) / 20;
+        const next = Math.round((value + direction * Theme.volumeStep) * 100) / 100;
         root.setVolume(row, Math.max(0, Math.min(next, Math.max(value, 1))));
     }
 

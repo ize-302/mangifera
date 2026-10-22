@@ -119,7 +119,7 @@ Singleton {
     readonly property int controlFontSize: 14
     readonly property int controlSmallFontSize: 12
     readonly property string controlEmptyText: "Nothing to control"
-    readonly property real volumeStep: 0.05
+    readonly property real volumeStep: 0.01
     readonly property int sliderHeight: 6
     readonly property color sliderTrackColor: keyColor
     readonly property color sliderKnobColor: "white"
