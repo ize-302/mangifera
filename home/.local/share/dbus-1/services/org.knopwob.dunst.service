@@ -1,0 +1,4 @@
+# Overrides dunst's file so D-Bus never starts it; Quickshell shows notifications
+[D-BUS Service]
+Name=org.freedesktop.Notifications
+Exec=/usr/bin/false

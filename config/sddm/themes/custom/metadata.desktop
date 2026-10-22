@@ -1,0 +1,10 @@
+[SddmGreeterTheme]
+Name=Custom
+Type=sddm-theme
+Description=Tokyo Night glass login screen, laid out like the Quickshell lock screen.
+License=GPL-3.0-or-later
+Version=2.0.0
+Theme-Id=custom
+Theme-API=2.0
+MainScript=Main.qml
+QtVersion=6

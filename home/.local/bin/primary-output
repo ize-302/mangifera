@@ -1,0 +1,36 @@
+#!/bin/bash
+# primary-output [COMMAND...]
+# Focuses the external display if any, else the laptop's, then runs COMMAND
+# there. Keeps following displays as they are plugged in and out.
+internal='^(eDP|LVDS|DSI)'
+
+outputs() {
+	jq -r '.monitors[].name' <<<"$1"
+}
+
+primary() {
+	local names
+	names=$(outputs "$1")
+	grep -Evm1 "$internal" <<<"$names" || head -n1 <<<"$names"
+}
+
+focus() {
+	[ -n "$1" ] && mmsg dispatch "focusmon,$1" >/dev/null
+}
+
+state=$(mmsg get all-monitors) || exit
+focus "$(primary "$state")"
+[ $# -gt 0 ] && setsid -f "$@" >/dev/null 2>&1
+
+externals=$(outputs "$state" | grep -Ev "$internal")
+mmsg watch all-monitors | while read -r state; do
+	now=$(outputs "$state" | grep -Ev "$internal")
+	[ "$now" = "$externals" ] && continue
+	added=$(comm -13 <(sort <<<"$externals") <(sort <<<"$now") | grep -m1 .)
+	if [ -n "$added" ]; then
+		focus "$added"
+	elif [ -z "$now" ]; then
+		focus "$(primary "$state")"
+	fi
+	externals=$now
+done

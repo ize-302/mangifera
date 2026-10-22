@@ -1,0 +1,57 @@
+#!/bin/bash
+# record-toggle [--sound|--desktop]
+# Starts recording a slurp-picked area to ~/Videos/Recordings, or stops the
+# running one. --sound adds the mic, --desktop the playing audio.
+dir=~/Videos/Recordings
+
+bar() {
+	pkill -RTMIN+12 -x waybar
+}
+
+if pgrep -x wf-recorder >/dev/null; then
+	# The starting run handles the rest
+	pkill -INT wf-recorder
+else
+	audio_args=()
+	case "$1" in
+	-s | --sound)
+		audio_args=(--audio)
+		;;
+	-d | --desktop)
+		default_sink="$(pactl get-default-sink)"
+		audio_args=(--audio="${default_sink}.monitor")
+		;;
+	esac
+
+	notify-send "Select area to record"
+	area=$(slurp -o) || exit 0
+	mkdir -p "$dir"
+	file="$dir/rec-$(date +%Y%m%d-%H%M%S).mp4"
+	wf-recorder -g "$area" -c libx264rgb "${audio_args[@]}" -f "$file" &
+	sleep 0.3
+	bar
+	wait
+	bar
+
+	if [ ! -s "$file" ]; then
+		notify-send -u critical "Recording failed" "Nothing was recorded."
+		exit 1
+	fi
+
+	thumb="${XDG_RUNTIME_DIR:-/tmp}/record-toggle-${file##*/}.png"
+	ffmpegthumbnailer -i "$file" -o "$thumb" -s 256 2>/dev/null || thumb=video-x-generic
+
+	action=$(timeout 1h notify-send -a "Screen recording" -i "$thumb" \
+		--action=default=Play --action=folder="Show in folder" --wait \
+		"Recording saved" "${file##*/}")
+	case "$action" in
+	default)
+		xdg-open "$file"
+		;;
+	folder)
+		gdbus call --session --dest org.freedesktop.FileManager1 \
+			--object-path /org/freedesktop/FileManager1 \
+			--method org.freedesktop.FileManager1.ShowItems "['file://$file']" "" >/dev/null
+		;;
+	esac
+fi

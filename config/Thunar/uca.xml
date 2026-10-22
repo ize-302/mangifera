@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+<action>
+	<icon>utilities-terminal</icon>
+	<name>Open Terminal Here</name>
+	<submenu></submenu>
+	<unique-id>1753069503245949-1</unique-id>
+	<command>sh -c 'exec alacritty --working-directory "$1" -e "${SHELL:-bash}"' _ %f</command>
+	<description>A terminal in this folder, outside tmux</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<directories/>
+</action>
+<action>
+	<icon>edit-copy</icon>
+	<name>Copy Path</name>
+	<submenu></submenu>
+	<unique-id>1760795000000001-1</unique-id>
+	<command>sh -c 'for f; do echo "$f"; done | wl-copy -n' _ %F</command>
+	<description>Copy the full path, one per line for several</description>
+	<range></range>
+	<patterns>*</patterns>
+	<directories/>
+	<audio-files/>
+	<image-files/>
+	<other-files/>
+	<text-files/>
+	<video-files/>
+</action>
+<action>
+	<icon>nvim</icon>
+	<name>Open in Neovim</name>
+	<submenu></submenu>
+	<unique-id>1760795000000002-1</unique-id>
+	<command>alacritty -e nvim %F</command>
+	<description>Edit in Neovim in a new terminal</description>
+	<range></range>
+	<patterns>*</patterns>
+	<startup-notify/>
+	<text-files/>
+</action>
+<action>
+	<icon>preferences-desktop-wallpaper</icon>
+	<name>Set as Wallpaper</name>
+	<submenu></submenu>
+	<unique-id>1760795000000003-1</unique-id>
+	<command>sh -c 'exec ~/.local/bin/wallpaper "$1"' _ %f</command>
+	<description>Kept until another is set, the lock and login screens too</description>
+	<range>1-1</range>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
+<action>
+	<icon>image-x-generic</icon>
+	<name>Convert to WebP</name>
+	<submenu></submenu>
+	<unique-id>1760795000000004-1</unique-id>
+	<command>mogrify -format webp -quality 90 %F</command>
+	<description>A .webp copy next to each image</description>
+	<range></range>
+	<patterns>*</patterns>
+	<image-files/>
+</action>
+</actions>

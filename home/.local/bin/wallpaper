@@ -1,0 +1,45 @@
+#!/bin/bash
+# wallpaper [--random|FILE]
+# Sets the wallpaper with swaybg (no argument: the last one). Saves its path
+# for the lock screen and copies it to /var/lib/sddm-wallpaper for SDDM.
+dir=~/Pictures/wallpapers
+default=~/.local/share/mangifera/default-wallpaper.jpg
+share=/var/lib/sddm-wallpaper
+state=${XDG_STATE_HOME:-$HOME/.local/state}/mangifera/wallpaper
+
+current=$(cat -- "$state" 2>/dev/null)
+
+pick() {
+	find -L "$dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) 2>/dev/null |
+		grep -vxF -- "$current" | shuf -n1
+}
+
+case $1 in
+--random)
+	img=$(pick)
+	[ -n "$img" ] || img=$current
+	;;
+"")
+	img=$current
+	[ -f "$img" ] || img=$(pick)
+	;;
+*)
+	img=$(realpath -- "$1") || exit
+	;;
+esac
+[ -f "$img" ] || img=$default
+
+# Start the new swaybg before killing the old one, so there's no gap
+old=$(pgrep -u "$UID" -x swaybg)
+setsid -f swaybg -o '*' -i "$img" -m fill >/dev/null 2>&1 || exit
+if [ -n "$old" ]; then
+	sleep 0.5
+	kill $old 2>/dev/null
+fi
+mkdir -p -- "${state%/*}"
+echo "$img" >"$state"
+
+# Atomic rename, so the greeter never reads half an image
+if [ -w "$share" ] && { [ "$img" != "$current" ] || [ ! -e "$share/current" ]; }; then
+	cp -f -- "$img" "$share/.current.tmp" && mv -f "$share/.current.tmp" "$share/current"
+fi

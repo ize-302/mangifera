@@ -1,0 +1,96 @@
+#!/bin/bash
+# bar-anchor <x> <bar-top> <bar-height>
+# Prints the centre of the waybar module nearest x, found by grabbing the bar
+# with grim and looking for bright pixels (waybar doesn't expose module
+# positions). Prints x when nothing is near.
+
+# Search radius, max gap within one module, max distance from x
+reach=48
+join=11
+nearest=24
+
+x=${1%%.*} top=${2%%.*} height=${3%%.*}
+left=$((x > reach ? x - reach : 0))
+
+grim -s 1 -t ppm -g "$left,$top $((reach * 2))x$height" - 2>/dev/null | od -An -tu1 -v |
+	awk -v x="$x" -v left="$left" -v join="$join" -v nearest="$nearest" '
+	{ for (i = 1; i <= NF; i++) byte[n++] = $i }
+
+	function brightness(px, py,    i, r, g, b) {
+		i = start + (py * w + px) * 3
+		r = byte[i]; g = byte[i + 1]; b = byte[i + 2]
+		return r > g ? (r > b ? r : b) : (g > b ? g : b)
+	}
+
+	# Half to even
+	function round(v,    whole) {
+		whole = int(v)
+		if (v - whole != 0.5)
+			return int(v + 0.5)
+		return whole % 2 ? whole + 1 : whole
+	}
+
+	END {
+		# P6 header
+		if (n < 2 || byte[0] != 80 || byte[1] != 54) { print x; exit }
+		at = 2
+		fields = 0
+		while (fields < 3 && at < n) {
+			c = byte[at]
+			if (c == 32 || (c >= 9 && c <= 13)) { at++; continue }
+			if (c == 35) { while (at < n && byte[at] != 10) at++; continue }
+			value = 0
+			while (at < n && byte[at] >= 48 && byte[at] <= 57)
+				value = value * 10 + byte[at++] - 48
+			field[fields++] = value
+		}
+		w = field[0]; h = field[1]
+		start = at + 1
+		if (w <= 0 || h <= 0 || start + w * h * 3 > n) { print x; exit }
+
+		# Background: darkest pixel of the middle row
+		middle = int(h / 2)
+		background = 256
+		for (px = 0; px < w; px++)
+			if ((v = brightness(px, middle)) < background)
+				background = v
+		for (px = 0; px < w; px++) {
+			ink[px] = 0
+			for (py = int(h / 5); py < h - int(h / 5); py++)
+				if (brightness(px, py) > background + 60) { ink[px] = 1; break }
+		}
+		ink[w] = 0
+
+		runs = 0
+		on = -1
+		for (px = 0; px <= w; px++) {
+			if (ink[px] && on < 0)
+				on = px
+			else if (!ink[px] && on >= 0) {
+				if (runs && on - b[runs] <= join)
+					b[runs] = px - 1
+				else {
+					runs++
+					a[runs] = on; b[runs] = px - 1
+				}
+				on = -1
+			}
+		}
+
+		target = x - left
+		best = -1
+		for (r = 1; r <= runs; r++) {
+			if (a[r] <= target && target <= b[r])
+				distance = 0
+			else {
+				distance = target - a[r]; if (distance < 0) distance = -distance
+				d = target - b[r]; if (d < 0) d = -d
+				if (d < distance) distance = d
+			}
+			if (distance <= nearest && (best < 0 || distance < best)) {
+				best = distance
+				mid = (a[r] + b[r]) / 2
+			}
+		}
+		print best >= 0 ? round(left + mid) : x
+	}'

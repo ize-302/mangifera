@@ -1,0 +1,3 @@
+#!/bin/bash
+# Shows or hides btop as mango's named scratchpad.
+exec mmsg dispatch toggle_named_scratchpad,btop,none,alacritty --class btop -e btop

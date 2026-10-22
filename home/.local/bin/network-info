@@ -1,0 +1,225 @@
+#!/bin/bash
+# Wi-Fi helpers for the control panel, via nmcli (or iwctl with the iwd backend,
+# since iwd only gets passwords from a secret agent):
+#
+#   network-info show <ssid>               details as JSON
+#   network-info autoconnect <uuid> yes|no
+#   network-info join <ssid>               hidden network, password on stdin
+#   network-info connect <ssid>            password on stdin
+
+json() {
+	local s=$1 c i out=
+	s=${s//\\/\\\\}
+	s=${s//\"/\\\"}
+	s=${s//$'\n'/\\n}
+	s=${s//$'\t'/\\t}
+	s=${s//$'\r'/\\r}
+	# Other control characters (SSIDs can hold them)
+	if [[ $s == *[$'\x01'-$'\x1f']* ]]; then
+		for ((i = 0; i < ${#s}; i++)); do
+			c=${s:i:1}
+			if [[ $c == [$'\x01'-$'\x1f'] ]]; then
+				printf -v c '\\u%04x' "'$c"
+			fi
+			out+=$c
+		done
+		s=$out
+	fi
+	printf '"%s"' "$s"
+}
+
+# Splits nmcli terse output into F on ':' but not '\:'
+fields() {
+	local s=${1//\\\\/$'\x02'} i
+	s=${s//\\:/$'\x01'}
+	IFS=: read -ra F <<<"$s"
+	for i in "${!F[@]}"; do
+		F[i]=${F[i]//$'\x01'/:}
+		F[i]=${F[i]//$'\x02'/\\}
+	done
+}
+
+iwd_backend() {
+	systemctl is-active --quiet iwd
+}
+
+# Sets code and error
+iwctl_station() {
+	local device=$1 password=$2
+	shift 2
+	local command=(iwctl --dont-ask)
+	[ -n "$password" ] && command+=(--passphrase "$password")
+	error=$("${command[@]}" station "$device" "$@" 2>&1)
+	code=$?
+	error=$(sed $'s/\e\\[[0-9;]*m//g' <<<"$error")
+	error=$(trim "$error")
+	if [ "$code" -ne 0 ] && { [ "$error" = "Operation failed" ] || [ "$error" = "Operation aborted" ]; }; then
+		error="Couldn't connect. Check the password."
+	fi
+}
+
+trim() {
+	local s=$1
+	s=${s#"${s%%[![:space:]]*}"}
+	printf '%s' "${s%"${s##*[![:space:]]}"}"
+}
+
+wifi_device() {
+	local line
+	while IFS= read -r line; do
+		fields "$line"
+		if [ "${F[1]}" = wifi ]; then
+			printf '%s' "${F[0]}"
+			return 0
+		fi
+	done < <(nmcli -t -f DEVICE,TYPE device)
+	return 1
+}
+
+report() {
+	local code=$1 error
+	if [ "$code" -eq 0 ]; then
+		echo '{"ok": true, "error": ""}'
+		return
+	fi
+	error=$(trim "$2")
+	error=${error#"Error: "}
+	[ -n "$error" ] || error="Couldn't connect"
+	echo "{\"ok\": false, \"error\": $(json "$error")}"
+}
+
+# Sets uuid and autoconnect, or fails
+saved_connection() {
+	local ssid=$1 line setting id auto
+	while IFS= read -r line; do
+		fields "$line"
+		[ "${F[1]}" = 802-11-wireless ] || continue
+		id=${F[0]} auto=${F[2]}
+		# -g escapes the value like -t: a ':' in the name comes as '\:'
+		setting=$(nmcli -g 802-11-wireless.ssid connection show "$id")
+		fields "$(trim "$setting")"
+		setting=$(IFS=:; printf '%s' "${F[*]}")
+		if [ "$setting" = "$ssid" ]; then
+			uuid=$id
+			autoconnect=$auto
+			return 0
+		fi
+	done < <(nmcli -t -f UUID,TYPE,AUTOCONNECT connection show)
+	return 1
+}
+
+show() {
+	local ssid=$1 line info dns=() connected=false
+	local best_use= best_signal=-1 freq rate security device
+	info=("\"ssid\": $(json "$ssid")")
+
+	if saved_connection "$ssid"; then
+		info+=("\"uuid\": $(json "$uuid")")
+		[ "$autoconnect" = yes ] && info+=('"autoconnect": true') || info+=('"autoconnect": false')
+	fi
+
+	# The access point in use, else the strongest
+	while IFS= read -r line; do
+		fields "$line"
+		[ "${F[1]}" = "$ssid" ] || continue
+		local use=0 signal=${F[2]:-0}
+		[ "${F[0]}" = '*' ] && use=1
+		if [ -z "$best_use" ] || [ "$use" -gt "$best_use" ] || { [ "$use" -eq "$best_use" ] && [ "$signal" -gt "$best_signal" ]; }; then
+			best_use=$use best_signal=$signal freq=${F[3]} rate=${F[4]} security=${F[5]} device=${F[6]}
+		fi
+	done < <(nmcli -t -f IN-USE,SSID,SIGNAL,FREQ,RATE,SECURITY,DEVICE device wifi list --rescan no)
+	if [ -n "$best_use" ]; then
+		info+=("\"signal\": $best_signal" "\"frequency\": $(json "$freq")" "\"rate\": $(json "$rate")" "\"security\": $(json "${security:-Open}")")
+		if [ "$best_use" = 1 ]; then
+			connected=true
+			info+=("\"device\": $(json "$device")")
+		fi
+	fi
+	info+=("\"connected\": $connected")
+
+	if [ "$connected" = true ]; then
+		local key value ip=
+		while IFS= read -r line; do
+			key=${line%%:*}
+			value=${line#*:}
+			case $key in
+			GENERAL.HWADDR) info+=("\"mac\": $(json "$value")") ;;
+			IP4.ADDRESS*) [ -z "$ip" ] && ip=${value%%/*} && info+=("\"ip\": $(json "$ip")") ;;
+			IP4.GATEWAY) [ -n "$value" ] && info+=("\"gateway\": $(json "$value")") ;;
+			IP4.DNS*) dns+=("$(json "$value")") ;;
+			esac
+		done < <(nmcli -t -f GENERAL.HWADDR,IP4.ADDRESS,IP4.GATEWAY,IP4.DNS device show "$device")
+		if [ ${#dns[@]} -gt 0 ]; then
+			local IFS=,
+			info+=("\"dns\": [${dns[*]}]")
+		fi
+	fi
+
+	local out= part
+	for part in "${info[@]}"; do
+		out+=${out:+, }$part
+	done
+	echo "{$out}"
+}
+
+set_autoconnect() {
+	local err
+	if ! err=$(nmcli connection modify "$1" connection.autoconnect "$2" 2>&1 >/dev/null); then
+		trim "$err" >&2
+		echo >&2
+		exit 1
+	fi
+}
+
+# nmcli and iwctl only take the password as an argument, so it's briefly in `ps`
+
+join() {
+	local ssid=$1 password device err code
+	IFS= read -r password
+	device=$(wifi_device) || { echo "No Wi-Fi device" >&2; exit 1; }
+	if iwd_backend; then
+		iwctl_station "$device" "$password" connect-hidden "$ssid"
+		report "$code" "$error"
+		return
+	fi
+	local args=(device wifi connect "$ssid" ifname "$device" hidden yes)
+	[ -n "$password" ] && args+=(password "$password")
+	err=$(nmcli "${args[@]}" 2>&1 >/dev/null)
+	report $? "$err"
+}
+
+connect() {
+	local ssid=$1 password device err saved=
+	IFS= read -r password
+	device=$(wifi_device) || { echo "No Wi-Fi device" >&2; exit 1; }
+	saved_connection "$ssid" && saved=$uuid
+	if [ -n "$saved" ]; then
+		if ! err=$(nmcli connection modify "$saved" 802-11-wireless-security.psk "$password" 2>&1 >/dev/null); then
+			report 1 "$err"
+			return
+		fi
+	fi
+	if iwd_backend; then
+		iwctl_station "$device" "$password" connect "$ssid"
+		report "$code" "$error"
+	elif [ -n "$saved" ]; then
+		err=$(nmcli connection up "$saved" 2>&1 >/dev/null)
+		report $? "$err"
+	else
+		err=$(nmcli device wifi connect "$ssid" ifname "$device" password "$password" 2>&1 >/dev/null)
+		report $? "$err"
+	fi
+}
+
+usage() {
+	echo "usage: network-info show <ssid> | autoconnect <uuid> yes|no | join <ssid> | connect <ssid>" >&2
+	exit 1
+}
+
+case $1:$# in
+show:2) show "$2" ;;
+connect:2) connect "$2" ;;
+autoconnect:3) [[ $3 == yes || $3 == no ]] || usage; set_autoconnect "$2" "$3" ;;
+join:2) join "$2" ;;
+*) usage ;;
+esac

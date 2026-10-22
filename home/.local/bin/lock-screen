@@ -1,0 +1,10 @@
+#!/bin/bash
+# Locks with the Quickshell locker, falling back to swaylock.
+fallback=(swaylock -f -c 000000)
+
+if command -v qs >/dev/null && [ -f ~/.config/quickshell/lock/shell.qml ]; then
+	pgrep -u "$UID" -f 'qs -c lock' >/dev/null && exit 0
+	qs -c lock -d && exit 0
+fi
+
+exec "${fallback[@]}"

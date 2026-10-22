@@ -1,0 +1,33 @@
+#!/bin/bash
+# power-menu [lock|logout|sleep|reboot|shutdown]
+# Toggles the Quickshell power menu, or carries out the given entry.
+logout_sound=/usr/share/sounds/freedesktop/stereo/service-logout.oga
+locker=(~/.local/bin/lock-screen)
+
+run() {
+	case "$1" in
+	lock) "${locker[@]}" ;;
+	logout) paplay "$logout_sound" && mmsg dispatch quit ;;
+	sleep) systemctl suspend ;;
+	reboot) paplay "$logout_sound" && systemctl reboot ;;
+	shutdown) paplay "$logout_sound" && systemctl poweroff -i ;;
+	esac
+}
+
+if [ $# -gt 0 ]; then
+	run "$1"
+	exit
+fi
+
+toggle=(qs -c launcher ipc call power togglePowerMenu)
+
+"${toggle[@]}" >/dev/null 2>&1 && exit 0
+
+if qs -c launcher -d >/dev/null 2>&1; then
+	for _ in {1..20}; do
+		"${toggle[@]}" >/dev/null 2>&1 && exit 0
+		sleep 0.1
+	done
+fi
+
+exit 1

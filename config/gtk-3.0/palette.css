@@ -1,0 +1,59 @@
+/* adw-gtk3 palette, shared by gtk-3.0 and gtk-4.0 */
+
+@define-color panel   #15161e;
+@define-color base    #1a1b26;
+@define-color raised  #1f2335;
+@define-color text    #c0caf5;
+@define-color divider #414868;
+@define-color accent  #0a84ff;
+@define-color on_accent #ffffff;
+@define-color danger  #f7768e;
+@define-color success #9ece6a;
+@define-color warning #e0af68;
+
+/* adw-gtk3 names */
+@define-color window_bg_color @panel;
+@define-color window_fg_color @text;
+@define-color view_bg_color @base;
+@define-color view_fg_color @text;
+@define-color headerbar_bg_color @panel;
+@define-color headerbar_fg_color @text;
+@define-color headerbar_border_color @text;
+@define-color headerbar_backdrop_color @panel;
+@define-color sidebar_bg_color @panel;
+@define-color sidebar_fg_color @text;
+@define-color sidebar_backdrop_color @panel;
+@define-color sidebar_border_color @divider;
+@define-color card_bg_color alpha(@text, 0.05);
+@define-color card_fg_color @text;
+@define-color dialog_bg_color @raised;
+@define-color dialog_fg_color @text;
+@define-color popover_bg_color @raised;
+@define-color popover_fg_color @text;
+@define-color thumbnail_bg_color @raised;
+@define-color thumbnail_fg_color @text;
+
+@define-color accent_bg_color @accent;
+@define-color accent_fg_color @on_accent;
+@define-color accent_color @accent;
+@define-color destructive_bg_color @danger;
+@define-color destructive_fg_color @panel;
+@define-color destructive_color @danger;
+@define-color error_bg_color @danger;
+@define-color error_fg_color @panel;
+@define-color error_color @danger;
+@define-color success_bg_color @success;
+@define-color success_fg_color @panel;
+@define-color success_color @success;
+@define-color warning_bg_color @warning;
+@define-color warning_fg_color @panel;
+@define-color warning_color @warning;
+
+@define-color borders @divider;
+@define-color unfocused_borders @divider;
+
+/* Legacy names some apps (Thunar's icon view) paint selections from */
+@define-color theme_selected_bg_color @accent;
+@define-color theme_selected_fg_color @on_accent;
+@define-color theme_unfocused_selected_bg_color alpha(@accent, 0.4);
+@define-color theme_unfocused_selected_fg_color @text;

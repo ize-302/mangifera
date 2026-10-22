@@ -1,0 +1,28 @@
+#!/bin/bash
+# Focuses windows that turn urgent (mango's focus_on_activate misses some).
+# One in the scratchpad is moved to an empty tag.
+
+free_tag() {
+	mmsg get all-monitors | jq -r '
+		[.monitors[] | select(.active)][0].tags as $tags |
+		([$tags[] | select(.is_active and .client_count == 0)][0] //
+			[$tags[] | select(.client_count == 0)][0] //
+			$tags[-1]).index'
+}
+
+urgent=
+mmsg watch all-clients | while read -r state; do
+	now=$(jq -r '.clients[] | select(.is_urgent and (.is_focused | not)) | .id' <<<"$state" | sort)
+	[ "$now" = "$urgent" ] && continue
+	# Newest newly urgent
+	id=$(comm -13 <(echo "$urgent") <(echo "$now") | sort -n | tail -n1)
+	urgent=$now
+	[ -n "$id" ] || continue
+
+	if jq -e --argjson id "$id" '.clients[] | select(.id == $id) | .is_minimized' <<<"$state" >/dev/null; then
+		mmsg dispatch focusid "client,$id" >/dev/null &&
+			mmsg dispatch "tag,$(free_tag),0" "client,$id" >/dev/null
+	else
+		mmsg dispatch focusid "client,$id" >/dev/null
+	fi
+done

@@ -1,0 +1,4 @@
+# Pick the output to share with slurp
+[screencast]
+chooser_type=simple
+chooser_cmd=slurp -f %o -or

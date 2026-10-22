@@ -1,0 +1,28 @@
+#!/bin/bash
+# Screenshot of a slurp-picked area into swappy; notifies when saved.
+dir=~/Pictures/Screenshots
+
+pkill -x slurp && exit 0
+area=$(slurp -o) || exit 0
+
+mkdir -p "$dir"
+since=$(mktemp)
+trap 'rm -f "$since"' EXIT
+grim -g "$area" - | swappy -f -
+
+saved=$(find "$dir" -maxdepth 1 -type f -newer "$since" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
+[ -n "$saved" ] || exit 0
+
+action=$(timeout 1h notify-send -a Screenshot -i "$saved" \
+	--action=default=Open --action=folder="Show in folder" --wait \
+	"Screenshot saved" "${saved##*/}")
+case "$action" in
+default)
+	xdg-open "$saved"
+	;;
+folder)
+	gdbus call --session --dest org.freedesktop.FileManager1 \
+		--object-path /org/freedesktop/FileManager1 \
+		--method org.freedesktop.FileManager1.ShowItems "['file://$saved']" "" >/dev/null
+	;;
+esac

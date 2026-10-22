@@ -1,0 +1,17 @@
+#!/bin/bash
+# scratchpad-menu [--tap]
+# Toggles the Quickshell scratchpad menu. --tap counts a lone Super tap; the
+# second of two quick taps toggles it.
+toggle=(qs -c launcher ipc call scratchpad toggleScratchpadMenu)
+[ "$1" = --tap ] && toggle=(qs -c launcher ipc call scratchpad tap)
+
+"${toggle[@]}" >/dev/null 2>&1 && exit 0
+
+if qs -c launcher -d >/dev/null 2>&1; then
+	for _ in {1..20}; do
+		"${toggle[@]}" >/dev/null 2>&1 && exit 0
+		sleep 0.1
+	done
+fi
+
+exit 1

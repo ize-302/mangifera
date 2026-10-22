@@ -1,0 +1,97 @@
+#!/bin/bash
+# A bluetooth device's audio profiles via pactl (Quickshell has no card profiles).
+#
+#   bluetooth-audio show <address>            {"card", "active", "profiles": [...]} or {}
+#   bluetooth-audio set <address> <profile>
+
+# Codec names are parsed from pactl's English output
+export LC_ALL=C
+
+json() {
+	local s=$1
+	s=${s//\\/\\\\}
+	s=${s//\"/\\\"}
+	printf '"%s"' "$s"
+}
+
+# Sets card, active and profiles for the device, or fails
+find_card() {
+	local wanted=${1^^} line section= name= address= current= list=()
+	matches() {
+		[ -n "$name" ] && { [ "${address^^}" = "$wanted" ] || [[ ${name^^} == *"${wanted//:/_}" ]]; }
+	}
+	while IFS= read -r line; do
+		case $line in
+		"Card #"*)
+			if matches; then break; fi
+			name= address= current= list=() section=
+			;;
+		$'\tName: '*) name=${line#$'\tName: '} ;;
+		$'\tActive Profile: '*) current=${line#$'\tActive Profile: '} section= ;;
+		$'\t\t'*)
+			line=${line#$'\t\t'}
+			case $section in
+			Properties) [[ $line == 'api.bluez5.address = "'*'"' ]] && address=${line#*\"} address=${address%\"} ;;
+			Profiles) list+=("$line") ;;
+			esac
+			;;
+		$'\t'*:) section=${line#$'\t'} section=${section%:} ;;
+		$'\t'*) section= ;;
+		esac
+	done < <(pactl list cards)
+	matches || return 1
+	card=$name
+	active=$current
+	profiles=("${list[@]}")
+}
+
+show() {
+	if ! find_card "$1"; then
+		echo "{}"
+		return
+	fi
+	local line name description priority available label codec rows=()
+	for line in "${profiles[@]}"; do
+		name=${line%%: *}
+		[[ ${line#*: } =~ ^(.*)\ \(sinks:\ [0-9]+,\ sources:\ [0-9]+,\ priority:\ ([0-9]+),\ available:\ ([a-z]+)\)$ ]] || continue
+		description=${BASH_REMATCH[1]} priority=${BASH_REMATCH[2]} available=${BASH_REMATCH[3]}
+		[ "$name" = off ] || [ "$available" = no ] && continue
+
+		# "High Fidelity Playback (A2DP Sink, codec AAC)" -> "High-quality audio", "AAC"
+		codec=
+		[[ $description =~ codec\ ([^\)]+)\) ]] && codec=${BASH_REMATCH[1]}
+		case $name in
+		a2dp*) label="High-quality audio" ;;
+		headset*) label="Headset with mic" ;;
+		*) label=${description:-$name} codec= ;;
+		esac
+		# A2DP first, then by priority
+		local group=1
+		[[ $name == a2dp* ]] && group=0
+		rows+=("$group"$'\t'"$priority"$'\t'"{\"name\": $(json "$name"), \"label\": $(json "$label"), \"codec\": $(json "$codec")}")
+	done
+
+	local out= row
+	while IFS= read -r row; do
+		[ -n "$row" ] && out+=${out:+, }${row#*$'\t'*$'\t'}
+	done < <(printf '%s\n' "${rows[@]}" | sort -s -t $'\t' -k1,1n -k2,2nr)
+	echo "{\"card\": $(json "$card"), \"active\": $(json "$active"), \"profiles\": [$out]}"
+}
+
+set_profile() {
+	if ! find_card "$1"; then
+		echo "No audio for $1" >&2
+		exit 1
+	fi
+	pactl set-card-profile "$card" "$2"
+	exit 0
+}
+
+case $1:$# in
+show:2) show "$2" ;;
+set:3) set_profile "$2" "$3" ;;
+*)
+	echo "usage: bluetooth-audio show <address> | set <address> <profile>" >&2
+	exit 1
+	;;
+esac

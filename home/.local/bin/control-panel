@@ -1,0 +1,25 @@
+#!/bin/bash
+# control-panel [--pointer] [section]
+# Toggles the Quickshell sound popup, or opens a section ("Network", "Bluetooth").
+# --pointer centres it over the bar module under the pointer.
+at=""
+if [ "$1" = "--pointer" ]; then
+	at="AtPointer"
+	shift
+fi
+if [ -n "$1" ]; then
+	toggle=(qs -c launcher ipc call controlPanel "openSection$at" "$1")
+else
+	toggle=(qs -c launcher ipc call controlPanel "toggleControlPanel$at")
+fi
+
+"${toggle[@]}" >/dev/null 2>&1 && exit 0
+
+if qs -c launcher -d >/dev/null 2>&1; then
+	for _ in {1..20}; do
+		"${toggle[@]}" >/dev/null 2>&1 && exit 0
+		sleep 0.1
+	done
+fi
+
+exit 1
