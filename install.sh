@@ -39,8 +39,8 @@ run() {
 }
 
 repo_packages=(
-  # Compositor; jq parses mmsg output
-  mangowm jq
+  # Compositor; jq parses mmsg output; wlr-randr turns the laptop screen off
+  mangowm jq wlr-randr
   # Shell, bar, lock, wallpaper; socat calls the launcher daemon
   quickshell qt6-5compat socat waybar swayidle swaylock swaybg
   # Screenshots, recording and the clipboard; qt6-multimedia shows the
