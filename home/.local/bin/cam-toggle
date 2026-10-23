@@ -1,0 +1,13 @@
+#!/bin/bash
+# cam-toggle [rotate|zoom-in|zoom-out|zoom-reset]
+# Shows or hides the webcam bubble (Quickshell, CameraWidget.qml). The
+# options do what right-click, scroll and double-click do on it.
+case "$1" in
+rotate) call=rotate ;;
+zoom-in) call=zoomIn ;;
+zoom-out) call=zoomOut ;;
+zoom-reset) call=zoomReset ;;
+*) call=toggle ;;
+esac
+
+exec ~/.local/bin/launcher-call camera "$call"

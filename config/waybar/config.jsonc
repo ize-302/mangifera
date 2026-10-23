@@ -27,6 +27,7 @@
 	"modules-right": [
 		"custom/recording",
 		"tray",
+		"custom/toolbox",
 		"custom/volume",
 		"backlight",
 		"custom/pomodoro",
@@ -35,6 +36,13 @@
 		"custom/notifications",
 		"custom/clock"
 	],
+
+	// Camera, recording and screenshots (Quickshell, ToolboxMenu.qml)
+	"custom/toolbox": {
+		"format": "\udb82\uddac",
+		"tooltip-format": "Toolbox",
+		"on-click": "~/.local/bin/toolbox --pointer"
+	},
 
 	// Tags, scratchpad and mode are written by ~/.local/bin/bar-tags (SIGRTMIN+13)
 	"custom/tag#1": {
@@ -205,12 +213,11 @@
 		"on-scroll-down": "wpctl set-volume @DEFAULT_AUDIO_SINK@ 1%-"
 	},
 
-	// Signalled by ~/.local/bin/record-toggle (SIGRTMIN+12)
+	// Keeps running: ticks each second while recording, else sleeps until
+	// ~/.local/bin/record-toggle wakes it
 	"custom/recording": {
-		"exec": "pgrep -x wf-recorder >/dev/null && echo '{\"text\": \"\\udb81\\udc4a\", \"tooltip\": \"Recording the screen. Click to stop\"}' || echo '{\"text\": \"\"}'",
+		"exec": "~/.local/bin/record-status",
 		"return-type": "json",
-		"interval": "once",
-		"signal": 12,
 		"on-click": "~/.local/bin/record-toggle"
 	},
 

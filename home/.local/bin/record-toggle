@@ -5,8 +5,12 @@
 # default mic, --both the two mixed. With no option it only stops.
 dir=~/Videos/Recordings
 
+# Wakes the bar's ~/.local/bin/record-status, one per bar
 bar() {
-	pkill -RTMIN+12 -x waybar
+	local file
+	for file in "${XDG_RUNTIME_DIR:-/tmp}"/record-status/*; do
+		[ -e "$file" ] && kill -USR1 "${file##*/}" 2>/dev/null
+	done
 }
 
 # Audio modules loaded for --both
@@ -47,7 +51,17 @@ elif [ $# -gt 0 ]; then
 	area=$(slurp -o) || exit 0
 	mkdir -p "$dir"
 	file="$dir/rec-$(date +%Y%m%d-%H%M%S).mp4"
-	wf-recorder -g "$area" -c libx264rgb "${audio_args[@]}" -f "$file" &
+	# Encode on the GPU: libx264rgb only managed ~33 fps of a moving screen,
+	# and starving the CPU lost audio, so the sound drifted ahead of the
+	# picture. It also makes plain 4:2:0 H.264 that any player decodes
+	codec_args=(-c libx264rgb)
+	if [ -e /dev/dri/renderD128 ]; then
+		# The GPU writes video range (16-235) whatever wf-recorder asks for,
+		# which it then labels full range, so players showed it washed out.
+		# Label it as what it is
+		codec_args=(-c h264_vaapi -d /dev/dri/renderD128 -p color_range=tv)
+	fi
+	wf-recorder -g "$area" "${codec_args[@]}" "${audio_args[@]}" -f "$file" &
 	sleep 0.3
 	bar
 	wait

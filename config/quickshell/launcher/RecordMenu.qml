@@ -8,6 +8,7 @@ import qs
 
 // Picks the sound for a screen recording, toggled by ~/.local/bin/record-menu.
 // The choice goes to ~/.local/bin/record-toggle, and is preselected next time.
+// The camera tile shows or hides the webcam widget and leaves the menu open.
 Scope {
     id: root
 
@@ -33,11 +34,23 @@ Scope {
             id: "both",
             label: "Desktop + Mic",
             icon: Theme.recordBothIcon
+        },
+        {
+            id: "camera",
+            label: "Camera",
+            icon: Theme.recordCameraIcon,
+            toggle: true
         }
     ]
     property int current: 0
+    // The webcam bubble (CameraWidget.qml)
+    required property var camera
 
     function run(entry) {
+        if (entry.toggle) {
+            camera.open = !camera.open;
+            return;
+        }
         open = false;
         lastFile.setText(entry.id);
         Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/record-toggle", "--" + entry.id]);
@@ -161,7 +174,7 @@ Scope {
                             Text {
                                 anchors.horizontalCenter: parent.horizontalCenter
                                 text: row.modelData.icon
-                                color: row.selected ? Theme.selectedColor : Theme.unselectedColor
+                                color: row.modelData.toggle && root.camera.open ? Theme.toggleOnColor : row.selected ? Theme.selectedColor : Theme.unselectedColor
                                 font.family: Theme.fontFamily
                                 font.pixelSize: Theme.powerIconSize
                             }

@@ -45,6 +45,11 @@ window#waybar {
   background-image: none;
 }
 
+#custom-toolbox {
+  padding: 0 12px;
+  color: #ffffff;
+}
+
 #custom-scratchpad {
   padding: 0 8px;
   background-color: rgba(255, 255, 255, 0.03);
@@ -162,7 +167,9 @@ window#waybar {
     color: rgba(255, 69, 58, 0.25);
   }
 }
+/* Faint backdrop, to set it apart */
 #custom-recording {
+  background-color: rgba(255, 255, 255, 0.08);
   color: #ff453a;
   animation: recording 1s ease-in-out infinite alternate;
 }

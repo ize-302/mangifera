@@ -70,12 +70,31 @@ Singleton {
     readonly property string recordDesktopIcon: String.fromCodePoint(0xf0f5f)
     readonly property string recordMicIcon: String.fromCodePoint(0xf036c)
     readonly property string recordBothIcon: String.fromCodePoint(0xf08b4)
+    readonly property string recordCameraIcon: String.fromCodePoint(0xf05a0)
     readonly property int powerIconSize: 26
     readonly property int powerTileWidth: 72
     readonly property int powerTilePadding: 8
     readonly property int powerPanelPadding: 6
     readonly property int powerFontSize: 13
     readonly property color powerColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
+
+    // Toolbox menu; the camera row uses recordCameraIcon. Same dot as the
+    // bar's recording module
+    readonly property string toolboxRecordIcon: String.fromCodePoint(0xf044a)
+    readonly property string toolboxScreenshotIcon: String.fromCodePoint(0xf0e51)
+
+    // Webcam bubble; size is the circle's diameter
+    readonly property int cameraSize: 220
+    readonly property int cameraMinSize: 120
+    readonly property int cameraMaxSize: 480
+    // Width of the band along the edge that resizes it
+    readonly property int cameraGrip: 14
+    readonly property real cameraZoomStep: 0.1
+    readonly property real cameraMaxZoom: 3
+    readonly property int cameraBorderWidth: 3
+    readonly property int cameraCornerRadius: 16
+    // Gap from the screen edge and the bar the first time
+    readonly property int cameraMargin: 24
 
     // Clipboard menu
     readonly property real clipboardWidth: 0.35

@@ -14,7 +14,7 @@ ShellRoot {
 
     // Desktop entry id -> times launched; most used first
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, recordMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, datePanel]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, recordMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, datePanel, toolboxMenu]
     readonly property bool anyOpen: menus.some(menu => menu.open)
     // Pointer x on its screen when a menu opened, snapped to the bar module's
     // centre (~/.local/bin/bar-anchor); -1 until known
@@ -191,6 +191,7 @@ ShellRoot {
 
     RecordMenu {
         id: recordMenu
+        camera: camera
         onOpenChanged: if (open)
             root.closeOthers(recordMenu)
     }
@@ -239,8 +240,22 @@ ShellRoot {
             root.closeOthers(datePanel)
     }
 
+    ToolboxMenu {
+        id: toolboxMenu
+        pointerX: root.pointerX
+        pointerScreen: root.pointerScreen
+        camera: camera
+        recordMenu: recordMenu
+        onOpenChanged: if (open)
+            root.closeOthers(toolboxMenu)
+    }
+
     Pomodoro {
         id: pomodoro
+    }
+
+    CameraWidget {
+        id: camera
     }
 
     BluetoothAgent {}
@@ -261,7 +276,7 @@ ShellRoot {
     }
 
     // Every IpcHandler, for calls over the socket
-    readonly property list<QtObject> handlers: [launcherIpc, powerMenu.ipc, recordMenu.ipc, clipboardMenu.ipc, scratchpadMenu.ipc, keybindMenu.ipc, controlPanel.ipc, notificationCenter.ipc, datePanel.ipc, pomodoro.ipc, notifications.ipc]
+    readonly property list<QtObject> handlers: [launcherIpc, powerMenu.ipc, recordMenu.ipc, clipboardMenu.ipc, scratchpadMenu.ipc, keybindMenu.ipc, controlPanel.ipc, notificationCenter.ipc, datePanel.ipc, pomodoro.ipc, notifications.ipc, camera.ipc, toolboxMenu.ipc]
 
     // `line` is "<target> <function> [argument]", as `qs ipc call` takes
     function call(line) {

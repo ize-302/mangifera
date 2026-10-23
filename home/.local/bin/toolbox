@@ -1,0 +1,10 @@
+#!/bin/bash
+# toolbox [--pointer]
+# Toggles the Quickshell toolbox menu: camera, screen recording, screenshot.
+if [ "$1" = "--pointer" ]; then
+	toggle=(toolbox toggleToolboxAtPointer)
+else
+	toggle=(toolbox toggleToolbox)
+fi
+
+exec ~/.local/bin/launcher-call "${toggle[@]}"

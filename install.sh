@@ -43,8 +43,10 @@ repo_packages=(
   mangowm jq
   # Shell, bar, lock, wallpaper; socat calls the launcher daemon
   quickshell qt6-5compat socat waybar swayidle swaylock swaybg
-  # Screenshots, recording and the clipboard
-  grim slurp swappy wf-recorder wl-clipboard cliphist
+  # Screenshots, recording and the clipboard; qt6-multimedia shows the
+  # webcam (CameraWidget.qml)
+  grim slurp swappy wf-recorder qt6-multimedia qt6-multimedia-ffmpeg
+  wl-clipboard cliphist
   # Portals: wlr for screen sharing, gtk for the rest
   xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk
   # Sound, media keys, brightness (libpulse has pactl, paplay)
