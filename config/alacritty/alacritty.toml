@@ -53,5 +53,5 @@ foreground = "#c0caf5"
 
 [terminal]
 shell.program = "tmux"
-shell.args = ["new-session", "-A", "-s", "home"]
+shell.args = ["new-session", ";", "set-option", "destroy-unattached", "on"]
 
