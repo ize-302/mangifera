@@ -1,11 +1,13 @@
 #!/bin/bash
 # wallpaper [--random|FILE]
-# Sets the wallpaper with swaybg (no argument: the last one). Saves its path
-# for the lock screen and copies it to /var/lib/sddm-wallpaper for SDDM.
+# Sets the wallpaper with awww (no argument: the last one). Saves its path
+# and a small copy for the lock screen, and copies it to
+# /var/lib/sddm-wallpaper for SDDM.
 dir=~/Pictures/wallpapers
 default=~/.local/share/mangifera/default-wallpaper.jpg
 share=/var/lib/sddm-wallpaper
 state=${XDG_STATE_HOME:-$HOME/.local/state}/mangifera/wallpaper
+lock=${state%/*}/lock-wallpaper.jpg
 
 current=$(cat -- "$state" 2>/dev/null)
 
@@ -29,15 +31,33 @@ case $1 in
 esac
 [ -f "$img" ] || img=$default
 
-# Start the new swaybg before killing the old one, so there's no gap
-old=$(pgrep -u "$UID" -x swaybg)
-setsid -f swaybg -o '*' -i "$img" -m fill >/dev/null 2>&1 || exit
-if [ -n "$old" ]; then
-	sleep 0.5
-	kill $old 2>/dev/null
+# --no-cache: this script picks the image, not awww's own last-used cache
+if ! awww query >/dev/null 2>&1; then
+	setsid -f awww-daemon --quiet --no-cache >/dev/null 2>&1 || exit
+	for _ in $(seq 50); do
+		awww query >/dev/null 2>&1 && break
+		sleep 0.1
+	done
 fi
+
+# Fades into a new image; the same one again (at login) shows at once
+if [ "$img" != "$current" ]; then
+	transition=(--transition-type fade --transition-duration 1 --transition-fps 60)
+else
+	transition=(--transition-type none)
+fi
+awww img "${transition[@]}" -- "$img" || exit
+# swaybg drew the wallpaper before awww
+pkill -u "$UID" -x swaybg
 mkdir -p -- "${state%/*}"
 echo "$img" >"$state"
+
+# The lock screen shows it blurred at a quarter size. A full-size photo takes
+# a second to decode, which the lock screen would show as a blank screen
+if [ "$img" != "$current" ] || [ ! -e "$lock" ]; then
+	magick -define jpeg:size=2560x1440 "$img" -auto-orient -thumbnail '1280x720^' -quality 90 "$lock.tmp.jpg" &&
+		mv -f -- "$lock.tmp.jpg" "$lock"
+fi
 
 # Atomic rename, so the greeter never reads half an image
 if [ -w "$share" ] && { [ "$img" != "$current" ] || [ ! -e "$share/current" ]; }; then

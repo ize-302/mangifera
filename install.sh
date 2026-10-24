@@ -46,7 +46,7 @@ repo_packages=(
   # Compositor; jq parses mmsg output; wlr-randr turns the laptop screen off
   mangowm jq wlr-randr
   # Shell, bar, lock, wallpaper; socat calls the launcher daemon
-  quickshell qt6-5compat socat waybar swayidle swaylock swaybg
+  quickshell qt6-5compat socat waybar swayidle swaylock awww
   # Screenshots, recording and the clipboard; qt6-multimedia shows the
   # webcam (CameraWidget.qml)
   grim slurp satty wf-recorder qt6-multimedia qt6-multimedia-ffmpeg
@@ -63,6 +63,8 @@ repo_packages=(
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf
   alacritty tmux btop fastfetch
+  # Shrinks the wallpaper for the lock screen
+  imagemagick
   # File manager, thumbnailers, archive and media tag plugins
   thunar gvfs tumbler ffmpegthumbnailer poppler-glib webp-pixbuf-loader libgsf
   thunar-archive-plugin xarchiver thunar-media-tags-plugin

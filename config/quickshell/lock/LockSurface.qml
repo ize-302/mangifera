@@ -21,20 +21,32 @@ Rectangle {
         precision: SystemClock.Minutes
     }
 
+    // The full wallpaper, if ~/.local/bin/wallpaper hasn't made the small copy
+    property bool fullWallpaper: false
+
     FileView {
         id: wallpaperState
         path: Theme.wallpaperState
     }
 
+    // The small copy loads before the first frame, so the screen never shows
+    // without it
     Image {
         id: wallpaper
         anchors.fill: parent
         visible: false
-        source: wallpaperState.loaded ? "file://" + wallpaperState.text().trim() : ""
+        source: !root.fullWallpaper ? "file://" + Theme.wallpaperSmall : wallpaperState.loaded ? "file://" + wallpaperState.text().trim() : ""
         sourceSize: Qt.size(width * Theme.wallpaperScale, height * Theme.wallpaperScale)
         fillMode: Image.PreserveAspectCrop
         smooth: true
-        asynchronous: true
+        asynchronous: root.fullWallpaper
+
+        onStatusChanged: {
+            // Deferred: changing the source in its own status handler is a
+            // binding loop
+            if (status === Image.Error && !root.fullWallpaper)
+                Qt.callLater(() => root.fullWallpaper = true);
+        }
     }
 
     MultiEffect {

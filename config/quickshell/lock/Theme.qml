@@ -26,6 +26,7 @@ Singleton {
 
     // Blurred wallpaper last set by ~/.local/bin/wallpaper
     readonly property string wallpaperState: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/mangifera/wallpaper"
+    readonly property string wallpaperSmall: (Quickshell.env("XDG_STATE_HOME") || Quickshell.env("HOME") + "/.local/state") + "/mangifera/lock-wallpaper.jpg"
     // Loading smaller blurs smoother
     readonly property real wallpaperScale: 0.25
     readonly property real wallpaperBlur: 1.0
