@@ -67,4 +67,8 @@ GreeterEnvironment=QT_SCREEN_SCALE_FACTORS=eDP-1=1.4;DP-2=1
 ~/mangifera/uninstall.sh
 ```
 
-Removes the links and the login theme; `local.conf` stays.
+Removes the links and the login theme, and puts back the files moved to
+`~/.mangifera-backup-*` (anything that would overwrite a file stays in the
+backup). It undoes only what the installer changed: SDDM is disabled if
+the installer enabled it, and your previous file manager is restored.
+`local.conf`, packages and Bluetooth stay.

@@ -246,12 +246,25 @@ fi
 
 # --- Services ----------------------------------------------------------------
 
+# What this changed, so uninstall.sh undoes only that. The first value is
+# kept on reruns: it's what was there before mangifera.
+state="${XDG_STATE_HOME:-$HOME/.local/state}/mangifera/installed"
+remember() {
+  if [ -n "$dry" ]; then
+    echo "    would remember: $1"
+    return
+  fi
+  mkdir -p "$state"
+  [ -e "$state/$1" ] || printf '%s\n' "${2-}" >"$state/$1"
+}
+
 # Another login manager already enabled is left alone
 if [ "$(systemctl is-enabled sddm 2>/dev/null)" != enabled ]; then
   current=$(readlink /etc/systemd/system/display-manager.service 2>/dev/null || true)
   if [ -z "$current" ]; then
     say "Enabling SDDM for the next boot"
     run sudo systemctl enable sddm
+    remember sddm
   else
     dm=$(basename "$current" .service)
     note "$dm is the login manager. To use mangifera's login screen:"
@@ -264,15 +277,27 @@ if [ "$(systemctl is-enabled bluetooth 2>/dev/null)" != enabled ]; then
   run sudo systemctl enable --now bluetooth
 fi
 
+# These need your user session (no SSH, su or bare TTY), so a failure only
+# warns instead of stopping the install
 # Runs config/pipewire/filter-chain.conf.d, the "Noise Canceling" mic
 if [ "$(systemctl --user is-enabled filter-chain 2>/dev/null)" != enabled ]; then
   say "Enabling the noise-canceling mic"
-  run systemctl --user enable --now filter-chain
+  if run systemctl --user enable --now filter-chain; then
+    remember filter-chain
+  else
+    note "Couldn't enable it. From your desktop session, run:"
+    note "  systemctl --user enable --now filter-chain"
+  fi
 fi
 
-if [ "$(xdg-mime query default inode/directory 2>/dev/null)" != thunar.desktop ]; then
+file_manager=$(xdg-mime query default inode/directory 2>/dev/null || true)
+if [ "$file_manager" != thunar.desktop ]; then
   say "Making Thunar the file manager"
-  run xdg-mime default thunar.desktop inode/directory
+  if run xdg-mime default thunar.desktop inode/directory; then
+    remember file-manager "$file_manager"
+  else
+    note "Couldn't set it. Run: xdg-mime default thunar.desktop inode/directory"
+  fi
 fi
 
 # Not enabled here: switching network services could cut the connection
