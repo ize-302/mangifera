@@ -3,22 +3,26 @@
 #
 #   ./install.sh                 install
 #   ./install.sh --dry-run       print what it would do, change nothing
-#   ./install.sh --backup        move conflicting files to ~/.mangifera-backup-<time>/
 #   ./install.sh --no-packages   skip installing packages
+#   ./install.sh --yes           don't ask to back up the system first
+#
+# Files in the way are moved to ~/.mangifera-backup-<time>/.
 set -e
 
 cd "$(dirname "${BASH_SOURCE[0]}")"
 
 dry=
-backup=
+yes=
 packages=1
 for arg in "$@"; do
   case "$arg" in
   --dry-run) dry=1 ;;
-  --backup) backup=1 ;;
+  # Backing up is the default now; kept so old commands still work
+  --backup) ;;
   --no-packages) packages= ;;
+  -y | --yes) yes=1 ;;
   -h | --help)
-    sed -n '2,7p' "$0" | sed 's/^# \{0,1\}//'
+    sed -n '2,9p' "$0" | sed 's/^# \{0,1\}//'
     exit 0
     ;;
   *)
@@ -74,6 +78,20 @@ repo_packages=(
 [ "$(id -u)" -ne 0 ] || { note "Run this as your own user, not root: it asks for sudo itself."; exit 1; }
 command -v pacman >/dev/null || { note "mangifera is for Arch Linux (no pacman here)."; exit 1; }
 [ -n "$dry" ] && say "Dry run: nothing will be changed."
+
+if [ -z "$dry" ] && [ -z "$yes" ]; then
+  note "This installs packages, upgrades the system, replaces your login"
+  note "screen and links over your desktop configs. Back up your system"
+  note "first (e.g. a timeshift or snapper snapshot)."
+  read -rp "    Continue? [y/N] " answer || answer=
+  case "$answer" in
+  [yY] | [yY][eE][sS]) ;;
+  *)
+    say "Nothing was changed."
+    exit 1
+    ;;
+  esac
+fi
 
 # --- Packages ---------------------------------------------------------------
 
@@ -157,27 +175,13 @@ for pkg in config home; do
 done
 
 if [ ${#conflicts[@]} -gt 0 ]; then
-  if [ -n "$backup" ]; then
-    stash="$HOME/.mangifera-backup-$(date +%Y%m%d-%H%M%S)"
-    say "Moving ${#conflicts[@]} files in the way to $stash"
-    for f in "${conflicts[@]}"; do
-      run mkdir -p "$stash/$(dirname "${f#"$HOME"/}")"
-      run mv "$f" "$stash/${f#"$HOME"/}"
-    done
-  else
-    note "These are where mangifera's files go, so nothing was linked:"
-    printf '      %s\n' "${conflicts[@]}"
-    # Leftover links from swarch, which this was forked from
-    for f in "${conflicts[@]}"; do
-      case "$(readlink -f "$f")" in */swarch/*)
-        note "Some are swarch's links: ~/swarch/uninstall.sh removes them."
-        break
-        ;;
-      esac
-    done
-    note "Move them aside, or run again with --backup to have them moved."
-    exit 1
-  fi
+  stash="$HOME/.mangifera-backup-$(date +%Y%m%d-%H%M%S)"
+  say "Moving ${#conflicts[@]} files in the way to $stash"
+  printf '      %s\n' "${conflicts[@]}"
+  for f in "${conflicts[@]}"; do
+    run mkdir -p "$stash/$(dirname "${f#"$HOME"/}")"
+    run mv "$f" "$stash/${f#"$HOME"/}"
+  done
 fi
 
 say "Linking config/ into ~/.config and home/ into ~"

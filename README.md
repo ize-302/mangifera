@@ -27,8 +27,9 @@ and enables SDDM and Bluetooth. It's safe to rerun.
 - Another login manager already enabled is left alone; it prints how to
   switch.
 - NetworkManager isn't enabled for you; it warns if it's off.
-- Existing files in the way stop the install. `--backup` moves them to
-  `~/.mangifera-backup-<time>/`.
+- It asks you to back up your system before changing anything. `--yes`
+  skips the question.
+- Existing files in the way are moved to `~/.mangifera-backup-<time>/`.
 - Installing missing packages upgrades the whole system too (`pacman -Syu`).
 - `--no-packages` skips packages.
 - An existing `~/.config/tmux` is kept.
