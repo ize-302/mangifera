@@ -78,6 +78,17 @@ signal_bar() {
 	fi
 }
 
+# Whether an event changes more than window titles, which most are (a browser
+# tab's title ticking). Titles only show in the scratchpad tooltip, so those
+# skip render's jq work; the tooltip catches up on the next real change
+declare -A seen
+changed() {
+	local kind=${1:2:8} stripped
+	stripped=$(sed -E 's/"title":"([^"\\]|\\.)*"//g' <<<"$1")
+	[ "$stripped" = "${seen[$kind]}" ] && return 1
+	seen[$kind]=$stripped
+}
+
 render
 # Drain event bursts before rendering
 {
@@ -85,7 +96,11 @@ render
 	mmsg watch all-monitors &
 	wait -n
 	kill $(jobs -p) 2>/dev/null
-} | while read -r _; do
-	while read -r -t 0.03 _; do :; done
-	render
+} | while read -r event; do
+	update=
+	while :; do
+		changed "$event" && update=1
+		read -r -t 0.03 event || break
+	done
+	[ -n "$update" ] && render
 done
