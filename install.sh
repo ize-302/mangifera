@@ -45,7 +45,7 @@ repo_packages=(
   quickshell qt6-5compat socat waybar swayidle swaylock swaybg
   # Screenshots, recording and the clipboard; qt6-multimedia shows the
   # webcam (CameraWidget.qml)
-  grim slurp swappy wf-recorder qt6-multimedia qt6-multimedia-ffmpeg
+  grim slurp satty wf-recorder qt6-multimedia qt6-multimedia-ffmpeg
   wl-clipboard cliphist
   # Portals: wlr for screen sharing, gtk for the rest
   xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk

@@ -1,0 +1,15 @@
+# Screenshot editor for ~/.local/bin/screenshot, which watches the save folder
+[general]
+# Closes after saving or copying, so the script can notify
+early-exit = ["all"]
+# Opens on the area you picked, not fullscreen, floating rather than tiled
+fullscreen = false
+floating-hack = true
+initial-tool = "arrow"
+copy-command = "wl-copy"
+# The script notifies, with Open and Show in folder
+disable-notifications = true
+# The save path comes from the script, which knows $HOME
+# Enter saves, Ctrl+C copies, Escape quits without saving
+actions-on-enter = ["save-to-file"]
+actions-on-escape = ["exit"]

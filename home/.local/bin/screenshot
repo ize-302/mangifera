@@ -1,5 +1,6 @@
 #!/bin/bash
-# Screenshot of a slurp-picked area into swappy; notifies when saved.
+# Screenshot of a slurp-picked area into satty (config/satty/config.toml);
+# notifies when saved.
 dir=~/Pictures/Screenshots
 
 pkill -x slurp && exit 0
@@ -8,7 +9,7 @@ area=$(slurp -o) || exit 0
 mkdir -p "$dir"
 since=$(mktemp)
 trap 'rm -f "$since"' EXIT
-grim -g "$area" - | swappy -f -
+grim -g "$area" - | satty --filename - --output-filename "$dir/%Y-%m-%d_%H-%M-%S.png"
 
 saved=$(find "$dir" -maxdepth 1 -type f -newer "$since" -printf '%T@ %p\n' | sort -n | tail -1 | cut -d' ' -f2-)
 [ -n "$saved" ] || exit 0
