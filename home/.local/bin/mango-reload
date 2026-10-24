@@ -7,7 +7,13 @@ logo=~/.local/share/mangifera/mango.svg
 mmsg dispatch reload_config | grep -q '"success":true'
 reloaded=$?
 
-qs kill -c launcher
+# Every instance: `qs kill` stops only one
+pkill -u "$UID" -xf 'qs -c launcher -d'
+# Wait for them to exit, or the new one can't take the notifications name
+for _ in {1..30}; do
+	pgrep -u "$UID" -xf 'qs -c launcher -d' >/dev/null || break
+	sleep 0.1
+done
 qs -c launcher -d
 # Quickshell shows the notifications, so wait up to 3s for it to take the name
 for _ in {1..30}; do

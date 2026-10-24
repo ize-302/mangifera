@@ -14,6 +14,10 @@ send "$@" && exit 0
 # A daemon from before the socket existed
 qs -c launcher ipc call "$@" >/dev/null 2>&1 && exit 0
 
+# Only when none is running: a busy daemon that missed the call above would
+# otherwise get a second one beside it, splitting menus from notifications
+pgrep -u "$UID" -xf 'qs -c launcher -d' >/dev/null && exit 1
+
 if qs -c launcher -d >/dev/null 2>&1; then
 	for _ in {1..20}; do
 		send "$@" && exit 0
