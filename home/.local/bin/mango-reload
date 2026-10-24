@@ -1,10 +1,21 @@
 #!/bin/bash
-# Reloads mango's config and says whether it worked. A script because the
-# command is too long for a line of mango's config.
+# Reloads mango's config and restarts quickshell, and says whether it worked.
+# A script because the command is too long for a line of mango's config.
 # The logo is from mangowm.github.io
 logo=~/.local/share/mangifera/mango.svg
 
-if mmsg dispatch reload_config | grep -q '"success":true'; then
+mmsg dispatch reload_config | grep -q '"success":true'
+reloaded=$?
+
+qs kill -c launcher
+qs -c launcher -d
+# Quickshell shows the notifications, so wait up to 3s for it to take the name
+for _ in {1..30}; do
+	busctl --user status org.freedesktop.Notifications &>/dev/null && break
+	sleep 0.1
+done
+
+if [ "$reloaded" -eq 0 ]; then
 	notify-send -a mango -i "$logo" -t 2000 "Config reloaded"
 else
 	notify-send -a mango -i "$logo" -u critical "Config reload failed"

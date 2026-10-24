@@ -107,7 +107,6 @@ Singleton {
     readonly property int cameraGrip: 14
     readonly property real cameraZoomStep: 0.1
     readonly property real cameraMaxZoom: 3
-    readonly property int cameraBorderWidth: 3
     readonly property int cameraCornerRadius: 16
     // Gap from the screen edge and the bar the first time
     readonly property int cameraMargin: 24

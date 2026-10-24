@@ -263,12 +263,13 @@ Scope {
                 visible: false
             }
 
+            // Thin outline, like the other panels
             Rectangle {
                 anchors.fill: parent
                 radius: bubble.radius
                 color: "transparent"
-                border.width: Theme.cameraBorderWidth
-                border.color: Theme.accentColor
+                border.width: 1
+                border.color: Theme.edgeColor
                 antialiasing: true
             }
 
