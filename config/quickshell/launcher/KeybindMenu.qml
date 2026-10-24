@@ -28,6 +28,7 @@ Scope {
             "Escape": "Esc",
             "space": "Space",
             "minus": "-",
+            "comma": ",",
             "slash": "/",
             "question": "?",
             "BackSpace": "Backspace",
