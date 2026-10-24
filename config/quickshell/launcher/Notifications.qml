@@ -57,7 +57,7 @@ Scope {
 
     function clear() {
         popups = [];
-        for (const notification of notifications)
+        for (const notification of notifications.slice())
             notification.dismiss();
     }
 
