@@ -96,6 +96,8 @@ Singleton {
     // Toolbox menu. Same dot as the bar's recording module
     readonly property string toolboxRecordIcon: String.fromCodePoint(0xf044a)
     readonly property string toolboxScreenshotIcon: String.fromCodePoint(0xf0e51)
+    readonly property string toolboxClipboardIcon: String.fromCodePoint(0xf0147)
+    readonly property string toolboxWallpaperIcon: String.fromCodePoint(0xf0e09)
 
     // Webcam bubble; size is the circle's diameter
     readonly property int cameraSize: 220

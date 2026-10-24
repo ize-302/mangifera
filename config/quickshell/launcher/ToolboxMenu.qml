@@ -21,8 +21,11 @@ Scope {
     property bool placeWaited: false
     readonly property bool placed: !atPointer || pointerX >= 0 || placeWaited
 
-    // The record menu, which also has the camera
+    // The record menu (which also has the camera), the clipboard menu and the
+    // pomodoro timer
     required property var recordMenu
+    required property var clipboardMenu
+    required property var pomodoro
     property bool recording: false
 
     readonly property list<var> entries: [
@@ -35,6 +38,21 @@ Scope {
             id: "screenshot",
             label: "Screenshot",
             icon: Theme.toolboxScreenshotIcon
+        },
+        {
+            id: "clipboard",
+            label: "Clipboard History",
+            icon: Theme.toolboxClipboardIcon
+        },
+        {
+            id: "pomodoro",
+            label: root.pomodoro.running ? "Pause Pomodoro" : root.pomodoro.idle ? "Start Pomodoro" : "Resume Pomodoro",
+            icon: Theme.pomodoroIcon
+        },
+        {
+            id: "wallpaper",
+            label: "Random Wallpaper",
+            icon: Theme.toolboxWallpaperIcon
         }
     ]
     property int current: 0
@@ -49,6 +67,12 @@ Scope {
         } else if (entry.id === "screenshot") {
             // Once the menu is gone, so it isn't in the shot
             shotDelay.restart();
+        } else if (entry.id === "clipboard") {
+            clipboardMenu.open = true;
+        } else if (entry.id === "pomodoro") {
+            pomodoro.toggle();
+        } else if (entry.id === "wallpaper") {
+            Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/wallpaper", "--random"]);
         }
     }
 

@@ -245,6 +245,8 @@ ShellRoot {
         pointerX: root.pointerX
         pointerScreen: root.pointerScreen
         recordMenu: recordMenu
+        clipboardMenu: clipboardMenu
+        pomodoro: pomodoro
         onOpenChanged: if (open)
             root.closeOthers(toolboxMenu)
     }
