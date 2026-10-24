@@ -79,6 +79,19 @@ repo_packages=(
 command -v pacman >/dev/null || { note "mangifera is for Arch Linux (no pacman here)."; exit 1; }
 [ -n "$dry" ] && say "Dry run: nothing will be changed."
 
+# Warnings only: mango (wlroots) needs a GPU it can drive through DRM
+if ! ls /dev/dri/card* >/dev/null 2>&1; then
+  note "No GPU found (/dev/dri/card*), so mango won't be able to start."
+fi
+if systemd-detect-virt -q --vm 2>/dev/null; then
+  note "This is a virtual machine: turn on its 3D acceleration, or mango"
+  note "may not start or will be slow."
+fi
+if [ -e /sys/module/nvidia_drm ] && [ "$(cat /sys/module/nvidia_drm/parameters/modeset 2>/dev/null)" != Y ]; then
+  note "NVIDIA's driver needs nvidia_drm.modeset=1 on the kernel command line"
+  note "for mango to start."
+fi
+
 if [ -z "$dry" ] && [ -z "$yes" ]; then
   note "This installs packages, upgrades the system, replaces your login"
   note "screen and links over your desktop configs. Back up your system"
@@ -235,10 +248,16 @@ if [ -d /usr/share/sddm/themes ] || [ -n "$dry" ]; then
   run sudo install -Dm644 etc/sddm/mango.conf /etc/sddm/mango.conf
   # Leftovers from X and swarch's sway greeter
   run sudo rm -f /etc/sddm/Xsetup /etc/sddm/sway.conf
-  # ~/.local/bin/wallpaper copies the wallpaper here for SDDM
-  run sudo install -d -m755 -o "$USER" -g "$(id -gn)" /var/lib/sddm-wallpaper
+  # ~/.local/bin/wallpaper copies the wallpaper here for SDDM. Every user
+  # who installs mangifera joins the group, so any of them can set it.
+  getent group mangifera >/dev/null || run sudo groupadd -r mangifera
+  if ! id -nG "$USER" | grep -qw mangifera; then
+    run sudo usermod -aG mangifera "$USER"
+    note "You'll be able to set the login wallpaper after logging in again."
+  fi
+  run sudo install -d -m2775 -o root -g mangifera /var/lib/sddm-wallpaper
   if [ ! -e /var/lib/sddm-wallpaper/current ]; then
-    run cp home/.local/share/mangifera/default-wallpaper.jpg /var/lib/sddm-wallpaper/current
+    run sudo install -m644 -g mangifera home/.local/share/mangifera/default-wallpaper.jpg /var/lib/sddm-wallpaper/current
   fi
 else
   note "SDDM isn't installed, so the login theme was skipped."

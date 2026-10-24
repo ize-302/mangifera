@@ -51,20 +51,35 @@ if [ -e "$state/filter-chain" ]; then
     note "Couldn't. From your desktop session, run: systemctl --user disable --now filter-chain"
 fi
 
-if [ -d /usr/share/sddm/themes/custom ]; then
-  echo "[+] Removing SDDM theme..."
-  sudo rm -r /usr/share/sddm/themes/custom
-  sudo rm -f /etc/sddm.conf.d/custom-theme.conf
-  sudo rm -f /etc/sddm/mango.conf /etc/sddm/Xsetup
+# The login screen is shared by everyone who installed mangifera (the
+# mangifera group), so it's only removed with the last of them
+others=
+if getent group mangifera >/dev/null; then
+  id -nG "$USER" | grep -qw mangifera && sudo gpasswd -d "$USER" mangifera >/dev/null
+  others=$(getent group mangifera | cut -d: -f4)
 fi
-sudo rm -rf /var/lib/sddm-wallpaper
 
-# Not stopped now, so this session keeps running
-if [ -e "$state/sddm" ]; then
-  say "Disabling SDDM, which install.sh enabled"
-  sudo systemctl disable sddm
-  note "From the next boot there's no login screen, only a text login."
-  note "To keep SDDM: sudo systemctl enable sddm"
+if [ -n "$others" ]; then
+  note "Leaving the login screen, other users still use mangifera: $others"
+else
+  if [ -d /usr/share/sddm/themes/custom ]; then
+    echo "[+] Removing SDDM theme..."
+    sudo rm -r /usr/share/sddm/themes/custom
+    sudo rm -f /etc/sddm.conf.d/custom-theme.conf
+    sudo rm -f /etc/sddm/mango.conf /etc/sddm/Xsetup
+  fi
+  sudo rm -rf /var/lib/sddm-wallpaper
+  if getent group mangifera >/dev/null; then
+    sudo groupdel mangifera
+  fi
+
+  # Not stopped now, so this session keeps running
+  if [ -e "$state/sddm" ]; then
+    say "Disabling SDDM, which install.sh enabled"
+    sudo systemctl disable sddm
+    note "From the next boot there's no login screen, only a text login."
+    note "To keep SDDM: sudo systemctl enable sddm"
+  fi
 fi
 
 rm -rf "$state"

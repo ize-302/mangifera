@@ -71,4 +71,8 @@ Removes the links and the login theme, and puts back the files moved to
 `~/.mangifera-backup-*` (anything that would overwrite a file stays in the
 backup). It undoes only what the installer changed: SDDM is disabled if
 the installer enabled it, and your previous file manager is restored.
-`local.conf`, packages and Bluetooth stay.
+`local.conf`, packages and Bluetooth stay. While other users still have
+mangifera installed, the login screen stays too.
+
+Each user who runs the installer joins the `mangifera` group, which lets
+them set the login screen's wallpaper (from their next login).
