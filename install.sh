@@ -49,8 +49,10 @@ repo_packages=(
   wl-clipboard cliphist
   # Portals: wlr for screen sharing, gtk for the rest
   xdg-desktop-portal xdg-desktop-portal-wlr xdg-desktop-portal-gtk
-  # Sound, media keys, brightness (libpulse has pactl, paplay)
+  # Sound, media keys, brightness (libpulse has pactl, paplay);
+  # noise-suppression-for-voice is the "Noise Canceling" mic's RNNoise
   pipewire pipewire-pulse wireplumber libpulse playerctl brightnessctl
+  noise-suppression-for-voice
   sound-theme-freedesktop
   libnotify
   # Network, Bluetooth; gcc builds src/bluetooth-agent.c
@@ -255,6 +257,12 @@ fi
 if [ "$(systemctl is-enabled bluetooth 2>/dev/null)" != enabled ]; then
   say "Enabling Bluetooth"
   run sudo systemctl enable --now bluetooth
+fi
+
+# Runs config/pipewire/filter-chain.conf.d, the "Noise Canceling" mic
+if [ "$(systemctl --user is-enabled filter-chain 2>/dev/null)" != enabled ]; then
+  say "Enabling the noise-canceling mic"
+  run systemctl --user enable --now filter-chain
 fi
 
 if [ "$(xdg-mime query default inode/directory 2>/dev/null)" != thunar.desktop ]; then

@@ -8,8 +8,9 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs
 
-// Webcam bubble for screen recordings, toggled by ~/.local/bin/cam-toggle
-// and the record menu. An overlay layer, so it stays above every window.
+// Webcam bubble for screen recordings, shown by ~/.local/bin/record-toggle
+// while recording when the record menu's Camera is on, or toggled by
+// ~/.local/bin/cam-toggle. An overlay layer, so it stays above every window.
 // Drag it to move, drag its edge to resize, scroll to zoom, double-click to
 // reset the zoom, right-click to switch circle / landscape / portrait. Shape,
 // size and place are kept for next time. Uses an external camera when one is
@@ -52,7 +53,11 @@ Scope {
     }
 
     function rotate() {
-        reshape(() => shape = shapes[(shapes.indexOf(shape) + 1) % shapes.length]);
+        setShape(shapes[(shapes.indexOf(shape) + 1) % shapes.length]);
+    }
+
+    function setShape(newShape) {
+        reshape(() => shape = newShape);
         save();
     }
 
@@ -112,6 +117,14 @@ Scope {
 
         function toggle(): void {
             root.open = !root.open;
+        }
+
+        function show(): void {
+            root.open = true;
+        }
+
+        function hide(): void {
+            root.open = false;
         }
 
         function rotate(): void {

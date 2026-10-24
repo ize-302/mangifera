@@ -244,7 +244,6 @@ ShellRoot {
         id: toolboxMenu
         pointerX: root.pointerX
         pointerScreen: root.pointerScreen
-        camera: camera
         recordMenu: recordMenu
         onOpenChanged: if (open)
             root.closeOthers(toolboxMenu)

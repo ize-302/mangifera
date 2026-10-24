@@ -1,9 +1,27 @@
 #!/bin/bash
-# record-toggle [--none|--desktop|--mic|--both]
+# record-toggle [--none|--desktop|--mic|--both] [--camera]
 # Starts recording a slurp-picked area to ~/Videos/Recordings, or stops the
 # running one. --desktop adds the playing audio, --mic (or --sound) the
-# default mic, --both the two mixed. With no option it only stops.
+# default mic, --both the two mixed. --camera shows the webcam bubble
+# (CameraWidget.qml) from picking the area until the recording stops. With no
+# option it only stops.
 dir=~/Videos/Recordings
+
+camera=
+args=()
+for arg in "$@"; do
+	if [ "$arg" = --camera ]; then
+		camera=1
+	else
+		args+=("$arg")
+	fi
+done
+set -- "${args[@]}"
+
+# Shows or hides the webcam bubble, if recording with it
+cam() {
+	[ -n "$camera" ] && ~/.local/bin/launcher-call camera "$1"
+}
 
 # Wakes the bar's ~/.local/bin/record-status, one per bar
 bar() {
@@ -47,8 +65,26 @@ elif [ $# -gt 0 ]; then
 		;;
 	esac
 
-	notify-send "Select area to record"
-	area=$(slurp -o) || exit 0
+	# Shown while picking, so it can be placed in the area first
+	cam show
+	notify-send "Select area to record" "Drag an area, or click a screen for all of it"
+	if ! area=$(slurp -o); then
+		cam hide
+		exit 0
+	fi
+
+	# 3-2-1 over the area (RecordCountdown.qml), gone before recording starts.
+	# Escape there sends SIGUSR1, which cuts the wait short
+	cancelled=
+	trap 'cancelled=1' USR1
+	~/.local/bin/launcher-call record countdown "$$ $area"
+	sleep 3.2 &
+	wait $!
+	if [ -n "$cancelled" ]; then
+		kill $! 2>/dev/null
+		cam hide
+		exit 0
+	fi
 	mkdir -p "$dir"
 	file="$dir/rec-$(date +%Y%m%d-%H%M%S).mp4"
 	# Encode on the GPU: libx264rgb only managed ~33 fps of a moving screen,
@@ -66,6 +102,7 @@ elif [ $# -gt 0 ]; then
 	bar
 	wait
 	unload
+	cam hide
 	bar
 
 	if [ ! -s "$file" ]; then

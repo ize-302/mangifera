@@ -78,8 +78,22 @@ Singleton {
     readonly property int powerFontSize: 13
     readonly property color powerColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
 
-    // Toolbox menu; the camera row uses recordCameraIcon. Same dot as the
-    // bar's recording module
+    // Record menu: the line under each tile (mic level, camera shapes), the
+    // chosen sound's dot, and the 3-2-1 before recording
+    readonly property string recordCircleIcon: String.fromCodePoint(0xf0765)
+    readonly property string recordRectangleIcon: String.fromCodePoint(0xf0e5e)
+    readonly property int recordStatusHeight: 14
+    readonly property int recordShapeSize: 13
+    readonly property int recordMeterHeight: 4
+    // Level bar range, in dB below full scale
+    readonly property int recordMeterFloor: 60
+    readonly property int recordDotSize: 5
+    readonly property int recordCountdownSeconds: 3
+    readonly property int recordCountdownSize: 140
+    readonly property int recordCountdownFontSize: 72
+    readonly property int recordOutlineWidth: 2
+
+    // Toolbox menu. Same dot as the bar's recording module
     readonly property string toolboxRecordIcon: String.fromCodePoint(0xf044a)
     readonly property string toolboxScreenshotIcon: String.fromCodePoint(0xf0e51)
 

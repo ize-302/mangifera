@@ -21,18 +21,11 @@ Scope {
     property bool placeWaited: false
     readonly property bool placed: !atPointer || pointerX >= 0 || placeWaited
 
-    // The webcam bubble (CameraWidget.qml) and the record menu
-    required property var camera
+    // The record menu, which also has the camera
     required property var recordMenu
     property bool recording: false
 
     readonly property list<var> entries: [
-        {
-            id: "camera",
-            label: "Camera",
-            icon: Theme.recordCameraIcon,
-            toggle: true
-        },
         {
             id: "record",
             label: root.recording ? "Stop Recording" : "Record Screen",
@@ -47,10 +40,6 @@ Scope {
     property int current: 0
 
     function run(entry) {
-        if (entry.id === "camera") {
-            camera.open = !camera.open;
-            return;
-        }
         open = false;
         if (entry.id === "record") {
             if (recording)
@@ -157,7 +146,7 @@ Scope {
             id: panel
 
             floating: true
-            width: Math.ceil(Theme.iconSize + Theme.iconSpacing * 2 + longest.widest + Theme.toggleWidth) + Theme.rowPadding * 2 + Theme.powerPanelPadding * 2
+            width: Math.ceil(Theme.iconSize + Theme.iconSpacing + longest.widest) + Theme.rowPadding * 2 + Theme.powerPanelPadding * 2
             height: rows.height + Theme.powerPanelPadding * 2
 
             Column {
@@ -222,14 +211,6 @@ Scope {
                             font.family: Theme.fontFamily
                             font.pixelSize: Theme.fontSize
                             font.weight: row.selected ? Theme.selectedWeight : Theme.unselectedWeight
-                        }
-
-                        Toggle {
-                            anchors.right: parent.right
-                            anchors.rightMargin: Theme.rowPadding
-                            anchors.verticalCenter: parent.verticalCenter
-                            visible: row.modelData.toggle ?? false
-                            checked: root.camera.open
                         }
 
                         MouseArea {
