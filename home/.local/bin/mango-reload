@@ -1,0 +1,11 @@
+#!/bin/bash
+# Reloads mango's config and says whether it worked. A script because the
+# command is too long for a line of mango's config.
+# The logo is from mangowm.github.io
+logo=~/.local/share/mangifera/mango.svg
+
+if mmsg dispatch reload_config | grep -q '"success":true'; then
+	notify-send -a mango -i "$logo" -t 2000 "Config reloaded"
+else
+	notify-send -a mango -i "$logo" -u critical "Config reload failed"
+fi
