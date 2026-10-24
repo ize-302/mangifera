@@ -11,11 +11,15 @@ Needs Arch Linux and a user with sudo. Packages come from the official repos
 (listed in `install.sh`).
 
 ```sh
-git clone <this repo> ~/mangifera
+git clone https://github.com/ize-302/mangifera.git ~/mangifera
 cd ~/mangifera
 ./install.sh --dry-run   # preview
 ./install.sh
 ```
+
+The configs are linked from the clone, so keep it where it is: moving or
+deleting `~/mangifera` breaks the desktop. To move it, uninstall first,
+then install again from the new place.
 
 The installer installs packages, links the configs, installs the SDDM theme,
 and enables SDDM and Bluetooth. It's safe to rerun.
@@ -25,6 +29,7 @@ and enables SDDM and Bluetooth. It's safe to rerun.
 - NetworkManager isn't enabled for you; it warns if it's off.
 - Existing files in the way stop the install. `--backup` moves them to
   `~/.mangifera-backup-<time>/`.
+- Installing missing packages upgrades the whole system too (`pacman -Syu`).
 - `--no-packages` skips packages.
 - An existing `~/.config/tmux` is kept.
 

@@ -84,7 +84,8 @@ if [ -n "$packages" ]; then
   done
   if [ ${#missing[@]} -gt 0 ]; then
     say "Installing ${#missing[@]} packages: ${missing[*]}"
-    run sudo pacman -S --needed "${missing[@]}"
+    # -Syu: Arch doesn't support installing onto an out-of-date system
+    run sudo pacman -Syu --needed "${missing[@]}"
   else
     say "Packages: all installed."
   fi
