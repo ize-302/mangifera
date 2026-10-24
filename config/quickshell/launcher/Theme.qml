@@ -111,6 +111,9 @@ Singleton {
     // Gap from the screen edge and the bar the first time
     readonly property int cameraMargin: 24
 
+    // App menu
+    readonly property real appMenuWidth: 0.28
+
     // Clipboard menu
     readonly property real clipboardWidth: 0.35
     readonly property string clipboardEmptyText: "Nothing found"

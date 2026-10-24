@@ -172,7 +172,9 @@ ShellRoot {
     SearchMenu {
         id: appMenu
 
-        shadow: true
+        floating: true
+        aboveBar: true
+        panelWidth: Theme.appMenuWidth
         results: root.search(query, DesktopEntries.applications.values, root.history)
         label: app => app.name
         icon: app => Quickshell.iconPath(app.icon, "application-x-executable")
