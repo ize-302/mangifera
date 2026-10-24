@@ -1,0 +1,22 @@
+#!/bin/bash
+# laptop-screen on|off|lid
+# Turns the laptop's built-in screen on or off, whatever it's called
+# (eDP-1, eDP-2, LVDS-1, DSI-1...). "lid" turns it off if the lid is closed.
+internal='^(eDP|LVDS|DSI)'
+
+case "$1" in
+on) flag=--on ;;
+off) flag=--off ;;
+lid)
+	grep -qs closed /proc/acpi/button/lid/*/state || exit 0
+	flag=--off
+	;;
+*)
+	echo "usage: laptop-screen on|off|lid" >&2
+	exit 1
+	;;
+esac
+
+wlr-randr --json | jq -r '.[].name' | grep -E "$internal" | while read -r name; do
+	wlr-randr --output "$name" "$flag"
+done
