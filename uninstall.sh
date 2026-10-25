@@ -83,4 +83,5 @@ else
 fi
 
 rm -rf "$state"
+rm -f "$(dirname "$state")/version"
 say "Uninstalled. Packages and Bluetooth were left as they are."

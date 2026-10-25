@@ -34,6 +34,18 @@ and enables SDDM and Bluetooth. It's safe to rerun.
 - `--no-packages` skips packages.
 - An existing `~/.config/tmux` is kept.
 
+## Update
+
+```sh
+cd ~/mangifera
+git pull
+./install.sh
+```
+
+The installer says which version you're updating from and to. Read
+[CHANGELOG.md](CHANGELOG.md) before updating: before 1.0, a minor bump
+(0.x.0) can break your setup and lists the steps to fix it.
+
 ## Wallpapers
 
 Put images in `~/Pictures/wallpapers`. Super+Shift+W picks a random one,

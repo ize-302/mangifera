@@ -81,6 +81,19 @@ repo_packages=(
 command -v pacman >/dev/null || { note "mangifera is for Arch Linux (no pacman here)."; exit 1; }
 [ -n "$dry" ] && say "Dry run: nothing will be changed."
 
+# The installed version, so a rerun after git pull can tell what changed
+version=$(cat VERSION)
+version_file="${XDG_STATE_HOME:-$HOME/.local/state}/mangifera/version"
+previous_version=$(cat "$version_file" 2>/dev/null || true)
+if [ -z "$previous_version" ]; then
+  say "Installing mangifera $version"
+elif [ "$previous_version" = "$version" ]; then
+  say "Reinstalling mangifera $version"
+else
+  say "Updating mangifera from $previous_version to $version"
+  note "Read CHANGELOG.md for what changed, and any steps for you."
+fi
+
 # Warnings only: mango (wlroots) needs a GPU it can drive through DRM
 if ! ls /dev/dri/card* >/dev/null 2>&1; then
   note "No GPU found (/dev/dri/card*), so mango won't be able to start."
@@ -332,6 +345,8 @@ fi
 if [ -n "$dry" ]; then
   say "Dry run done: nothing was changed."
 else
-  say "Installed. Put your displays and other settings in"
+  mkdir -p "$(dirname "$version_file")"
+  printf '%s\n' "$version" >"$version_file"
+  say "Installed mangifera $version. Put your displays and other settings in"
   echo "    ~/.config/mango/local.conf, then log in to mango (or restart it)."
 fi
