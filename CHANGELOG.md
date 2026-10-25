@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-10-25
+
 - Fix the laptop screen having no wallpaper after unplugging an external
   display.
 - Fix the power menu, launcher, keybind and record menus not opening after
@@ -74,7 +76,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.2.1...HEAD
+[0.2.1]: https://github.com/ize-302/mangifera/releases/tag/v0.2.1
 [0.2.0]: https://github.com/ize-302/mangifera/releases/tag/v0.2.0
 [0.1.4]: https://github.com/ize-302/mangifera/releases/tag/v0.1.4
 [0.1.3]: https://github.com/ize-302/mangifera/releases/tag/v0.1.3
