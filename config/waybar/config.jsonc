@@ -214,11 +214,13 @@
 	},
 
 	// Keeps running: ticks each second while recording, else sleeps until
-	// ~/.local/bin/record-toggle wakes it
+	// ~/.local/bin/record-toggle wakes it. Click stops, right-click opens the
+	// record menu to change the sound or camera
 	"custom/recording": {
 		"exec": "~/.local/bin/record-status",
 		"return-type": "json",
-		"on-click": "~/.local/bin/record-toggle"
+		"on-click": "~/.local/bin/record-toggle",
+		"on-click-right": "~/.local/bin/record-menu"
 	},
 
 	// Written by Quickshell (Pomodoro.qml, SIGRTMIN+11)

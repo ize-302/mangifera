@@ -7,54 +7,114 @@ import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
 
-// Picks the sound for a screen recording, toggled by ~/.local/bin/record-menu.
-// The choice goes to ~/.local/bin/record-toggle, and is preselected next time
-// (the dot). The mic tiles show the mic's level, so a dead mic shows before
-// recording. The camera tile turns recording with the webcam widget on or off
-// (on until turned off, then remembered) and leaves the menu open. While the
-// menu is open the widget shows if it's on, and its shape can be picked under
-// the tile. 1-4 pick a sound, Space the camera, R its shape.
+// Sets up a screen recording, toggled by ~/.local/bin/record-menu: a row each
+// for the sound, the camera (with its shape while it's on), which camera
+// (while it's on and there's more than one) and the frame rate, then Record, which runs ~/.local/bin/record-toggle with them. Every
+// setting is remembered for next time. The mic sounds show the mic's level,
+// so a dead mic shows before recording. While the camera is on its bubble
+// (CameraWidget.qml) shows, so it can be placed first. Up/Down move between
+// rows, Left/Right change one (on the camera row, its shape); 1-4 pick a
+// sound, Space the camera, R its shape, F the frame rate, Enter records.
+// Opened while recording (live), it changes the running recording's sound
+// and camera on the spot; the frame rate is fixed then, and Record is Stop.
 Scope {
     id: root
 
     property bool open: false
-    // `id` is the option given to record-toggle
+    // Opened while recording
+    property bool live: false
+    // `value` is the option given to record-toggle
     readonly property list<var> sounds: [
         {
-            id: "none",
+            value: "none",
             label: "No Sound",
             icon: Theme.recordNoSoundIcon
         },
         {
-            id: "desktop",
+            value: "desktop",
             label: "Desktop",
             icon: Theme.recordDesktopIcon
         },
         {
-            id: "mic",
+            value: "mic",
             label: "Mic",
             icon: Theme.recordMicIcon,
             mic: true
         },
         {
-            id: "both",
+            value: "both",
             label: "Desktop + Mic",
             icon: Theme.recordBothIcon,
             mic: true
         }
     ]
-    readonly property var cameraEntry: ({
+    readonly property list<var> shapes: [
+        {
+            value: "circle",
+            label: "Circle",
+            icon: Theme.recordCircleIcon
+        },
+        {
+            value: "landscape",
+            label: "Landscape",
+            icon: Theme.recordRectangleIcon
+        },
+        {
+            value: "portrait",
+            label: "Portrait",
+            icon: Theme.recordRectangleIcon,
+            rotation: 90
+        }
+    ]
+    // Frame rates given to record-toggle's --fps; 0 is uncapped (up to the
+    // refresh rate, which sites such as X refuse over 60)
+    readonly property list<var> frameRates: [30, 60, 120, 0].map(rate => ({
+                value: rate,
+                label: rate > 0 ? String(rate) : "Max"
+            }))
+    readonly property list<var> settings: [
+        {
+            id: "sound",
+            label: "Sound",
+            options: sounds
+        },
+        {
             id: "camera",
             label: "Camera",
-            icon: Theme.recordCameraIcon,
-            toggle: true
-        })
-    // The camera tile comes after the sounds
-    readonly property list<var> entries: [...sounds, cameraEntry]
+            options: shapes
+        },
+        {
+            id: "device",
+            label: "Device",
+            // "Integrated Camera: Integrated C" reads as "Integrated Camera"
+            options: camera.devices.map(device => ({
+                        value: device.description,
+                        label: device.description.split(":")[0]
+                    }))
+        },
+        {
+            id: "fps",
+            label: "FPS",
+            options: frameRates
+        }
+    ]
+    // The focused row; settings.length is the Record button
     property int current: 0
-    // The last sound picked; desktop until there is one
+    // desktop until one is picked
     property string chosen: "desktop"
     property bool withCamera: cameraFile.text().trim() !== "off"
+    // 60 until one is picked
+    property int fps: {
+        const saved = parseInt(fpsFile.text().trim());
+        return frameRates.some(rate => rate.value === saved) ? saved : 60;
+    }
+    // What Record will do, shown on it
+    readonly property string summary: {
+        const parts = [sounds.find(sound => sound.value === chosen)?.label ?? "", fps > 0 ? fps + " fps" : "Max fps"];
+        if (withCamera)
+            parts.push("Camera");
+        return parts.join("  ·  ");
+    }
     // The webcam bubble (CameraWidget.qml), shown while the menu is open so it
     // can be placed before recording
     required property var camera
@@ -71,19 +131,101 @@ Scope {
         return Math.max(0, Math.min(1, (db + Theme.recordMeterFloor) / Theme.recordMeterFloor));
     }
 
-    function run(entry) {
-        if (entry.toggle) {
-            withCamera = !withCamera;
-            cameraFile.setText(withCamera ? "on" : "off");
-            camera.open = withCamera;
-            shownCamera = withCamera;
+    // The camera row picks the shape
+    function valueOf(id: string): var {
+        switch (id) {
+        case "sound":
+            return chosen;
+        case "camera":
+            return camera.shape;
+        case "device":
+            return camera.currentDevice;
+        case "fps":
+            return fps;
+        }
+    }
+
+    function choose(id: string, value: var): void {
+        switch (id) {
+        case "sound":
+            chosen = value;
+            lastFile.setText(value);
+            if (live)
+                Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/record-toggle", "--live-sound=" + value]);
+            break;
+        case "camera":
+            camera.setShape(value);
+            break;
+        case "device":
+            camera.setDevice(value);
+            break;
+        case "fps":
+            fps = value;
+            fpsFile.setText(String(value));
+            break;
+        }
+    }
+
+    function setting(id: string): var {
+        return settings.find(setting => setting.id === id);
+    }
+
+    // The camera choice only shows with the camera on and a choice to make.
+    // The Record button (undefined) always shows
+    function shown(setting: var): bool {
+        return setting?.id !== "device" || (withCamera && setting.options.length > 1);
+    }
+
+    // wf-recorder's frame rate is set when it starts
+    function editable(setting: var): bool {
+        return !live || setting?.id !== "fps";
+    }
+
+    // Focuses the next (1) or previous (-1) row showing that can change,
+    // wrapping
+    function move(delta: int): void {
+        const count = settings.length + 1;
+        let next = current;
+        do
+            next = (next + delta + count) % count;
+        while (!shown(settings[next]) || !editable(settings[next]))
+        current = next;
+    }
+
+    function setCamera(on: bool): void {
+        withCamera = on;
+        cameraFile.setText(on ? "on" : "off");
+        camera.open = on;
+        shownCamera = on;
+        // Off the camera choice as it hides
+        if (!shown(settings[current]))
+            current = settings.indexOf(setting("camera"));
+    }
+
+    // Moves a setting to its next (1) or previous (-1) option, wrapping. The
+    // camera's shape turns it on first
+    function step(setting: var, delta: int): void {
+        if (!editable(setting))
+            return;
+        if (setting.id === "camera" && !withCamera) {
+            setCamera(true);
+            return;
+        }
+        const options = setting.options;
+        const index = options.findIndex(option => option.value === valueOf(setting.id));
+        choose(setting.id, options[(index + delta + options.length) % options.length].value);
+    }
+
+    // Or stops the running one, when live
+    function record(): void {
+        if (live) {
+            open = false;
+            Quickshell.execDetached([Quickshell.env("HOME") + "/.local/bin/record-toggle"]);
             return;
         }
         recording = true;
         open = false;
-        chosen = entry.id;
-        lastFile.setText(entry.id);
-        const args = [Quickshell.env("HOME") + "/.local/bin/record-toggle", "--" + entry.id];
+        const args = [Quickshell.env("HOME") + "/.local/bin/record-toggle", "--" + chosen, "--fps=" + fps];
         if (withCamera)
             args.push("--camera");
         Quickshell.execDetached(args);
@@ -94,6 +236,14 @@ Scope {
         id: cameraFile
 
         path: Quickshell.statePath("record-camera")
+        blockLoading: true
+        printErrors: false
+    }
+
+    FileView {
+        id: fpsFile
+
+        path: Quickshell.statePath("record-fps")
         blockLoading: true
         printErrors: false
     }
@@ -130,16 +280,22 @@ Scope {
                 camera.open = false;
             shownCamera = false;
             recording = false;
+            // Set again by toggleLiveMenu; others open it to start one
+            live = false;
             return;
         }
 
-        if (withCamera && !camera.open) {
+        if (live) {
+            // What's being recorded; the bubble stays as left on closing
+            withCamera = camera.open;
+        } else if (withCamera && !camera.open) {
             camera.open = true;
             shownCamera = true;
         }
         chosen = lastFile.text().trim() || "desktop";
-        current = Math.max(0, entries.findIndex(entry => entry.id === chosen));
-        tiles.forceActiveFocus();
+        // On Record (or Stop), so Enter records with last time's settings
+        current = settings.length;
+        layout.forceActiveFocus();
         panel.appear();
     }
 
@@ -148,6 +304,13 @@ Scope {
         target: "record"
 
         function toggleRecordMenu(): void {
+            root.open = !root.open;
+        }
+
+        // ~/.local/bin/record-menu, while recording
+        function toggleLiveMenu(): void {
+            if (!root.open)
+                root.live = true;
             root.open = !root.open;
         }
 
@@ -160,145 +323,186 @@ Scope {
         }
     }
 
-    // Widest label, so every tile is as wide
+    // Widest row label, so the controls line up
     FontMetrics {
-        id: longest
+        id: labels
 
-        readonly property real widest: Math.max(...root.entries.map(entry => longest.advanceWidth(entry.label)))
+        readonly property real widest: Math.max(...root.settings.map(setting => labels.advanceWidth(setting.label)))
 
         font.family: Theme.fontFamily
         font.pixelSize: Theme.powerFontSize
         font.weight: Theme.selectedWeight
     }
 
-    component Tile: Rectangle {
-        id: tile
+    // A setting's options in one track, the picked one on a pill that slides
+    // between them
+    component SegmentedControl: Rectangle {
+        id: control
 
-        required property var entry
+        required property var setting
+        // Icons only, for the shapes
+        property bool iconsOnly: false
+        readonly property int chosenIndex: setting.options.findIndex(option => option.value === root.valueOf(setting.id))
+        // Read again as the segments are made
+        readonly property Item chosenItem: segments.count > chosenIndex ? segments.itemAt(chosenIndex) : null
+
+        width: segmentRow.width + Theme.recordTrackPadding * 2
+        height: Theme.recordSegmentHeight + Theme.recordTrackPadding * 2
+        radius: Theme.cornerRadius + Theme.recordTrackPadding
+        color: Theme.keyColor
+
+        Rectangle {
+            visible: control.chosenItem !== null
+            x: Theme.recordTrackPadding + (control.chosenItem?.x ?? 0)
+            y: Theme.recordTrackPadding
+            width: control.chosenItem?.width ?? 0
+            height: Theme.recordSegmentHeight
+            radius: Theme.cornerRadius
+            color: Theme.recordChosenColor
+
+            Behavior on x {
+                NumberAnimation {
+                    duration: Theme.animationDuration
+                    easing.type: Easing.OutCubic
+                }
+            }
+
+            Behavior on width {
+                NumberAnimation {
+                    duration: Theme.animationDuration
+                    easing.type: Easing.OutCubic
+                }
+            }
+        }
+
+        Row {
+            id: segmentRow
+
+            x: Theme.recordTrackPadding
+            y: Theme.recordTrackPadding
+
+            Repeater {
+                id: segments
+
+                model: control.setting.options
+
+                Item {
+                    id: segment
+
+                    required property var modelData
+                    required property int index
+                    readonly property bool chosen: control.chosenIndex === index
+                    readonly property color textColor: chosen || hover.containsMouse ? Theme.selectedColor : Theme.unselectedColor
+
+                    width: segmentContent.width + Theme.rowPadding * (control.iconsOnly ? 1.5 : 2)
+                    height: Theme.recordSegmentHeight
+
+                    MouseArea {
+                        id: hover
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onClicked: root.choose(control.setting.id, segment.modelData.value)
+                    }
+
+                    Row {
+                        id: segmentContent
+
+                        anchors.centerIn: parent
+                        spacing: Theme.rowSpacing + 2
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: segment.modelData.icon !== undefined
+                            text: segment.modelData.icon ?? ""
+                            rotation: segment.modelData.rotation ?? 0
+                            color: segment.textColor
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.powerFontSize + 3
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            visible: !control.iconsOnly
+                            text: segment.modelData.label
+                            color: segment.textColor
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.powerFontSize
+                            font.weight: segment.chosen ? Theme.selectedWeight : Theme.unselectedWeight
+                        }
+                    }
+
+                    // The mic's level, on the sounds that record it
+                    Rectangle {
+                        visible: segment.modelData.mic ?? false
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 3
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: segmentContent.width
+                        height: Theme.recordMeterHeight
+                        radius: height / 2
+                        color: Theme.dividerColor
+
+                        Rectangle {
+                            width: parent.width * root.micLevel
+                            height: parent.height
+                            radius: parent.radius
+                            color: root.micLevel > 0.95 ? Theme.accentColor : Theme.toggleOnColor
+
+                            Behavior on width {
+                                NumberAnimation {
+                                    duration: 80
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    // A label, then its control
+    component SettingRow: Rectangle {
+        id: row
+
         required property int index
-        readonly property bool selected: root.current === index
+        readonly property var setting: root.settings[index]
+        readonly property bool focused: root.current === index
+        default property alias control: controls.data
+        readonly property real naturalWidth: Math.ceil(labels.widest) + Theme.rowPadding * 4 + controls.width
 
-        width: Math.max(Theme.powerTileWidth, Math.ceil(longest.widest) + Theme.rowPadding * 2)
-        height: content.height + Theme.powerTilePadding * 2
-        color: tile.selected ? Theme.currentRowColor : "transparent"
+        enabled: root.editable(setting)
+        opacity: enabled ? 1 : 0.35
+        width: layout.width
+        height: Theme.recordSegmentHeight + Theme.recordTrackPadding * 2 + Theme.powerTilePadding
         radius: Theme.cornerRadius
+        color: row.focused ? Theme.currentRowColor : "transparent"
 
+        // Behind the controls, so they still take clicks
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
-            cursorShape: Qt.PointingHandCursor
-            onPositionChanged: root.current = tile.index
-            onClicked: root.run(tile.entry)
+            onPositionChanged: root.current = row.index
         }
 
-        // The sound used last time
-        Rectangle {
-            anchors.top: parent.top
+        Text {
+            anchors.verticalCenter: parent.verticalCenter
+            x: Theme.rowPadding
+            text: row.setting.label
+            color: row.focused ? Theme.selectedColor : Theme.dimColor
+            font.family: Theme.fontFamily
+            font.pixelSize: Theme.powerFontSize
+            font.weight: Theme.selectedWeight
+        }
+
+        Row {
+            id: controls
+
+            anchors.verticalCenter: parent.verticalCenter
             anchors.right: parent.right
-            anchors.margins: Theme.powerTilePadding
-            width: Theme.recordDotSize
-            height: Theme.recordDotSize
-            radius: width / 2
-            color: Theme.toggleOnColor
-            visible: tile.entry.id === root.chosen
-        }
-
-        Column {
-            id: content
-
-            anchors.centerIn: parent
-            width: parent.width - Theme.rowPadding * 2
-            spacing: Theme.rowSpacing + 2
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: tile.entry.icon
-                color: tile.entry.toggle && root.withCamera ? Theme.toggleOnColor : tile.selected ? Theme.selectedColor : Theme.unselectedColor
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.powerIconSize
-            }
-
-            Text {
-                anchors.horizontalCenter: parent.horizontalCenter
-                text: tile.entry.label
-                color: tile.selected ? Theme.selectedColor : Theme.unselectedColor
-                font.family: Theme.fontFamily
-                font.pixelSize: Theme.powerFontSize
-                font.weight: tile.selected ? Theme.selectedWeight : Theme.unselectedWeight
-            }
-
-            // Every tile has the line, so they stay the same height
-            Item {
-                width: parent.width
-                height: Theme.recordStatusHeight
-
-                // Mic level
-                Rectangle {
-                    visible: tile.entry.mic ?? false
-                    anchors.verticalCenter: parent.verticalCenter
-                    width: parent.width
-                    height: Theme.recordMeterHeight
-                    radius: height / 2
-                    color: Theme.keyColor
-
-                    Rectangle {
-                        width: parent.width * root.micLevel
-                        height: parent.height
-                        radius: parent.radius
-                        color: root.micLevel > 0.95 ? Theme.accentColor : Theme.toggleOnColor
-
-                        Behavior on width {
-                            NumberAnimation {
-                                duration: 80
-                            }
-                        }
-                    }
-                }
-
-                // Camera shape, while it's on
-                Row {
-                    visible: (tile.entry.toggle ?? false) && root.withCamera
-                    anchors.centerIn: parent
-                    spacing: Theme.rowSpacing * 2
-
-                    Repeater {
-                        model: [
-                            {
-                                shape: "circle",
-                                icon: Theme.recordCircleIcon,
-                                rotation: 0
-                            },
-                            {
-                                shape: "landscape",
-                                icon: Theme.recordRectangleIcon,
-                                rotation: 0
-                            },
-                            {
-                                shape: "portrait",
-                                icon: Theme.recordRectangleIcon,
-                                rotation: 90
-                            }
-                        ]
-
-                        Text {
-                            required property var modelData
-
-                            text: modelData.icon
-                            rotation: modelData.rotation
-                            color: root.camera.shape === modelData.shape ? Theme.toggleOnColor : Theme.dimColor
-                            font.family: Theme.fontFamily
-                            font.pixelSize: Theme.recordShapeSize
-
-                            MouseArea {
-                                anchors.fill: parent
-                                anchors.margins: -Theme.rowSpacing
-                                cursorShape: Qt.PointingHandCursor
-                                onClicked: root.camera.setShape(parent.modelData.shape)
-                            }
-                        }
-                    }
-                }
-            }
+            anchors.rightMargin: Theme.rowPadding
+            spacing: Theme.rowPadding * 1.5
         }
     }
 
@@ -351,73 +555,184 @@ Scope {
             visible: root.open
             floating: true
             color: Theme.powerColor
-            width: Math.max(tiles.width, hints.width) + Theme.powerPanelPadding * 2
+            width: layout.width + Theme.powerPanelPadding * 2
             height: layout.height + Theme.powerPanelPadding * 2
 
             Column {
                 id: layout
 
                 anchors.centerIn: parent
-                spacing: Theme.powerPanelPadding
+                // The camera rows as wide as with the camera on, so turning it
+                // on doesn't resize the panel
+                width: Math.max(soundRow.naturalWidth, cameraRow.naturalWidth + (root.withCamera ? 0 : shapeControl.width + Theme.rowPadding * 1.5), deviceRow.naturalWidth, fpsRow.naturalWidth, hints.width)
+                spacing: Theme.rowSpacing
 
-                Row {
-                    id: tiles
+                Keys.onPressed: event => {
+                    const ctrl = event.modifiers & Qt.ControlModifier;
+                    const setting = root.settings[root.current];
 
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    spacing: Theme.rowSpacing
-
-                    Keys.onPressed: event => {
-                        const ctrl = event.modifiers & Qt.ControlModifier;
-                        const count = root.entries.length;
-
-                        if (event.key === Qt.Key_Escape || event.key === Qt.Key_Backspace) {
-                            root.open = false;
-                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                            root.run(root.entries[root.current]);
-                        } else if (event.key >= Qt.Key_1 && event.key < Qt.Key_1 + root.sounds.length) {
-                            root.run(root.sounds[event.key - Qt.Key_1]);
-                        } else if (event.key === Qt.Key_Space || event.key === Qt.Key_C) {
-                            root.run(root.cameraEntry);
-                        } else if (event.key === Qt.Key_R && root.withCamera) {
-                            root.camera.rotate();
-                        } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L || event.key === Qt.Key_Down || event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N)) {
-                            root.current = (root.current + 1) % count;
-                        } else if (event.key === Qt.Key_Left || event.key === Qt.Key_H || event.key === Qt.Key_Up || event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P)) {
-                            root.current = (root.current + count - 1) % count;
-                        } else {
-                            return;
-                        }
-                        event.accepted = true;
+                    if (event.key === Qt.Key_Escape || event.key === Qt.Key_Backspace) {
+                        root.open = false;
+                    } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                        root.record();
+                    } else if (event.key >= Qt.Key_1 && event.key < Qt.Key_1 + root.sounds.length) {
+                        root.choose("sound", root.sounds[event.key - Qt.Key_1].value);
+                    } else if (event.key === Qt.Key_Space || event.key === Qt.Key_C) {
+                        root.setCamera(!root.withCamera);
+                    } else if (event.key === Qt.Key_R) {
+                        if (root.withCamera)
+                            root.step(root.setting("camera"), 1);
+                    } else if (event.key === Qt.Key_F) {
+                        root.step(root.setting("fps"), 1);
+                    } else if (event.key === Qt.Key_Right || event.key === Qt.Key_L) {
+                        if (setting)
+                            root.step(setting, 1);
+                    } else if (event.key === Qt.Key_Left || event.key === Qt.Key_H) {
+                        if (setting)
+                            root.step(setting, -1);
+                    } else if (event.key === Qt.Key_Down || event.key === Qt.Key_J || event.key === Qt.Key_Tab || (ctrl && event.key === Qt.Key_N)) {
+                        root.move(1);
+                    } else if (event.key === Qt.Key_Up || event.key === Qt.Key_K || event.key === Qt.Key_Backtab || (ctrl && event.key === Qt.Key_P)) {
+                        root.move(-1);
+                    } else {
+                        return;
                     }
+                    event.accepted = true;
+                }
 
-                    Repeater {
-                        model: root.sounds
+                SettingRow {
+                    id: soundRow
 
-                        Tile {
-                            required property var modelData
+                    index: 0
 
-                            entry: modelData
-                        }
-                    }
-
-                    // Sounds pick one; the camera goes with any
-                    Rectangle {
-                        anchors.verticalCenter: parent.verticalCenter
-                        width: 1
-                        height: Theme.powerIconSize * 2
-                        color: Theme.dividerColor
-                    }
-
-                    Tile {
-                        entry: root.cameraEntry
-                        index: root.sounds.length
+                    SegmentedControl {
+                        setting: soundRow.setting
                     }
                 }
 
-                Rectangle {
+                SettingRow {
+                    id: cameraRow
+
+                    index: 1
+
+                    // Left of the switch, so the switch stays put at the edge
+                    SegmentedControl {
+                        id: shapeControl
+
+                        anchors.verticalCenter: parent.verticalCenter
+                        visible: root.withCamera
+                        setting: cameraRow.setting
+                        iconsOnly: true
+                    }
+
+                    Item {
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: Theme.toggleWidth
+                        height: Theme.recordSegmentHeight
+
+                        Toggle {
+                            anchors.centerIn: parent
+                            checked: root.withCamera
+                        }
+
+                        MouseArea {
+                            anchors.fill: parent
+                            anchors.margins: -Theme.rowSpacing
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: root.setCamera(!root.withCamera)
+                        }
+                    }
+                }
+
+                SettingRow {
+                    id: deviceRow
+
+                    index: 2
+                    visible: root.shown(setting)
+
+                    SegmentedControl {
+                        setting: deviceRow.setting
+                    }
+                }
+
+                SettingRow {
+                    id: fpsRow
+
+                    index: 3
+
+                    SegmentedControl {
+                        setting: fpsRow.setting
+                    }
+                }
+
+                Item {
                     width: parent.width
-                    height: 1
-                    color: Theme.dividerColor
+                    height: Theme.rowSpacing
+                }
+
+                Rectangle {
+                    id: recordButton
+
+                    readonly property bool focused: root.current === root.settings.length
+                    readonly property color tint: Theme.closeColor
+
+                    width: parent.width
+                    height: Theme.recordButtonHeight
+                    radius: Theme.cornerRadius
+                    color: Qt.rgba(tint.r, tint.g, tint.b, focused ? 0.32 : recordHover.containsMouse ? 0.24 : 0.16)
+                    border.width: focused ? 1 : 0
+                    border.color: Qt.rgba(tint.r, tint.g, tint.b, 0.6)
+
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: Theme.animationDuration
+                        }
+                    }
+
+                    MouseArea {
+                        id: recordHover
+
+                        anchors.fill: parent
+                        hoverEnabled: true
+                        cursorShape: Qt.PointingHandCursor
+                        onPositionChanged: root.current = root.settings.length
+                        onClicked: root.record()
+                    }
+
+                    Row {
+                        anchors.centerIn: parent
+                        spacing: Theme.rowPadding
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: root.live ? Theme.recordStopIcon : Theme.toolboxRecordIcon
+                            color: recordButton.tint
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.powerFontSize + 3
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: root.live ? "Stop" : "Record"
+                            color: Theme.selectedColor
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.powerFontSize + 1
+                            font.weight: Theme.selectedWeight
+                        }
+
+                        Text {
+                            anchors.verticalCenter: parent.verticalCenter
+                            text: root.summary
+                            color: Theme.keyTextColor
+                            font.family: Theme.fontFamily
+                            font.pixelSize: Theme.sectionFontSize
+                        }
+                    }
+                }
+
+                Item {
+                    width: parent.width
+                    height: Theme.rowSpacing
                 }
 
                 Row {
@@ -426,7 +741,7 @@ Scope {
                     anchors.horizontalCenter: parent.horizontalCenter
                     spacing: Theme.rowPadding * 2
 
-                    // Which mic the mic tiles record
+                    // Which mic the mic sounds record
                     Text {
                         anchors.verticalCenter: parent.verticalCenter
                         text: Theme.recordMicIcon + " " + (root.mic ? (root.mic.nickname || root.mic.description || root.mic.name) : "No mic")
@@ -436,8 +751,13 @@ Scope {
                     }
 
                     Hint {
-                        key: "1–4"
-                        label: "sound"
+                        key: "↑↓"
+                        label: "setting"
+                    }
+
+                    Hint {
+                        key: "←→"
+                        label: "change"
                     }
 
                     Hint {
@@ -446,9 +766,8 @@ Scope {
                     }
 
                     Hint {
-                        visible: root.withCamera
-                        key: "R"
-                        label: "shape"
+                        key: "Enter"
+                        label: root.live ? "stop" : "record"
                     }
 
                     Hint {

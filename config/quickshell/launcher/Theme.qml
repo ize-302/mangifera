@@ -71,6 +71,7 @@ Singleton {
     readonly property string recordMicIcon: String.fromCodePoint(0xf036c)
     readonly property string recordBothIcon: String.fromCodePoint(0xf08b4)
     readonly property string recordCameraIcon: String.fromCodePoint(0xf05a0)
+    readonly property string recordStopIcon: String.fromCodePoint(0xf04db)
     readonly property int powerIconSize: 26
     readonly property int powerTileWidth: 72
     readonly property int powerTilePadding: 8
@@ -78,16 +79,18 @@ Singleton {
     readonly property int powerFontSize: 13
     readonly property color powerColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
 
-    // Record menu: the line under each tile (mic level, camera shapes), the
-    // chosen sound's dot, and the 3-2-1 before recording
+    // Record menu: the settings rows (the picked option's fill), the mic
+    // level under the sounds, and the 3-2-1 before recording
     readonly property string recordCircleIcon: String.fromCodePoint(0xf0765)
     readonly property string recordRectangleIcon: String.fromCodePoint(0xf0e5e)
-    readonly property int recordStatusHeight: 14
-    readonly property int recordShapeSize: 13
+    readonly property color recordChosenColor: Qt.rgba(1, 1, 1, 0.16)
+    readonly property int recordSegmentHeight: 28
+    // Gap between a row's track and the pill on the picked option
+    readonly property int recordTrackPadding: 2
+    readonly property int recordButtonHeight: 40
     readonly property int recordMeterHeight: 4
     // Level bar range, in dB below full scale
     readonly property int recordMeterFloor: 60
-    readonly property int recordDotSize: 5
     readonly property int recordCountdownSeconds: 3
     readonly property int recordCountdownSize: 140
     readonly property int recordCountdownFontSize: 72
