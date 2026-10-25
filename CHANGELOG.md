@@ -14,6 +14,10 @@ git pull
 
 ## [Unreleased]
 
+### Changed
+
+- README shows the screen recorder and lock screen.
+
 ## [0.1.3] - 2026-10-25
 
 ### Changed

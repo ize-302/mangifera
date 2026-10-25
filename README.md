@@ -19,14 +19,17 @@ bar and a [Quickshell](https://quickshell.org) shell.
   </tr>
   <tr>
     <td><img src="docs/screenshots/clipboard.webp" alt="Clipboard history"><br>Clipboard history</td>
+    <td><img src="docs/screenshots/recording.webp" alt="Screen recording"><br>Screen recording, with an optional camera overlay</td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/lock.webp" alt="Lock screen"><br>Lock screen</td>
     <td></td>
   </tr>
 </table>
 
-Also: screenshots and screen recording with an optional camera overlay, an
-overview of all your windows, matching login and lock screens, a
-noise-canceling mic, a pomodoro timer in the bar, scratchpad windows, and
-Bluetooth audio that switches over as soon as it connects.
+Also: screenshots, an overview of all your windows, a matching login
+screen, a noise-canceling mic, a pomodoro timer in the bar, scratchpad
+windows, and Bluetooth audio that switches over as soon as it connects.
 
 ## Install
 
