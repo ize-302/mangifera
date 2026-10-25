@@ -1,20 +1,34 @@
 #!/bin/bash
-# record-toggle [--none|--desktop|--mic|--both] [--camera]
+# record-toggle [--none|--desktop|--mic|--both] [--camera] [--fps=N]
+# record-toggle --live-sound=<none|desktop|mic|both>
 # Starts recording a slurp-picked area to ~/Videos/Recordings, or stops the
 # running one. --desktop adds the playing audio, --mic (or --sound) the
 # default mic, --both the two mixed. --camera shows the webcam bubble
-# (CameraWidget.qml) from picking the area until the recording stops. With no
-# option it only stops.
+# (CameraWidget.qml) from picking the area until the recording stops. --fps
+# sets a constant frame rate, 60 by default; 0 leaves it uncapped. With no
+# option it only stops. --live-sound changes the running recording's sound
+# (from the record menu, RecordMenu.qml), without stopping it.
 dir=~/Videos/Recordings
 
 camera=
+fps=60
+live_sound=
 args=()
 for arg in "$@"; do
-	if [ "$arg" = --camera ]; then
+	case "$arg" in
+	--camera)
 		camera=1
-	else
+		;;
+	--fps=*)
+		fps="${arg#--fps=}"
+		;;
+	--live-sound=*)
+		live_sound="${arg#--live-sound=}"
+		;;
+	*)
 		args+=("$arg")
-	fi
+		;;
+	esac
 done
 set -- "${args[@]}"
 
@@ -31,39 +45,61 @@ bar() {
 	done
 }
 
-# Audio modules loaded for --both
-modules=()
-unload() {
-	for m in "${modules[@]}"; do
-		pactl unload-module "$m"
-	done
-	modules=()
+# Every recording takes its sound from a sink of its own, record_mix, with
+# the mic and the playing audio looped into it as picked. wf-recorder takes
+# one source, fixed when it starts, so this way the sound can change while
+# recording. With no sound it records the sink's silence.
+
+# Ids of the loaded modules feeding (or being) record_mix, matched by their
+# arguments, so any run finds the ones the starting run loaded
+mix_modules() {
+	pactl list modules short | awk -v kind="$1" '$2 == kind && /record_mix/ { print $1 }'
 }
 
-if pgrep -x wf-recorder >/dev/null; then
+# Feeds record_mix the given sound: none, desktop, mic or both
+mix() {
+	local m default_sink
+	for m in $(mix_modules module-loopback); do
+		pactl unload-module "$m"
+	done
+	default_sink="$(pactl get-default-sink)"
+	case "$1" in
+	mic | both)
+		pactl load-module module-loopback source=@DEFAULT_SOURCE@ sink=record_mix latency_msec=20 >/dev/null
+		;;
+	esac
+	case "$1" in
+	desktop | both)
+		pactl load-module module-loopback source="${default_sink}.monitor" sink=record_mix latency_msec=20 >/dev/null
+		;;
+	esac
+}
+
+unload() {
+	local m
+	for m in $(mix_modules module-loopback) $(mix_modules module-null-sink); do
+		pactl unload-module "$m"
+	done
+}
+
+if [ -n "$live_sound" ]; then
+	pgrep -x wf-recorder >/dev/null && mix "$live_sound"
+elif pgrep -x wf-recorder >/dev/null; then
 	# The starting run handles the rest
 	pkill -INT wf-recorder
 elif [ $# -gt 0 ]; then
-	audio_args=()
 	case "$1" in
-	-m | --mic | -s | --sound)
-		audio_args=(--audio)
-		;;
-	-d | --desktop)
-		default_sink="$(pactl get-default-sink)"
-		audio_args=(--audio="${default_sink}.monitor")
-		;;
-	-b | --both)
-		# wf-recorder takes one source, so mix the mic and the playing audio
-		# into a sink of their own while recording
-		default_sink="$(pactl get-default-sink)"
-		trap unload EXIT
-		modules+=("$(pactl load-module module-null-sink sink_name=record_mix sink_properties=device.description=Recording)")
-		modules+=("$(pactl load-module module-loopback source=@DEFAULT_SOURCE@ sink=record_mix latency_msec=20)")
-		modules+=("$(pactl load-module module-loopback source="${default_sink}.monitor" sink=record_mix latency_msec=20)")
-		audio_args=(--audio=record_mix.monitor)
-		;;
+	-m | --mic | -s | --sound) sound=mic ;;
+	-d | --desktop) sound=desktop ;;
+	-b | --both) sound=both ;;
+	*) sound=none ;;
 	esac
+	# Left over from a run that didn't get to clean up
+	unload
+	trap unload EXIT
+	pactl load-module module-null-sink sink_name=record_mix sink_properties=device.description=Recording >/dev/null
+	mix "$sound"
+	audio_args=(--audio=record_mix.monitor)
 
 	# Shown while picking, so it can be placed in the area first
 	cam show
@@ -97,12 +133,20 @@ elif [ $# -gt 0 ]; then
 		# Label it as what it is
 		codec_args=(-c h264_vaapi -d /dev/dri/renderD128 -p color_range=tv)
 	fi
-	wf-recorder -g "$area" "${codec_args[@]}" "${audio_args[@]}" -f "$file" &
+	# Left alone it writes a frame per screen update, up to the refresh rate,
+	# and sites such as X refuse anything over 60 fps
+	fps_args=()
+	if [ "$fps" -gt 0 ] 2>/dev/null; then
+		fps_args=(-r "$fps")
+	fi
+	wf-recorder -g "$area" "${fps_args[@]}" "${codec_args[@]}" "${audio_args[@]}" -f "$file" &
 	sleep 0.3
 	bar
 	wait
 	unload
-	cam hide
+	# Whether or not it started with the camera: the menu can turn it on
+	# while recording
+	~/.local/bin/launcher-call camera hide
 	bar
 
 	if [ ! -s "$file" ]; then

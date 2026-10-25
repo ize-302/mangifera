@@ -13,8 +13,8 @@ import qs
 // ~/.local/bin/cam-toggle. An overlay layer, so it stays above every window.
 // Drag it to move, drag its edge to resize, scroll to zoom, double-click to
 // reset the zoom, right-click to switch circle / landscape / portrait. Shape,
-// size and place are kept for next time. Uses an external camera when one is
-// plugged in, else the built-in one.
+// size, place and camera are kept for next time. Uses the camera picked in
+// the record menu, else an external one when plugged in, else the built-in one.
 Scope {
     id: root
 
@@ -28,6 +28,12 @@ Scope {
     property real posX: -1
     property real posY: -1
     property var screen: null
+    // The picked camera's description; empty for the default
+    property string device: ""
+    // Cameras to pick from: only those with a 720p mode, which leaves out IR
+    // and metadata nodes
+    readonly property list<var> devices: mediaDevices.videoInputs.filter(input => input.videoFormats.some(format => format.resolution.height === 720))
+    readonly property string currentDevice: camera.cameraDevice.description
 
     readonly property int shapeWidth: shape === "landscape" ? Math.round(size * 16 / 9) : size
     readonly property int shapeHeight: shape === "portrait" ? Math.round(size * 16 / 9) : size
@@ -70,8 +76,14 @@ Scope {
         zoom = clamp(zoom + steps * Theme.cameraZoomStep, 1, Theme.cameraMaxZoom);
     }
 
+    function setDevice(description) {
+        device = description;
+        save();
+    }
+
     function save() {
         stateFile.setText(JSON.stringify({
+            device: device,
             shape: shape,
             size: size,
             x: posX,
@@ -105,6 +117,7 @@ Scope {
                 root.size = root.clamp(saved.size ?? root.size, Theme.cameraMinSize, Theme.cameraMaxSize);
                 root.posX = saved.x ?? -1;
                 root.posY = saved.y ?? -1;
+                root.device = saved.device ?? "";
             } catch (error) {}
         }
     }
@@ -146,7 +159,7 @@ Scope {
     }
 
     MediaDevices {
-        id: devices
+        id: mediaDevices
     }
 
     CaptureSession {
@@ -155,12 +168,9 @@ Scope {
 
             // Only while shown, so the camera's light goes off with it
             active: root.open
-            // An external camera over the built-in one; only those with a 720p
-            // mode, which leaves out IR and metadata nodes
-            cameraDevice: {
-                const usable = devices.videoInputs.filter(device => device.videoFormats.some(format => format.resolution.height === 720));
-                return usable.find(device => !device.description.startsWith("Integrated")) ?? usable[0] ?? devices.defaultVideoInput;
-            }
+            // The picked one while it's plugged in, else an external camera
+            // over the built-in one
+            cameraDevice: root.devices.find(input => input.description === root.device) ?? root.devices.find(input => !input.description.startsWith("Integrated")) ?? root.devices[0] ?? mediaDevices.defaultVideoInput
             // The smallest 16:9 mode at least 480 high (848x480 is near
             // enough), at 30 frames a second, raw YUYV (17; VideoFrameFormat
             // isn't in QML) if it has one. Motion-JPEG is decoded on the CPU,

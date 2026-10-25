@@ -14,6 +14,11 @@ git pull
 
 ## [Unreleased]
 
+- Record menu redesign.
+- FPS (30, 60, 120 and max fps) options.
+- Camera choice selection.
+- Modify settings during recording.
+
 ## [0.1.4] - 2026-10-25
 
 ### Changed
