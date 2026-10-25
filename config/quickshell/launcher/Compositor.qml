@@ -19,6 +19,26 @@ Singleton {
         return Quickshell.screens.find(screen => screen.name === root.focusedMonitorName) ?? null;
     }
 
+    // Briefly true after screens come or go, so windows that stay mapped
+    // unmap and map again: one left without a screen (every display off at
+    // once, as when unplugging with the lid closed) never shows again
+    property bool remapping: false
+
+    Connections {
+        target: Quickshell
+
+        function onScreensChanged() {
+            root.remapping = true;
+            remap.restart();
+        }
+    }
+
+    Timer {
+        id: remap
+        interval: 250
+        onTriggered: root.remapping = false
+    }
+
     Process {
         id: watcher
         running: true

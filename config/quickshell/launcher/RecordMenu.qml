@@ -534,6 +534,7 @@ Scope {
         screen: Compositor.focusedScreen()
         // Stays mapped while closed, just empty and click-through: mapping a
         // surface again took ~40 ms each open
+        visible: !Compositor.remapping
         mask: Region {
             item: root.open ? panel : null
         }

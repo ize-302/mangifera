@@ -14,6 +14,14 @@ git pull
 
 ## [Unreleased]
 
+- Fix the laptop screen having no wallpaper after unplugging an external
+  display.
+- Fix the power menu, launcher, keybind and record menus not opening after
+  every display turned off at once (as when unplugging with the lid closed).
+- Super+Shift+R no longer restarts Quickshell, so reloading takes a fraction
+  of a second instead of several. Quickshell still reloads its own files when
+  they change.
+
 ## [0.2.0] - 2026-10-25
 
 - Record menu redesign.

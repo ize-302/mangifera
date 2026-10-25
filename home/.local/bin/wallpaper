@@ -1,8 +1,9 @@
 #!/bin/bash
-# wallpaper [--random|FILE]
+# wallpaper [--random|--follow|FILE]
 # Sets the wallpaper with awww (no argument: the last one). Saves its path
 # and a small copy for the lock screen, and copies it to
-# /var/lib/sddm-wallpaper for SDDM.
+# /var/lib/sddm-wallpaper for SDDM. --follow keeps setting it again on each
+# display that turns on.
 dir=~/Pictures/wallpapers
 default=~/.local/share/mangifera/default-wallpaper.jpg
 share=/var/lib/sddm-wallpaper
@@ -10,6 +11,39 @@ state=${XDG_STATE_HOME:-$HOME/.local/state}/mangifera/wallpaper
 lock=${state%/*}/lock-wallpaper.jpg
 
 current=$(cat -- "$state" 2>/dev/null)
+
+# The daemon runs with --no-cache, so it leaves a display that turns on (one
+# plugged in, or the laptop's after an unplug) black
+if [ "$1" = --follow ]; then
+	# mango lists a display even while it's off, so ask wlr-randr
+	names() {
+		wlr-randr --json | jq -r '.[] | select(.enabled) | .name' | sort
+	}
+
+	# awww sees a display a moment after mango does
+	shown() {
+		local outputs name
+		outputs=$(awww query 2>/dev/null) || return
+		while read -r name; do
+			grep -qF ": $name:" <<<"$outputs" || return
+		done <<<"$1"
+	}
+
+	known=$(names)
+	# Only as a signal: an event follows a display turning on or off
+	mmsg watch all-monitors | while read -r _; do
+		now=$(names)
+		added=$(comm -13 <(echo "$known") <(echo "$now"))
+		known=$now
+		[ -n "$added" ] || continue
+		for _ in $(seq 50); do
+			shown "$added" && break
+			sleep 0.1
+		done
+		"$0"
+	done
+	exit
+fi
 
 pick() {
 	find -L "$dir" -type f \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' \) 2>/dev/null |
