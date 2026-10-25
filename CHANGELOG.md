@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+- Release script
+
 ## [0.1.1] - 2026-10-25
 
 ### Added
