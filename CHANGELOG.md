@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-10-25
+
 ### Added
 
 - MIT license (LICENSE).
@@ -42,4 +44,5 @@ First release.
   backed-up files.
 
 [Unreleased]: https://github.com/ize-302/mangifera/compare/v0.1.0...HEAD
+[0.1.1]: https://github.com/ize-302/mangifera/releases/tag/v0.1.1
 [0.1.0]: https://github.com/ize-302/mangifera/releases/tag/v0.1.0
