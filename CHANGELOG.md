@@ -12,6 +12,12 @@ git pull
 ./install.sh
 ```
 
+## [Unreleased]
+
+### Added
+
+- MIT license (LICENSE).
+
 ## [0.1.0] - 2026-10-25
 
 First release.
@@ -35,4 +41,5 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/ize-302/mangifera/releases/tag/v0.1.0
