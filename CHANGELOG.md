@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.1.4] - 2026-10-25
+
 ### Changed
 
 - README shows the screen recorder and lock screen.
@@ -57,7 +59,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/ize-302/mangifera/releases/tag/v0.1.4
 [0.1.3]: https://github.com/ize-302/mangifera/releases/tag/v0.1.3
 [0.1.2]: https://github.com/ize-302/mangifera/releases/tag/v0.1.2
 [0.1.1]: https://github.com/ize-302/mangifera/releases/tag/v0.1.1
