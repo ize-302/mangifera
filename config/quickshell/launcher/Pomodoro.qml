@@ -4,9 +4,8 @@ import Quickshell.Io
 import qs
 
 // Pomodoro timer: focus, then a short break, a long one every pomodoroRounds.
-// Each phase ends with a notification and waits to be started. Writes
-// $XDG_RUNTIME_DIR/pomodoro.json for the bar and signals waybar (SIGRTMIN+11).
-// State persists across daemon restarts.
+// Each phase ends with a notification and waits to be started. Shown on the
+// bar (Bar.qml). State persists across daemon restarts.
 Scope {
     id: root
 
@@ -107,16 +106,6 @@ Scope {
         }));
     }
 
-    readonly property string status: JSON.stringify(idle ? {
-        text: ""
-    } : {
-        text: (phase === "focus" ? Theme.pomodoroIcon : Theme.pomodoroBreakIcon) + " " + clock,
-        class: [phase === "focus" ? "focus" : "break"].concat(running ? [] : ["paused"]),
-        tooltip: label + (running ? "" : " (paused)")
-    })
-
-    onStatusChanged: barFile.setText(status + "\n")
-
     Timer {
         running: root.running
         repeat: true
@@ -144,14 +133,6 @@ Scope {
         }
     }
 
-    FileView {
-        id: barFile
-
-        path: Quickshell.env("XDG_RUNTIME_DIR") + "/pomodoro.json"
-        printErrors: false
-        onSaved: Quickshell.execDetached(["pkill", "-RTMIN+11", "-x", "waybar"])
-    }
-
     // Restores saved state; one that ended meanwhile finishes now
     FileView {
         id: stateFile
@@ -171,8 +152,6 @@ Scope {
                 // After the load, as finishing saves to this same file
                 Qt.callLater(root.tick);
             } catch (error) {}
-            barFile.setText(root.status + "\n");
         }
-        onLoadFailed: barFile.setText(root.status + "\n")
     }
 }

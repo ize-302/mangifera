@@ -37,12 +37,9 @@ cam() {
 	[ -n "$camera" ] && ~/.local/bin/launcher-call camera "$1"
 }
 
-# Wakes the bar's ~/.local/bin/record-status, one per bar
+# Shows or hides the bar's recording timer (Bar.qml)
 bar() {
-	local file
-	for file in "${XDG_RUNTIME_DIR:-/tmp}"/record-status/*; do
-		[ -e "$file" ] && kill -USR1 "${file##*/}" 2>/dev/null
-	done
+	~/.local/bin/launcher-call bar recordingChanged
 }
 
 # Every recording takes its sound from a sink of its own, record_mix, with

@@ -14,6 +14,30 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- The bar is now part of the Quickshell shell instead of waybar. It looks and
+  works the same, but panels open exactly over the module clicked, and the
+  waybar CPU watchdog is gone. Log out and back in after `./install.sh`:
+  until then waybar runs beside the new bar. waybar can then be removed
+  (`sudo pacman -Rs waybar`), along with the links it leaves behind:
+  `rm -r ~/.config/waybar ~/.local/bin/{bar-anchor,bar-tags,bar-watchdog,clock-status,record-status}`.
+
+### Changed
+
+- Tags show each window's app icon instead of a Nerd Font glyph.
+- Tray app menus (right-click) are drawn like the launcher's menus, with
+  submenus opening in place and keyboard navigation.
+- The battery tooltip says "Fully charged", "Plugged in, not charging",
+  "Charging" or "On battery" when there's no time estimate.
+- The bar uses far less CPU while windows change: title, focus and geometry
+  changes no longer redraw it. The scratchpad menu shares its window list.
+
+### Fixed
+
+- Launcher menus opening slowly after Quickshell reloaded its files: the
+  reload deleted the launcher's socket.
+
 ## [0.2.1] - 2026-10-25
 
 - Fix the laptop screen having no wallpaper after unplugging an external

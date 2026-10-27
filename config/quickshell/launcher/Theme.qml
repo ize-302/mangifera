@@ -220,9 +220,65 @@ Singleton {
     readonly property color popupColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
     readonly property color popupEdgeColor: Qt.rgba(1, 1, 1, 0.08)
 
-    // waybar's height; ~/.local/bin/bar-anchor scans it
-    readonly property int barHeight: 38
-    readonly property string barAnchor: Quickshell.env("HOME") + "/.local/bin/bar-anchor"
+    // Bar (Bar.qml)
+    readonly property int barHeight: 32
+    readonly property color barColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.85)
+    readonly property string barFontFamily: "JetBrainsMono NF"
+    // Points, as waybar had it
+    readonly property real barFontSize: 13
+    readonly property int barModulePadding: 12
+    readonly property color barModuleColor: Qt.rgba(1, 1, 1, 0.03)
+    readonly property color barFocusedColor: Qt.rgba(1, 1, 1, 0.15)
+    readonly property color barUrgentColor: closeColor
+    readonly property color barUrgentTextColor: "#15161e"
+    readonly property color barModeColor: "#ff5555"
+    readonly property color barOffColor: "#808080"
+    readonly property color barFadedColor: Qt.rgba(1, 1, 1, 0.4)
+    readonly property color barTrayColor: Qt.rgba(192 / 255, 202 / 255, 245 / 255, 0.06)
+    readonly property int barTrayIconSize: 21
+    readonly property int barTraySpacing: 14
+    readonly property color barRecordingColor: "#ff453a"
+    readonly property color barRecordingBackground: Qt.rgba(1, 1, 1, 0.08)
+    readonly property color barChargingColor: "#7dd3fc"
+    readonly property color barDividerColor: Qt.rgba(1, 1, 1, 0.25)
+    // Hover time before a tooltip shows
+    readonly property int barTooltipDelay: 500
+    readonly property color barTooltipColor: "#202020"
+    readonly property int barTooltipFontSize: 13
+    // Green to red as a reading rises; [threshold, colour], highest first
+    readonly property var barLoadColors: [[70, "#ff0000"], [60, "#ff8000"], [50, "#ffbf00"], [25, "#ffff00"], [10, "#bfff00"], [0, "#00ff00"]]
+    readonly property var barDiskColors: [[92, "#ff0000"], [85, "#ff8000"], [75, "#ffbf00"], [65, "#ffff00"], [50, "#bfff00"], [0, "#00ff00"]]
+    // The thermometer empties as it cools: [from °C, colour, icon]
+    readonly property var barTemperatureLevels: [[70, "#ff0000", 0xf2c7], [65, "#ff8000", 0xf2c7], [60, "#ffbf00", 0xf2c8], [55, "#ffff00", 0xf2c9], [50, "#bfff00", 0xf2ca], [0, "#00ff00", 0xf2cb]].map(([level, colour, code]) => [level, colour, String.fromCodePoint(code)])
+    // Battery is the other way round: [below or at, colour]
+    readonly property var barBatteryColors: [[9, "#ff0000"], [29, "#ff8000"], [49, "#ffff00"], [79, "#bfff00"]]
+    readonly property color barBatteryFullColor: "#00ff00"
+
+    readonly property string barToolboxIcon: String.fromCodePoint(0xf09ac)
+    readonly property string barDiskIcon: "\uf233"
+    readonly property string barCpuIcon: "\uee9c"
+    readonly property string barMemoryIcon: "\uefc5"
+    readonly property string barBacklightIcon: String.fromCodePoint(0xf05a8)
+    readonly property string barEthernetIcon: String.fromCodePoint(0xf0200)
+    readonly property string barChargingIcon: String.fromCodePoint(0xf0084)
+    // [below or at, icon], then the full one
+    readonly property var barBatteryIcons: [[9, 0xf007b], [29, 0xf007c], [49, 0xf007e], [79, 0xf0080]].map(([level, code]) => [level, String.fromCodePoint(code)])
+    readonly property string barBatteryFullIcon: String.fromCodePoint(0xf0079)
+    // App icons on the tags: size, gap after the number, between icons, and
+    // after the last
+    readonly property int barTagIconSize: 18
+    readonly property int barTagIconGap: 6
+    readonly property int barTagIconSpacing: 4
+    readonly property int barTagPadding: 10
+
+    // Tray app menus (TrayMenu.qml)
+    readonly property int trayIconSize: 18
+    readonly property int trayMenuMaxWidth: 360
+    readonly property string trayBackText: "Back"
+    readonly property string trayCheckOnIcon: String.fromCodePoint(0xf0132)
+    readonly property string trayCheckOffIcon: String.fromCodePoint(0xf0131)
+    readonly property string trayRadioOnIcon: String.fromCodePoint(0xf043e)
+    readonly property string trayRadioOffIcon: String.fromCodePoint(0xf043d)
 
     // Volume popup
     readonly property int osdWidth: 40

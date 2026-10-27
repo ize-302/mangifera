@@ -6,18 +6,18 @@ import Quickshell.Io
 import Quickshell.Wayland
 import qs
 
-// Launcher daemon (`qs -c launcher -d`): the app menu plus every other menu,
-// panel, popup, notification and prompt. Toggled over IPC by the ~/.local/bin
+// Launcher daemon (`qs -c launcher -d`): the bar, the app menu plus every
+// other menu, panel, popup, notification and prompt. Toggled over IPC by the ~/.local/bin
 // scripts.
 ShellRoot {
     id: root
 
     // Desktop entry id -> times launched; most used first
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, recordMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, datePanel, toolboxMenu]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, recordMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, datePanel, toolboxMenu, trayMenu]
     readonly property bool anyOpen: menus.some(menu => menu.open)
-    // Pointer x on its screen when a menu opened, snapped to the bar module's
-    // centre (~/.local/bin/bar-anchor); -1 until known
+    // Pointer x on its screen when a menu opened, or the centre of the bar
+    // module clicked; -1 until known
     property real pointerX: -1
     property var pointerScreen: null
     property bool pointerSeen: false
@@ -37,25 +37,28 @@ ShellRoot {
             return;
         root.pointerSeen = true;
         root.pointerScreen = screen;
-        anchor.screenX = screen.x;
-        anchor.pointer = x;
-        anchor.command = [Theme.barAnchor, String(screen.x + x), String(screen.y + screen.height - Theme.barHeight), String(Theme.barHeight)];
-        anchor.running = true;
+        root.pointerX = x;
     }
 
-    // Falls back to the pointer itself
-    Process {
-        id: anchor
-
-        property real screenX: 0
-        property real pointer: -1
-
-        stdout: StdioCollector {
-            onStreamFinished: {
-                const x = parseFloat(text);
-                root.pointerX = isNaN(x) ? anchor.pointer : x - anchor.screenX;
-            }
+    // From the bar: a tray app's menu, centred over x on the given screen.
+    // Again on the same one closes it
+    function openTrayMenu(menu, screen, x) {
+        if (trayMenu.open && trayMenu.menu === menu) {
+            trayMenu.open = false;
+            return;
         }
+        trayMenu.show(menu, screen, x);
+    }
+
+    // From the bar: calls `line` (see call()), and centres the panel it opens
+    // over x on the given screen
+    function openAt(screen, x, line) {
+        root.call(line);
+        if (!root.anyOpen)
+            return;
+        root.pointerSeen = true;
+        root.pointerScreen = screen;
+        root.pointerX = x;
     }
 
     // { x, y, monitor }, x in global layout coordinates
@@ -253,6 +256,12 @@ ShellRoot {
             root.closeOthers(toolboxMenu)
     }
 
+    TrayMenu {
+        id: trayMenu
+        onOpenChanged: if (open)
+            root.closeOthers(trayMenu)
+    }
+
     Pomodoro {
         id: pomodoro
     }
@@ -267,7 +276,12 @@ ShellRoot {
 
     CapsLock {}
 
-    BarVolume {}
+    Bar {
+        id: bar
+        shell: root
+        pomodoro: pomodoro
+        notifications: notifications
+    }
 
     Osd {
         suppressed: controlPanel.open
@@ -279,7 +293,7 @@ ShellRoot {
     }
 
     // Every IpcHandler, for calls over the socket
-    readonly property list<QtObject> handlers: [launcherIpc, powerMenu.ipc, recordMenu.ipc, clipboardMenu.ipc, scratchpadMenu.ipc, keybindMenu.ipc, controlPanel.ipc, notificationCenter.ipc, datePanel.ipc, pomodoro.ipc, notifications.ipc, camera.ipc, toolboxMenu.ipc]
+    readonly property list<QtObject> handlers: [launcherIpc, powerMenu.ipc, recordMenu.ipc, clipboardMenu.ipc, scratchpadMenu.ipc, keybindMenu.ipc, controlPanel.ipc, notificationCenter.ipc, datePanel.ipc, pomodoro.ipc, notifications.ipc, camera.ipc, toolboxMenu.ipc, bar.ipc]
 
     // `line` is "<target> <function> [argument]", as `qs ipc call` takes
     function call(line) {
@@ -291,7 +305,28 @@ ShellRoot {
 
     // ~/.local/bin/launcher-call writes a call here. Much quicker than
     // `qs ipc call`, which starts a whole Qt client each time.
+    // A reload starts this config's socket before the old one is gone, and the
+    // old one deletes the file as it goes; make it again once that's done
+    Connections {
+        target: Quickshell
+
+        function onReloadCompleted() {
+            socketRestart.restart();
+        }
+    }
+
+    Timer {
+        id: socketRestart
+        interval: 500
+        onTriggered: {
+            socket.active = false;
+            Qt.callLater(() => socket.active = true);
+        }
+    }
+
     SocketServer {
+        id: socket
+
         active: true
         path: Quickshell.env("XDG_RUNTIME_DIR") + "/mangifera-launcher.sock"
         handler: Socket {

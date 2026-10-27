@@ -9,9 +9,8 @@ import Quickshell.Widgets
 import qs
 
 // Notification server (replaces dunst). Shows cards above the bar's right end,
-// at most maxPopups, and keeps them for NotificationCenter.qml. Writes
-// $XDG_RUNTIME_DIR/notifications.json for the bar's bell and signals waybar
-// (SIGRTMIN+8).
+// at most maxPopups, and keeps them for NotificationCenter.qml. The bar's bell
+// (Bar.qml) shows the unread count and do not disturb.
 Scope {
     id: root
 
@@ -180,18 +179,6 @@ Scope {
             doNotDisturbFor = "";
             doNotDisturbUntil = 0;
         }
-        root.writeStatus();
-    }
-    onUnreadChanged: root.writeStatus()
-    Component.onCompleted: root.writeStatus()
-
-    // { text, class }; class is "unread" or "dnd" for style.css
-    function writeStatus() {
-        const dot = unread > 0 ? `<span color='${Theme.accentColor}' size='small' rise='6pt'>●</span>` : "";
-        status.setText(JSON.stringify({
-            text: (doNotDisturb ? Theme.doNotDisturbIcon : unread > 0 ? Theme.bellUnreadIcon : Theme.bellIcon) + dot,
-            class: doNotDisturb ? "dnd" : unread > 0 ? "unread" : ""
-        }) + "\n");
     }
 
     // Also called over the launcher socket (shell.qml)
@@ -212,14 +199,6 @@ Scope {
         function clear(): void {
             root.clear();
         }
-    }
-
-    FileView {
-        id: status
-
-        path: Quickshell.env("XDG_RUNTIME_DIR") + "/notifications.json"
-        printErrors: false
-        onSaved: Quickshell.execDetached(["pkill", "-RTMIN+8", "-x", "waybar"])
     }
 
     Process {

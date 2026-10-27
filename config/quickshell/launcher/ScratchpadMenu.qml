@@ -134,27 +134,29 @@ Scope {
         return code >= 10 && code <= 18 ? code - 9 : 0;
     }
 
-    // Restarted if mmsg exits (mango restarting)
-    Process {
-        id: clientWatcher
-        running: true
-        command: ["mmsg", "watch", "all-clients"]
+    // Windows from Compositor.qml; only a change to the parked ones updates
+    // the strip
+    property string entriesKey: ""
 
-        onExited: watchRestart.restart()
-
-        stdout: SplitParser {
-            onRead: line => {
-                try {
-                    root.update(root.parse(JSON.parse(line)));
-                } catch (error) {}
-            }
-        }
+    function refresh() {
+        const entries = root.parse({
+            clients: Compositor.clients
+        });
+        const key = JSON.stringify(entries);
+        if (key === root.entriesKey)
+            return;
+        root.entriesKey = key;
+        root.update(entries);
     }
 
-    Timer {
-        id: watchRestart
-        interval: 1000
-        onTriggered: clientWatcher.running = true
+    Component.onCompleted: refresh()
+
+    Connections {
+        target: Compositor
+
+        function onClientsChanged() {
+            root.refresh();
+        }
     }
 
     // Also called over the launcher socket (shell.qml)

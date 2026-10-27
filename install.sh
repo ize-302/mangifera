@@ -45,8 +45,8 @@ run() {
 repo_packages=(
   # Compositor; jq parses mmsg output; wlr-randr turns the laptop screen off
   mangowm jq wlr-randr
-  # Shell, bar, lock, wallpaper; socat calls the launcher daemon
-  quickshell qt6-5compat socat waybar swayidle swaylock awww
+  # Shell and bar, lock, wallpaper; socat calls the launcher daemon
+  quickshell qt6-5compat socat swayidle swaylock awww
   # Screenshots, recording and the clipboard; qt6-multimedia shows the
   # webcam (CameraWidget.qml)
   grim slurp satty wf-recorder qt6-multimedia qt6-multimedia-ffmpeg

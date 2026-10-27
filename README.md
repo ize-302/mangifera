@@ -1,8 +1,8 @@
 # Mangifera
 
 A clean, frosted-glass [mango](https://github.com/DreamMaoMao/mangowc)
-desktop for Arch Linux, with a [waybar](https://github.com/Alexays/Waybar)
-bar and a [Quickshell](https://quickshell.org) shell.
+desktop for Arch Linux, with a [Quickshell](https://quickshell.org) bar and
+shell.
 
 ![Mangifera desktop](docs/screenshots/desktop.webp)
 
