@@ -32,6 +32,8 @@ git pull
   "Charging" or "On battery" when there's no time estimate.
 - The bar uses far less CPU while windows change: title, focus and geometry
   changes no longer redraw it. The scratchpad menu shares its window list.
+- Bar tooltips are flatter: smaller corners, no outline and softer grey
+  text.
 
 ### Fixed
 

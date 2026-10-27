@@ -244,6 +244,9 @@ Singleton {
     // Hover time before a tooltip shows
     readonly property int barTooltipDelay: 500
     readonly property color barTooltipColor: "#202020"
+    readonly property int barTooltipRadius: 2
+    // Softer than the bar's white, like the launcher's unselected rows
+    readonly property color barTooltipTextColor: keyTextColor
     readonly property int barTooltipFontSize: 13
     // Green to red as a reading rises; [threshold, colour], highest first
     readonly property var barLoadColors: [[70, "#ff0000"], [60, "#ff8000"], [50, "#ffbf00"], [25, "#ffff00"], [10, "#bfff00"], [0, "#00ff00"]]

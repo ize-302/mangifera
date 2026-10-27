@@ -23,16 +23,14 @@ PopupWindow {
     anchor.edges: Edges.Top
     anchor.gravity: Edges.Top
 
-    // Styled like the launcher's cards
+    // Plain dark box, no outline
     Rectangle {
         id: box
 
         width: label.implicitWidth + 12
         height: label.implicitHeight + 6
         color: Theme.barTooltipColor
-        radius: Theme.cornerRadius
-        border.width: 1
-        border.color: Theme.edgeColor
+        radius: Theme.barTooltipRadius
 
         Text {
             id: label
@@ -40,7 +38,7 @@ PopupWindow {
             anchors.centerIn: parent
             text: tip.text
             textFormat: Text.PlainText
-            color: Theme.textColor
+            color: Theme.barTooltipTextColor
             font.family: Theme.fontFamily
             font.pixelSize: Theme.barTooltipFontSize
             font.weight: Theme.fontWeight
