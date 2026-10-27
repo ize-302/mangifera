@@ -136,6 +136,8 @@ Scope {
             property bool tipDelayed: true
             // Clicked: no tooltip until the pointer moves to another module
             property bool tipDismissed: false
+            // The module whose tooltip is up
+            property Item tipFor: null
             readonly property var monitor: Compositor.monitors.find(monitor => monitor.name === modelData.name) ?? null
 
             screen: modelData
@@ -155,20 +157,29 @@ Scope {
                 right: true
             }
 
+            // The pointer can enter the next module before leaving the last, so
+            // the tooltip always closes first and the new one is a fresh popup:
+            // one retargeted while open kept the old text and place
             onHoveredChanged: {
                 tipDismissed = false;
+                tipFor = null;
                 if (!hovered) {
                     tipDelayed = true;
                     tipDelay.stop();
                 } else if (tipDelayed) {
                     tipDelay.restart();
+                } else {
+                    Qt.callLater(() => window.tipFor = window.hovered);
                 }
             }
 
             Timer {
                 id: tipDelay
                 interval: Theme.barTooltipDelay
-                onTriggered: window.tipDelayed = false
+                onTriggered: {
+                    window.tipDelayed = false;
+                    window.tipFor = window.hovered;
+                }
             }
 
             Connections {
@@ -181,9 +192,13 @@ Scope {
                 }
             }
 
-            BarTooltip {
-                anchor.window: window
-                target: window.tipDelayed || window.tipDismissed ? null : window.hovered
+            LazyLoader {
+                active: window.tipFor !== null && !window.tipDismissed
+
+                BarTooltip {
+                    anchor.window: window
+                    target: window.tipFor
+                }
             }
 
             // Top edge
