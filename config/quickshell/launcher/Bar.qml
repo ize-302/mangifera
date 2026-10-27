@@ -510,7 +510,7 @@ Scope {
 
                         readonly property int percent: Math.round(root.volume * 100)
                         // Spacing after each glyph tuned so they look even
-                        readonly property string icon: root.playing && !root.muted ? Theme.musicIcon + " " : root.muted ? Theme.volumeMutedIcon + " " : percent >= 51 ? Theme.volumeHighIcon + "  " : Theme.volumeLowIcon + " "
+                        readonly property string icon: root.playing && !root.muted ? Theme.musicIcon + " " : root.muted ? Theme.volumeMutedIcon + " " : percent >= 51 ? Theme.volumeHighIcon + " " : Theme.volumeLowIcon + " "
 
                         text: root.sink ? icon + percent + "%" : ""
                         textColor: Theme.volumeColor(root.volume, root.muted)
