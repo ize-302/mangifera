@@ -4,8 +4,9 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 
-// mango's monitors via `mmsg watch all-monitors`: which has focus, and their
-// tags. Each event carries the whole state.
+// mango's monitors and windows via `mmsg watch all-monitors` and `mmsg watch
+// all-clients`: which monitor has focus, their tags, and what's on them. Each
+// event carries the whole state.
 Singleton {
     id: root
 
@@ -14,6 +15,14 @@ Singleton {
     property var monitors: []
     readonly property var focusedMonitor: monitors.find(monitor => monitor.active) ?? null
     readonly property string focusedMonitorName: focusedMonitor?.name ?? ""
+    // As mmsg prints them, without titles or geometry: { id, appid, monitor,
+    // tags: [index], is_minimized, is_fullscreen, ... }. Those are left out so
+    // a browser tab ticking its title, or a window moving, doesn't update
+    // every binding
+    property var clients: []
+    // Windows parked in the scratchpad (minimized), in full as mmsg prints
+    // them. Named scratchpads are mango's own toggled windows, not parked ones
+    property var parked: []
 
     function focusedScreen() {
         return Quickshell.screens.find(screen => screen.name === root.focusedMonitorName) ?? null;
@@ -60,5 +69,50 @@ Singleton {
         id: restart
         interval: 1000
         onTriggered: watcher.running = true
+    }
+
+    Process {
+        id: clientWatcher
+        running: true
+        command: ["mmsg", "watch", "all-clients"]
+
+        onExited: clientRestart.restart()
+
+        // Each is only replaced when it changed
+        stdout: SplitParser {
+            property string lastClients
+            property string lastParked
+
+            onRead: line => {
+                try {
+                    const all = JSON.parse(line).clients ?? [];
+
+                    const parked = all.filter(client => client.is_minimized && !client.is_namedscratchpad);
+                    const parkedKey = JSON.stringify(parked);
+                    if (parkedKey !== lastParked) {
+                        lastParked = parkedKey;
+                        root.parked = parked;
+                    }
+
+                    const clients = all.map(client => {
+                        const stripped = Object.assign({}, client);
+                        for (const field of ["title", "x", "y", "width", "height", "scroller_proportion"])
+                            delete stripped[field];
+                        return stripped;
+                    });
+                    const clientsKey = JSON.stringify(clients);
+                    if (clientsKey !== lastClients) {
+                        lastClients = clientsKey;
+                        root.clients = clients;
+                    }
+                } catch (error) {}
+            }
+        }
+    }
+
+    Timer {
+        id: clientRestart
+        interval: 1000
+        onTriggered: clientWatcher.running = true
     }
 }

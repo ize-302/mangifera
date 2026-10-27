@@ -14,6 +14,13 @@ git pull
 
 ## [Unreleased]
 
+- The bar's tags show each window's real app icon instead of a Nerd Font
+  glyph. Tags, the scratchpad count and the key mode are now drawn by
+  Quickshell over the left end of waybar; `~/.local/bin/bar-tags` is gone
+  (remove its leftover link with `rm ~/.local/bin/bar-tags`).
+- Quickshell watches mango's windows once instead of twice, and skips updates
+  when only a window's title, position or size changed.
+
 ## [0.2.1] - 2026-10-25
 
 - Fix the laptop screen having no wallpaper after unplugging an external

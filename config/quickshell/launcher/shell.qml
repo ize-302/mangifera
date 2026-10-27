@@ -269,6 +269,10 @@ ShellRoot {
 
     BarVolume {}
 
+    TagBar {
+        scratchpadMenu: scratchpadMenu
+    }
+
     Osd {
         suppressed: controlPanel.open
     }

@@ -23,9 +23,8 @@ Scope {
     property real lastTap: 0
     readonly property string previewDir: Quickshell.env("XDG_RUNTIME_DIR") + "/scratchpad-previews"
 
-    // Named scratchpads are mango's own toggled windows, not parked ones
-    function parse(state) {
-        return (state.clients ?? []).filter(client => client.is_minimized && !client.is_namedscratchpad).map(client => ({
+    function parse(parked) {
+        return parked.map(client => ({
                     id: client.id,
                     appId: client.appid ?? "",
                     title: client.title ?? "",
@@ -134,27 +133,14 @@ Scope {
         return code >= 10 && code <= 18 ? code - 9 : 0;
     }
 
-    // Restarted if mmsg exits (mango restarting)
-    Process {
-        id: clientWatcher
-        running: true
-        command: ["mmsg", "watch", "all-clients"]
+    Component.onCompleted: root.update(root.parse(Compositor.parked))
 
-        onExited: watchRestart.restart()
+    Connections {
+        target: Compositor
 
-        stdout: SplitParser {
-            onRead: line => {
-                try {
-                    root.update(root.parse(JSON.parse(line)));
-                } catch (error) {}
-            }
+        function onParkedChanged() {
+            root.update(root.parse(Compositor.parked));
         }
-    }
-
-    Timer {
-        id: watchRestart
-        interval: 1000
-        onTriggered: clientWatcher.running = true
     }
 
     // Also called over the launcher socket (shell.qml)
