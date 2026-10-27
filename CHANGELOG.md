@@ -20,6 +20,9 @@ git pull
   (remove its leftover link with `rm ~/.local/bin/bar-tags`).
 - Quickshell watches mango's windows once instead of twice, and skips updates
   when only a window's title, position or size changed.
+- The bar has a light blur behind it, and is a little more see-through.
+- Super+Shift+R also restarts waybar, so bar config changes show up.
+- The volume control comes before the toolbox in the bar.
 
 ## [0.2.1] - 2026-10-25
 

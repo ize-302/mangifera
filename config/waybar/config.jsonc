@@ -16,8 +16,8 @@
 	"modules-right": [
 		"custom/recording",
 		"tray",
-		"custom/toolbox",
 		"custom/volume",
+		"custom/toolbox",
 		"backlight",
 		"custom/pomodoro",
 		"network",
