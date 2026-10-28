@@ -5,6 +5,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Date panel: pomodoro card over a month calendar, floating above the bar.
 // Toggled by ~/.local/bin/date-panel; `--pointer` centres it over the clock.

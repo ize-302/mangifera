@@ -7,6 +7,8 @@ import Quickshell.Services.Notifications
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs
+import qs.services
+import qs.widgets
 
 // Notification server (replaces dunst). Shows cards above the bar's right end,
 // at most maxPopups, and keeps them for NotificationCenter.qml. Writes

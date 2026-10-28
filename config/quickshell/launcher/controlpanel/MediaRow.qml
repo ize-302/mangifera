@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell.Services.Mpris
 import Quickshell.Widgets
 import qs
+import qs.widgets
 
 // Now playing, in the sound popup: artwork, title, controls and a seekable
 // progress bar.

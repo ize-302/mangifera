@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Services.Polkit
 import Quickshell.Wayland
 import qs
+import qs.widgets
 
 // The session's polkit agent: asks for the admin password in a centred panel.
 // Without an agent such requests are refused, so this only works while the

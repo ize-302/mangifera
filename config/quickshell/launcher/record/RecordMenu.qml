@@ -6,6 +6,8 @@ import Quickshell.Io
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Sets up a screen recording, toggled by ~/.local/bin/record-menu: a row each
 // for the sound, the camera (with its shape while it's on), which camera

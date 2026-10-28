@@ -3,6 +3,7 @@ import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
 import qs
+import qs.services
 
 // The bar's tags, scratchpad count and key mode, drawn over the left end of
 // waybar on each screen: waybar's custom modules can only show text, and these

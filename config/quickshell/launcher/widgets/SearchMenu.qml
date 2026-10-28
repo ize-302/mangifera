@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Wayland
 import Quickshell.Widgets
 import qs
+import qs.services
 
 // Searchable list in the corner panel, or a strip of cards when `card` is set.
 // The owner filters `results` by `query` and handles `accepted`.

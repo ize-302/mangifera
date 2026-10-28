@@ -2,6 +2,7 @@ pragma ComponentBehavior: Bound
 
 import QtQuick
 import qs
+import qs.widgets
 
 // Pomodoro card in the date panel: phase, session dots, controls, time left and
 // a progress bar.

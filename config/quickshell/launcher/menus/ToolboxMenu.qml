@@ -5,6 +5,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Toolbox: small tools, floating above the bar's toolbox icon. Toggled by
 // ~/.local/bin/toolbox; `--pointer` centres it over the icon. Up/Down (k/j)

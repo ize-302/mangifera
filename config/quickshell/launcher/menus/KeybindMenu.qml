@@ -5,6 +5,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Cheat sheet of the mango key bindings, toggled by ~/.local/bin/keybind-menu.
 // Typing filters rows by every word (a matching group name keeps all its rows).

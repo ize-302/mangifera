@@ -3,6 +3,7 @@ pragma ComponentBehavior: Bound
 import QtQuick
 import Quickshell.Widgets
 import qs
+import qs.widgets
 
 // A notification card in the notification centre. A collapsed stack (`stack` >
 // 1) shows two card edges peeking out below and its × dismisses the whole
