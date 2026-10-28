@@ -20,6 +20,7 @@ git pull
   the dimmed desktop, like macOS Mission Control. h/j/k/l or the arrows move
   through it. `scratchpadStyle` in the launcher's `Theme.qml` switches
   between it (`"overview"`) and the strip (`"strip"`).
+- Backspace closes the selected scratchpad window, like Delete.
 
 ### Changed
 

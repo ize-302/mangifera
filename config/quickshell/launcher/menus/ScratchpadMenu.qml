@@ -11,7 +11,8 @@ import qs.widgets
 // Theme.scratchpadStyle. Previews are grabbed with `grim -T` once, when the
 // window is parked: mango stops redrawing hidden windows, so the frame stays
 // accurate. Opened by double tapping Super or by ~/.local/bin/scratchpad-menu.
-// Enter brings the window out onto an empty tag; Delete closes it.
+// Enter brings the window out onto an empty tag; Delete or Backspace closes
+// it.
 Scope {
     id: root
 
@@ -134,10 +135,10 @@ Scope {
         return Quickshell.iconPath(DesktopEntries.heuristicLookup(entry.appId)?.icon ?? entry.appId, "application-x-executable");
     }
 
-    // Delete closes. Alt+1…9 sends to that tag and stays; Alt+Shift+1…9
-    // follows
+    // Delete or Backspace closes. Alt+1…9 sends to that tag and stays;
+    // Alt+Shift+1…9 follows
     function handleKey(event, entry) {
-        if (event.key === Qt.Key_Delete) {
+        if (event.key === Qt.Key_Delete || event.key === Qt.Key_Backspace) {
             root.close(entry);
             return true;
         }
