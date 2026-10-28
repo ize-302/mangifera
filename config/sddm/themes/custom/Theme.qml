@@ -20,7 +20,7 @@ QtObject {
     readonly property color glassColor: Qt.rgba(1, 1, 1, 0.04)
     readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.16)
     // Menus
-    readonly property color menuColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.7)
+    readonly property color menuColor: Qt.rgba(0, 0, 0, 0.7)
     readonly property color menuTextColor: "white"
     readonly property color menuSoftTextColor: "#cccccc"
     readonly property int menuSelectedWeight: Font.DemiBold
