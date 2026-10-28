@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-10-28
+
 ### Added
 
 - Scratchpad overview: the scratchpad as a full-screen grid of previews over
@@ -139,7 +141,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.4.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/ize-302/mangifera/releases/tag/v0.5.0
 [0.4.0]: https://github.com/ize-302/mangifera/releases/tag/v0.4.0
 [0.3.0]: https://github.com/ize-302/mangifera/releases/tag/v0.3.0
 [0.2.1]: https://github.com/ize-302/mangifera/releases/tag/v0.2.1
