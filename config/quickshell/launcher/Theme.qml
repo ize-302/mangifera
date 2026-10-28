@@ -224,6 +224,27 @@ Singleton {
     readonly property int barHeight: 38
     readonly property string barAnchor: Quickshell.env("HOME") + "/.local/bin/bar-anchor"
 
+    // Tags over the bar's left end, styled like waybar's modules (style.css)
+    readonly property string barFontFamily: "JetBrainsMono NF"
+    readonly property int barFontSize: 13
+    // waybar's "height" (config.jsonc)
+    readonly property int tagBarHeight: 32
+    // waybar's top border
+    readonly property int tagBorder: 1
+    readonly property int tagPadding: 6
+    // After the last icon
+    readonly property int tagEndPadding: 10
+    readonly property int tagIconSize: 18
+    // Between the tag number and its first icon
+    readonly property int tagNumberSpacing: 4
+    readonly property int tagIconSpacing: 4
+    readonly property color tagColor: Qt.rgba(1, 1, 1, 0.03)
+    readonly property color tagFocusedColor: Qt.rgba(1, 1, 1, 0.15)
+    readonly property color tagUrgentTextColor: "#15161e"
+    readonly property int scratchpadPadding: 8
+    readonly property int modePadding: 6
+    readonly property color modeColor: "#ff5555"
+
     // Volume popup
     readonly property int osdWidth: 40
     readonly property int osdFontSize: 10

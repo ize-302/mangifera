@@ -8,58 +8,14 @@
 }
 
 window#waybar {
-  background-color: rgba(32, 32, 32, 0.85);
+  background-color: rgba(32, 32, 32, 0.5);
   border-top: 1px solid rgba(255, 255, 255, 0.12);
   color: #ffffff;
-}
-
-#custom-tag {
-  padding: 0 14px 0 6px;
-  margin: 0;
-  background-color: rgba(255, 255, 255, 0.03);
-  color: #ffffff;
-}
-
-#custom-tag.empty {
-  padding: 0 6px;
-}
-
-#custom-tag.visible {
-  background-color: rgba(255, 255, 255, 0.03);
-  color: #ffffff;
-}
-
-#custom-tag.focused {
-  background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
-}
-
-#custom-tag.urgent {
-  background-color: #f7768e;
-  color: #15161e;
-}
-
-#custom-tag:hover {
-  box-shadow: none;
-  text-shadow: none;
-  background-image: none;
 }
 
 #custom-toolbox {
   padding: 0 12px;
   color: #ffffff;
-}
-
-#custom-scratchpad {
-  padding: 0 8px;
-  background-color: rgba(255, 255, 255, 0.03);
-  color: #ffffff;
-}
-
-#custom-mode {
-  padding: 0 6px;
-  background-color: #ff5555;
-  color: #15161e;
 }
 
 #custom-recording,
@@ -195,7 +151,10 @@ window#waybar {
   color: #ffffff;
   font-size: 16px;
   /* Divider as a background line: a border would make the bar taller */
-  background-image: linear-gradient(rgba(255, 255, 255, 0.25), rgba(255, 255, 255, 0.25));
+  background-image: linear-gradient(
+    rgba(255, 255, 255, 0.25),
+    rgba(255, 255, 255, 0.25)
+  );
   background-size: 1px 50%;
   background-position: left center;
   background-repeat: no-repeat;

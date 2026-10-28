@@ -9,6 +9,8 @@ import Quickshell.Services.Mpris
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // The bar's sound, Wi-Fi and bluetooth popup. The main view has each section's
 // slider or switch; lists (audio devices, networks, bluetooth devices) and

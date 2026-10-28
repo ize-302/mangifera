@@ -4,19 +4,8 @@
 	"position": "bottom",
 	"height": 32,
 	"spacing": 0,
-	"modules-left": [
-		"custom/tag#1",
-		"custom/tag#2",
-		"custom/tag#3",
-		"custom/tag#4",
-		"custom/tag#5",
-		"custom/tag#6",
-		"custom/tag#7",
-		"custom/tag#8",
-		"custom/tag#9",
-		"custom/scratchpad",
-		"custom/mode"
-	],
+	// Tags, scratchpad and mode are drawn over this end by Quickshell (TagBar.qml)
+	"modules-left": [],
 	"modules-center": [
 		"temperature",
 		"disk",
@@ -27,8 +16,8 @@
 	"modules-right": [
 		"custom/recording",
 		"tray",
-		"custom/toolbox",
 		"custom/volume",
+		"custom/toolbox",
 		"backlight",
 		"custom/pomodoro",
 		"network",
@@ -44,85 +33,6 @@
 		"on-click": "~/.local/bin/toolbox --pointer"
 	},
 
-	// Tags, scratchpad and mode are written by ~/.local/bin/bar-tags (SIGRTMIN+13)
-	"custom/tag#1": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-1.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,1,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#2": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-2.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,2,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#3": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-3.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,3,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#4": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-4.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,4,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#5": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-5.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,5,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#6": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-6.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,6,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#7": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-7.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,7,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#8": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-8.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,8,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-	"custom/tag#9": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/$WAYBAR_OUTPUT_NAME-9.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "mmsg dispatch viewcrossmon,9,$(mmsg get cursorpos | jq -r .monitor)"
-	},
-
-	"custom/scratchpad": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/scratchpad.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13,
-		"on-click": "~/.local/bin/scratchpad-menu"
-	},
-
-	"custom/mode": {
-		"exec": "cat \"$XDG_RUNTIME_DIR/bar-tags/mode.json\" 2>/dev/null || echo '{\"text\": \"\"}'",
-		"return-type": "json",
-		"interval": "once",
-		"signal": 13
-	},
 
 	// No `states` for temperature, so the icon carries the colour (index = temp / 5)
 	"temperature": {

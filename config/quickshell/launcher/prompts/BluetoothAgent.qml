@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.widgets
 
 // Bluetooth pairing prompts. Runs ~/.local/bin/bluetooth-agent (the default
 // BlueZ agent) and shows its requests. Without an agent, phones and keyboards

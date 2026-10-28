@@ -6,6 +6,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Notification centre: kept notifications grouped by app, newest app first, as
 // floating cards above the bar. Toggled by ~/.local/bin/notification-center;

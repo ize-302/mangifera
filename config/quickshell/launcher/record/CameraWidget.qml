@@ -7,6 +7,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
 
 // Webcam bubble for screen recordings, shown by ~/.local/bin/record-toggle
 // while recording when the record menu's Camera is on, or toggled by

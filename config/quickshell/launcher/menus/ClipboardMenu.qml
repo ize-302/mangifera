@@ -2,6 +2,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Io
 import qs
+import qs.widgets
 
 // Clipboard history (cliphist). Enter copies the entry again.
 Scope {

@@ -1,10 +1,15 @@
 #!/bin/bash
-# Reloads mango's config and says whether it worked. A script because the
-# command is too long for a line of mango's config. Quickshell isn't
-# restarted: it reloads its own QML when a file changes, and starting it again
-# took seconds.
+# Reloads mango's and waybar's config and says whether mango's worked. A
+# script because the command is too long for a line of mango's config.
+# Quickshell isn't restarted: it reloads its own QML when a file changes, and
+# starting it again took seconds.
 # The logo is from mangowm.github.io
 logo=~/.local/share/mangifera/mango.svg
+
+# Waybar reads its config only at start. Restarted, not reloaded in place
+# with SIGUSR2: that segfaulted when mango's reload changed the screens.
+pkill -x waybar
+setsid -f waybar >/dev/null 2>&1
 
 if mmsg dispatch reload_config | grep -q '"success":true'; then
 	notify-send -a mango -i "$logo" -t 2000 "Config reloaded"
