@@ -14,6 +14,21 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- Super+H/L no longer always switch tags: they move the focus left or right,
+  and switch to the previous or next tag only from the edge of this one.
+  Super+Ctrl+H/J/K/L are gone; use Super+H/J/K/L.
+
+### Changed
+
+- Super+J/K move the focus down and up.
+- After Super+H/L (or Super+Left/Right) switch tags, the focus lands on the
+  window at the edge you came in from.
+- Super+Shift+H/L (and Super+Shift+Left/Right) move a window that's already
+  at the left or right edge of its tag to the previous or next tag, and
+  follow it. Away from the edge they still swap it with its neighbour.
+
 ## [0.3.0] - 2026-10-28
 
 ### Breaking

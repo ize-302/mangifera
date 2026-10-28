@@ -70,7 +70,14 @@ Scope {
         switch (func) {
         case "spawn":
         case "spawn_shell":
-            return args.join(",");
+            {
+                // focus-window and move-window stand in for focusdir and
+                // move_client
+                const move = args.join(",").match(/(focus|move)-window (\w+)$/);
+                if (move)
+                    return move[1] + " " + move[2];
+                return args.join(",");
+            }
         case "focusdir":
             return "focus " + args[0];
         case "move_client":
