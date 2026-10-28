@@ -5,6 +5,15 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.bar
+import qs.controlpanel
+import qs.datepanel
+import qs.menus
+import qs.notifications
+import qs.osd
+import qs.prompts
+import qs.record
+import qs.widgets
 
 // Launcher daemon (`qs -c launcher -d`): the app menu plus every other menu,
 // panel, popup, notification and prompt. Toggled over IPC by the ~/.local/bin

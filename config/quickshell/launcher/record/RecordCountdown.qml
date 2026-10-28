@@ -4,6 +4,7 @@ import QtQuick
 import Quickshell
 import Quickshell.Wayland
 import qs
+import qs.services
 
 // 3-2-1 over the picked area before ~/.local/bin/record-toggle starts
 // recording, with the area outlined. Gone before the recording starts, so it

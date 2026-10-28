@@ -3,6 +3,8 @@ import Quickshell
 import Quickshell.Services.Pipewire
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Volume popup on the right edge, shown briefly when the output volume or a
 // mute changes. Clicks go through it.

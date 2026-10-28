@@ -3,6 +3,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Widgets
 import qs
+import qs.services
+import qs.widgets
 
 // Strip of preview cards for windows in mango's scratchpad (minimized).
 // Previews are grabbed with `grim -T` once, when the window is parked: mango

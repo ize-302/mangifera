@@ -6,6 +6,7 @@ import Quickshell.Bluetooth
 import Quickshell.Networking
 import Quickshell.Services.Pipewire
 import qs
+import qs.widgets
 
 // One control panel row (an entry of ControlPanel's `rows`), with its section's
 // header over the first. Clicks and keys go to the panel.

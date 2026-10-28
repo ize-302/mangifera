@@ -5,6 +5,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Power menu, toggled by ~/.local/bin/power-menu, which also carries out the
 // choice.

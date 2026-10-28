@@ -6,6 +6,8 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import qs
+import qs.services
+import qs.widgets
 
 // Caps lock popup, centred above the bar while caps lock is on, and briefly
 // after it's turned off. Reads the keyboard LEDs (/sys/class/leds/*::capslock),

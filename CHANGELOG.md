@@ -23,6 +23,10 @@ git pull
 - The bar has a light blur behind it, and is a little more see-through.
 - Super+Shift+R also restarts waybar, so bar config changes show up.
 - The volume control comes before the toolbox in the bar.
+- The launcher's Quickshell files are grouped into folders by feature (bar,
+  osd, control panel, date panel, notifications, record, menus, prompts,
+  services, widgets). After `./install.sh`, remove the old broken links with
+  `find ~/.config/quickshell/launcher -xtype l -delete`.
 
 ## [0.2.1] - 2026-10-25
 

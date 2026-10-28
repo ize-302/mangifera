@@ -5,6 +5,7 @@ import Quickshell
 import Quickshell.Networking
 import Quickshell.Wayland
 import qs
+import qs.widgets
 
 // Wi-Fi password prompt, for a new secured network or a wrong or changed
 // password. Stays up, spinning, while connecting. ControlPanel.qml sets
