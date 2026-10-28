@@ -339,19 +339,21 @@ PanelWindow { // qmllint disable uncreatable-type
                     id: cellMouse
                     width: parent.width
                     height: cell.rect.height
+                    // Hover only shows the close button: the selection follows the keys
                     hoverEnabled: true
                     cursorShape: Qt.PointingHandCursor
-                    onPositionChanged: window.currentIndex = cell.index
                     onClicked: window.accept(cell.modelData)
                 }
 
                 CloseButton {
                     id: closeButton
-                    // Centred on the preview's top right corner
-                    anchors.horizontalCenter: thumbnail.right
-                    anchors.verticalCenter: thumbnail.top
-                    outside: true
+                    // Against the inside of the preview's outline
+                    anchors.top: thumbnail.top
+                    anchors.right: thumbnail.right
+                    anchors.margins: cell.selected || cell.closing ? 3 : 1
+                    square: true
                     shown: cellMouse.containsMouse || hovered
+                    lit: shown
                     onClicked: window.closeClicked(cell.modelData)
                 }
             }

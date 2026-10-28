@@ -395,9 +395,9 @@ Scope {
             MouseArea {
                 id: cardMouse
                 anchors.fill: parent
+                // Hover only shows the close button: the selection follows the keys
                 hoverEnabled: true
                 cursorShape: Qt.PointingHandCursor
-                onPositionChanged: cell.ListView.view.currentIndex = cell.index
                 onClicked: menu.accept(cell.modelData)
             }
 

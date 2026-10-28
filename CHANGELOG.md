@@ -29,8 +29,11 @@ git pull
 - Unfocused windows are dimmed more.
 - The scratchpad menu has a header with its window count, and centres its
   cards while they don't fill the strip.
-- The scratchpad's close button is a tab in the card's top right corner, or
-  in the overview a badge centred on its top right corner; white while hovered.
+- The scratchpad's close button is a tab in a hovered card's top right
+  corner, white while hovered. In the overview it's a larger square, white
+  with a dark ✕ while its card is hovered.
+- Hovering a scratchpad card no longer moves the selection; clicking still
+  brings it out.
 - Scratchpad previews are grabbed about 3× faster, take less memory, and are
   retried when a grab fails instead of staying blank.
 - Lighter blur (2 passes instead of 3).

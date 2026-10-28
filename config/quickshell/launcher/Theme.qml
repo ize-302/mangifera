@@ -147,6 +147,8 @@ Singleton {
     // mango's tag_num
     readonly property int tagCount: 9
     readonly property int closeButtonSize: 24
+    readonly property int overviewCloseSize: 30
+    readonly property int overviewCloseFontSize: 20
     // A scratchpad card and its close button while the button is hovered
     readonly property color scratchpadCloseColor: textColor
     readonly property color closeColor: "#f7768e"
