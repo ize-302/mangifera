@@ -138,6 +138,7 @@ Singleton {
     readonly property string keybindEmptyText: "No bindings found"
 
     // Scratchpad menu
+    readonly property string scratchpadTitle: "Scratchpad"
     readonly property string scratchpadEmptyText: "No windows in the scratchpad"
     // Fraction of the screen width
     readonly property real cardWidth: 0.15
@@ -146,12 +147,32 @@ Singleton {
     // mango's tag_num
     readonly property int tagCount: 9
     readonly property int closeButtonSize: 24
+    // A scratchpad card and its close button while the button is hovered
+    readonly property color scratchpadCloseColor: textColor
     readonly property color closeColor: "#f7768e"
     readonly property int stripFadeWidth: 64
     // Fraction of the screen height
     readonly property real cardHeight: 0.2
     readonly property int cardSpacing: 6
     readonly property int cardTitleHeight: 34
+    // Grabs of a parked window's preview before giving up on it
+    readonly property int previewAttempts: 3
+
+    // Scratchpad overview
+    // "strip" (cards on the bar) or "overview" (full screen, like Mission
+    // Control)
+    readonly property string scratchpadStyle: "overview"
+    readonly property color overviewScrimColor: Qt.rgba(0, 0, 0, 0.45)
+    // Fraction of the area's height, and of the screen width
+    readonly property real overviewMaxHeight: 0.45
+    readonly property real overviewMaxWidth: 0.5
+    readonly property int overviewMargin: 96
+    readonly property int overviewGap: 40
+    // Room under each preview for its icon and title
+    readonly property int overviewTitleHeight: 52
+    readonly property int overviewPillHeight: 24
+    readonly property int overviewRadius: 2
+    readonly property int overviewDuration: 180
 
     // Control panel
     readonly property real controlWidth: 0.18

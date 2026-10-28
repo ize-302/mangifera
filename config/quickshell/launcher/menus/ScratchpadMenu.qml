@@ -6,21 +6,28 @@ import qs
 import qs.services
 import qs.widgets
 
-// Strip of preview cards for windows in mango's scratchpad (minimized).
-// Previews are grabbed with `grim -T` once, when the window is parked: mango
-// stops redrawing hidden windows, so the frame stays accurate. Opened by double
-// tapping Super or by ~/.local/bin/scratchpad-menu. Enter brings the window out
-// onto an empty tag; Delete closes it.
+// Previews of windows in mango's scratchpad (minimized), as a strip of cards on
+// the bar or a full-screen overview (ScratchpadOverview.qml), picked by
+// Theme.scratchpadStyle. Previews are grabbed with `grim -T` once, when the
+// window is parked: mango stops redrawing hidden windows, so the frame stays
+// accurate. Opened by double tapping Super or by ~/.local/bin/scratchpad-menu.
+// Enter brings the window out onto an empty tag; Delete closes it.
 Scope {
     id: root
 
-    property alias open: menu.open
-    // { id, appId, title, toplevel, width }
+    property bool open: false
+    // Theme.scratchpadStyle picks the full-screen overview over the strip
+    readonly property bool overview: Theme.scratchpadStyle === "overview"
+    readonly property var overviewWindow: overviewLoader.item
+    // Widest a card or overview preview gets; previews are decoded at it
+    readonly property int previewWidth: overview ? Math.round(menu.screen.width * Theme.overviewMaxWidth) : menu.cardWidth
+    // { id, appId, title, toplevel, width, height }
     property var entries: []
     readonly property var workspaces: workspaceState(Compositor.focusedMonitor)
     // Client id -> preview URL
     property var previews: ({})
-    // Ids already tried, so failures aren't retried until the window leaves
+    // Client id -> grabs tried, so a failure is retried only a few times until
+    // the window leaves
     property var tried: ({})
     property real lastTap: 0
     readonly property string previewDir: Quickshell.env("XDG_RUNTIME_DIR") + "/scratchpad-previews"
@@ -31,7 +38,8 @@ Scope {
                     appId: client.appid ?? "",
                     title: client.title ?? "",
                     toplevel: client.foreign_toplevel_id ?? "",
-                    width: client.width
+                    width: client.width,
+                    height: client.height
                 }));
     }
 
@@ -70,30 +78,33 @@ Scope {
                 Quickshell.execDetached(["rm", "-f", root.previewDir + "/" + id + ".png"]);
                 continue;
             }
-            tried[id] = true;
+            tried[id] = root.tried[id];
             if (id in root.previews)
                 previews[id] = root.previews[id];
         }
         root.previews = previews;
         root.tried = tried;
         // A new list resets the selection; keep it in place
-        const selected = menu.view.currentIndex;
+        const view = root.overview ? root.overviewWindow : menu.view;
+        const selected = view?.currentIndex ?? 0;
         root.entries = entries;
-        menu.view.currentIndex = Math.max(0, Math.min(selected, entries.length - 1));
+        if (view)
+            view.currentIndex = Math.max(0, Math.min(selected, entries.length - 1));
 
         if (grabber.running)
             return;
-        const missing = entries.filter(entry => entry.toplevel && !(String(entry.id) in tried));
+        const missing = entries.filter(entry => entry.toplevel && !(String(entry.id) in previews) && (tried[String(entry.id)] ?? 0) < Theme.previewAttempts);
         for (const entry of missing)
-            tried[String(entry.id)] = true;
+            tried[String(entry.id)] = (tried[String(entry.id)] ?? 0) + 1;
         root.capture(missing);
     }
 
-    // About twice a card's width, sharp on HiDPI
+    // At full size and light compression: grim's scaling took ~500 ms a
+    // window against ~140 ms, and the Image decodes it down anyway
     function capture(entries) {
         const args = [];
         for (const entry of entries)
-            args.push(String(entry.id), entry.toplevel, String(Math.min(1, menu.cardWidth * 2 / entry.width).toFixed(3)));
+            args.push(String(entry.id), entry.toplevel);
         if (args.length === 0)
             return;
 
@@ -101,8 +112,8 @@ Scope {
             dir=$1; shift
             mkdir -p "$dir"
             while [ $# -gt 0 ]; do
-                (grim -T "$2" -s "$3" "$dir/$1.png" && echo "$1") &
-                shift 3
+                (grim -T "$2" -l 1 "$dir/$1.png" && echo "$1") &
+                shift 2
             done
             wait`, "sh", root.previewDir].concat(args);
         grabber.running = true;
@@ -117,6 +128,27 @@ Scope {
     function bringOut(entry, workspace, follow) {
         const back = follow ? "" : `; mmsg dispatch view,${root.workspaces.focused},0`;
         Quickshell.execDetached(["sh", "-c", `mmsg dispatch focusid client,$1 && mmsg dispatch ${follow ? "tag" : "tagsilent"},$2,0 client,$1${back}`, "sh", String(entry.id), String(workspace)]);
+    }
+
+    function icon(entry) {
+        return Quickshell.iconPath(DesktopEntries.heuristicLookup(entry.appId)?.icon ?? entry.appId, "application-x-executable");
+    }
+
+    // Delete closes. Alt+1…9 sends to that tag and stays; Alt+Shift+1…9
+    // follows
+    function handleKey(event, entry) {
+        if (event.key === Qt.Key_Delete) {
+            root.close(entry);
+            return true;
+        }
+
+        const workspace = root.workspaceKey(event);
+        if (!(event.modifiers & Qt.AltModifier) || workspace === 0)
+            return false;
+
+        root.open = false;
+        root.bringOut(entry, workspace, event.modifiers & Qt.ShiftModifier);
+        return true;
     }
 
     function tap() {
@@ -136,6 +168,17 @@ Scope {
     }
 
     Component.onCompleted: root.update(root.parse(Compositor.parked))
+
+    // Hands open on to the style in use, and takes it back when that closes
+    // itself
+    onOpenChanged: {
+        if (root.overview) {
+            if (root.overviewWindow)
+                root.overviewWindow.open = root.open;
+        } else {
+            menu.open = root.open;
+        }
+    }
 
     Connections {
         target: Compositor
@@ -188,32 +231,37 @@ Scope {
     SearchMenu {
         id: menu
 
+        onOpenChanged: root.open = open
         shadow: true
         panelPadding: Theme.cardSpacing
         card: windowCard
         searchable: false
+        title: Theme.scratchpadTitle
         results: root.entries
         label: entry => entry.title
-        icon: entry => Quickshell.iconPath(DesktopEntries.heuristicLookup(entry.appId)?.icon ?? entry.appId, "application-x-executable")
+        icon: root.icon
         emptyText: Theme.scratchpadEmptyText
+        keyHandler: root.handleKey
 
         onAccepted: entry => root.bringOut(entry, root.emptyWorkspace(), true)
+    }
 
-        // Delete closes. Alt+1…9 sends to that tag and stays; Alt+Shift+1…9
-        // follows
-        keyHandler: (event, entry) => {
-            if (event.key === Qt.Key_Delete) {
-                root.close(entry);
-                return true;
-            }
+    Loader {
+        id: overviewLoader
 
-            const workspace = root.workspaceKey(event);
-            if (!(event.modifiers & Qt.AltModifier) || workspace === 0)
-                return false;
+        active: root.overview
 
-            menu.open = false;
-            root.bringOut(entry, workspace, event.modifiers & Qt.ShiftModifier);
-            return true;
+        sourceComponent: ScratchpadOverview {
+            previewWidth: root.previewWidth
+            entries: root.entries
+            previews: root.previews
+            icon: root.icon
+            emptyText: Theme.scratchpadEmptyText
+            keyHandler: root.handleKey
+
+            onOpenChanged: root.open = open
+            onAccepted: entry => root.bringOut(entry, root.emptyWorkspace(), true)
+            onCloseClicked: entry => root.close(entry)
         }
     }
 
@@ -226,8 +274,8 @@ Scope {
             required property var modelData
             required property int index
             readonly property bool selected: ListView.isCurrentItem
-            readonly property bool closing: closeMouse.containsMouse
-            readonly property string iconSource: Quickshell.iconPath(DesktopEntries.heuristicLookup(modelData.appId)?.icon ?? modelData.appId, "application-x-executable")
+            readonly property bool closing: closeButton.hovered
+            readonly property string iconSource: root.icon(modelData)
 
             width: menu.cardWidth
             height: ListView.view.height
@@ -240,7 +288,7 @@ Scope {
                 radius: Theme.cornerRadius
                 color: cell.selected ? Theme.hoverColor : Theme.keyColor
                 border.width: cell.selected ? 2 : 1
-                border.color: cell.closing ? Theme.closeColor : cell.selected ? Theme.selectedColor : "transparent"
+                border.color: cell.closing ? Theme.scratchpadCloseColor : cell.selected ? Theme.selectedColor : "transparent"
 
                 Behavior on border.color {
                     ColorAnimation {
@@ -274,7 +322,8 @@ Scope {
                         asynchronous: true
                         cache: false
                         smooth: true
-                        mipmap: true
+                        // Decoded at the card's size, not the window's
+                        sourceSize.width: root.previewWidth
                         opacity: cell.selected ? 1 : 0.75
                     }
 
@@ -289,8 +338,8 @@ Scope {
 
                     Rectangle {
                         anchors.fill: parent
-                        color: Theme.closeColor
-                        opacity: cell.closing ? 0.18 : 0
+                        color: Theme.scratchpadCloseColor
+                        opacity: cell.closing ? 0.1 : 0
 
                         Behavior on opacity {
                             NumberAnimation {
@@ -351,81 +400,15 @@ Scope {
                 onClicked: menu.accept(cell.modelData)
             }
 
-            // Close button on a hovered card
-            Rectangle {
+            CloseButton {
                 id: closeButton
-
-                readonly property bool shown: cardMouse.containsMouse || closeMouse.containsMouse
-
-                // Out as far as the strip's clip allows
+                // Inside the card's border
                 anchors.top: card.top
                 anchors.right: card.right
-                anchors.margins: -Theme.cardSpacing
-                width: Theme.closeButtonSize
-                height: Theme.closeButtonSize
-                radius: width / 2
-                color: cell.closing ? Theme.closeColor : Theme.panelColor
-                border.width: 1
-                border.color: cell.closing ? Theme.closeColor : Theme.edgeColor
-                opacity: shown ? 1 : 0
-                visible: opacity > 0
-                scale: !shown ? 0.6 : closeMouse.pressed ? 0.85 : 1
-
-                Behavior on opacity {
-                    NumberAnimation {
-                        duration: Theme.animationDuration
-                    }
-                }
-                Behavior on scale {
-                    NumberAnimation {
-                        duration: Theme.animationDuration * 1.5
-                        easing.type: Easing.OutBack
-                    }
-                }
-                Behavior on color {
-                    ColorAnimation {
-                        duration: Theme.animationDuration
-                    }
-                }
-
-                // Two crossed bars, crisper than a glyph
-                Item {
-                    anchors.centerIn: parent
-                    width: parent.width * 0.42
-                    height: width
-                    rotation: cell.closing ? 90 : 0
-
-                    Behavior on rotation {
-                        NumberAnimation {
-                            duration: Theme.animationDuration * 2
-                            easing.type: Easing.OutCubic
-                        }
-                    }
-
-                    Repeater {
-                        model: [45, -45]
-
-                        Rectangle {
-                            required property int modelData
-
-                            anchors.centerIn: parent
-                            width: parent.width * Math.SQRT2
-                            height: 2
-                            radius: 1
-                            rotation: modelData
-                            antialiasing: true
-                            color: cell.closing ? Theme.panelColor : Theme.textColor
-                        }
-                    }
-                }
-
-                MouseArea {
-                    id: closeMouse
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    cursorShape: Qt.PointingHandCursor
-                    onClicked: root.close(cell.modelData)
-                }
+                anchors.margins: card.border.width
+                outerRadius: card.radius - card.border.width
+                shown: cardMouse.containsMouse || hovered
+                onClicked: root.close(cell.modelData)
             }
         }
     }
