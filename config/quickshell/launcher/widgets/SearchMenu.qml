@@ -39,6 +39,8 @@ PanelWindow { // qmllint disable uncreatable-type
     // `index`; ListView.isCurrentItem marks the selection.
     property Component card: null
     readonly property bool strip: card !== null
+    // Header above a strip of cards, with the card count
+    property string title: ""
     readonly property int cardWidth: Math.round(screen.width * Theme.cardWidth)
     readonly property Item view: strip ? cards : list
     // Called with the key event and selected result first; returns true when
@@ -225,6 +227,13 @@ PanelWindow { // qmllint disable uncreatable-type
                 color: Theme.dividerColor
             }
 
+            SectionHeader {
+                width: parent.width
+                visible: window.strip && window.title !== ""
+                text: window.title
+                summary: window.results.length > 0 ? String(window.results.length) : ""
+            }
+
             // Always room for maxRows (or one row of cards)
             Item {
                 width: parent.width
@@ -233,7 +242,13 @@ PanelWindow { // qmllint disable uncreatable-type
                 ListView {
                     id: cards
 
-                    anchors.fill: parent
+                    // Narrowed to its cards and centred while they don't
+                    // fill the strip. From the card count, as contentWidth
+                    // would loop through the width
+                    anchors.top: parent.top
+                    anchors.bottom: parent.bottom
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    width: Math.min(parent.width, window.results.length * window.cardWidth)
                     visible: window.strip
                     orientation: ListView.Horizontal
                     // Kept while closed: rebuilding the cards and decoding

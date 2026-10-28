@@ -14,6 +14,30 @@ git pull
 
 ## [Unreleased]
 
+### Added
+
+- Scratchpad overview: the scratchpad as a full-screen grid of previews over
+  the dimmed desktop, like macOS Mission Control. h/j/k/l or the arrows move
+  through it. `scratchpadStyle` in the launcher's `Theme.qml` switches
+  between it (`"overview"`) and the strip (`"strip"`).
+- Backspace closes the selected scratchpad window, like Delete.
+
+### Changed
+
+- The focused window's border is white instead of orange, and so is the
+  selected scratchpad card's.
+- Unfocused windows are dimmed more.
+- The scratchpad menu has a header with its window count, and centres its
+  cards while they don't fill the strip.
+- The scratchpad's close button is a tab in a hovered card's top right
+  corner, white while hovered. In the overview it's a larger square, white
+  with a dark ✕ while its card is hovered.
+- Hovering a scratchpad card no longer moves the selection; clicking still
+  brings it out.
+- Scratchpad previews are grabbed about 3× faster, take less memory, and are
+  retried when a grab fails instead of staying blank.
+- Lighter blur (2 passes instead of 3).
+
 ## [0.4.0] - 2026-10-28
 
 ### Breaking
