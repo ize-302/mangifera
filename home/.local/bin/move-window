@@ -1,0 +1,17 @@
+#!/bin/bash
+# Moves the focused window left or right: swaps it with its neighbour on the
+# tag, or, when there's none on that side, moves it to the previous or next
+# tag and follows it. Stops at the first and last tag.
+#
+#   move-window left|right
+. ~/.local/lib/mangifera/window-edge.sh
+
+[ -n "$focused" ] || exit 0
+
+# A floating or fullscreen window has no place among the tiled ones to move to
+if [ "$(jq '.is_floating or .is_fullscreen' <<<"$focused")" = false ] && [ "$neighbour" -gt 0 ]; then
+	mmsg dispatch "move_client,$dir" >/dev/null
+	exit 0
+fi
+
+[ -n "$target" ] && mmsg dispatch "tag,$target,0" >/dev/null

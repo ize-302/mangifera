@@ -1,0 +1,23 @@
+#!/bin/bash
+# Moves the focus left or right: to the neighbour on the tag, or, when there's
+# none on that side, to the previous or next tag, landing on the window at the
+# edge it came in from. Stops at the first and last tag.
+#
+#   focus-window left|right
+. ~/.local/lib/mangifera/window-edge.sh
+
+if [ "$neighbour" -gt 0 ]; then
+	mmsg dispatch "focusdir,$dir" >/dev/null
+	exit 0
+fi
+
+[ -n "$target" ] || exit 0
+mmsg dispatch "view,$target,0" >/dev/null
+
+# Going right, the leftmost window (the top one of a column); going left, the
+# rightmost
+edge=$(mmsg get all-clients | jq --arg m "$monitor" --argjson t "$target" --arg dir "$dir" '
+	[.clients[] | select(.monitor == $m and (.tags | index($t)) and
+		(.is_floating or .is_minimized or .is_scratchpad | not))] |
+	sort_by(if $dir == "right" then .x else -(.x + .width) end, .y) | .[0].id // empty')
+[ -n "$edge" ] && mmsg dispatch focusid "client,$edge" >/dev/null
