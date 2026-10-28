@@ -14,19 +14,25 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- `~/.local/bin/bar-tags` is gone. Remove its leftover link with
+  `rm ~/.local/bin/bar-tags`.
+- The launcher's Quickshell files are grouped into folders by feature (bar,
+  osd, control panel, date panel, notifications, record, menus, prompts,
+  services, widgets). After `./install.sh`, remove the old broken links with
+  `find ~/.config/quickshell/launcher -xtype l -delete`.
+
+### Changed
+
 - The bar's tags show each window's real app icon instead of a Nerd Font
   glyph. Tags, the scratchpad count and the key mode are now drawn by
-  Quickshell over the left end of waybar; `~/.local/bin/bar-tags` is gone
-  (remove its leftover link with `rm ~/.local/bin/bar-tags`).
+  Quickshell over the left end of waybar.
 - Quickshell watches mango's windows once instead of twice, and skips updates
   when only a window's title, position or size changed.
 - The bar has a light blur behind it, and is a little more see-through.
 - Super+Shift+R also restarts waybar, so bar config changes show up.
 - The volume control comes before the toolbox in the bar.
-- The launcher's Quickshell files are grouped into folders by feature (bar,
-  osd, control panel, date panel, notifications, record, menus, prompts,
-  services, widgets). After `./install.sh`, remove the old broken links with
-  `find ~/.config/quickshell/launcher -xtype l -delete`.
 
 ## [0.2.1] - 2026-10-25
 
