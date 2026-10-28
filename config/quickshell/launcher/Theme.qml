@@ -13,8 +13,8 @@ Singleton {
     // Fraction of the screen width
     readonly property real panelWidth: 0.22
     readonly property int panelPadding: 14
-    readonly property color panelColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.9)
-    readonly property color glassPanelColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.7)
+    readonly property color panelColor: Qt.rgba(0, 0, 0, 0.9)
+    readonly property color glassPanelColor: Qt.rgba(0, 0, 0, 0.7)
     readonly property color edgeColor: Qt.rgba(1, 1, 1, 0.12)
     readonly property int panelRadius: 4
     readonly property int cornerRadius: 4
@@ -77,7 +77,7 @@ Singleton {
     readonly property int powerTilePadding: 8
     readonly property int powerPanelPadding: 6
     readonly property int powerFontSize: 13
-    readonly property color powerColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
+    readonly property color powerColor: Qt.rgba(0, 0, 0, 0.5)
 
     // Record menu: the settings rows (the picked option's fill), the mic
     // level under the sounds, and the 3-2-1 before recording
@@ -240,7 +240,7 @@ Singleton {
     readonly property int capsLockTimeout: 1200
     readonly property int capsLockPoll: 150
     // Caps lock and volume popups' glass
-    readonly property color popupColor: Qt.rgba(32 / 255, 32 / 255, 32 / 255, 0.5)
+    readonly property color popupColor: Qt.rgba(0, 0, 0, 0.5)
     readonly property color popupEdgeColor: Qt.rgba(1, 1, 1, 0.08)
 
     // waybar's height; ~/.local/bin/bar-anchor scans it

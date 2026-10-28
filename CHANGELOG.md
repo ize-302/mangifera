@@ -14,6 +14,12 @@ git pull
 
 ## [Unreleased]
 
+### Changed
+
+- The bar, its tooltips, the launcher's panels and popups, and the login
+  screen's menu are black instead of dark grey. The bar is also slightly
+  more opaque.
+
 ## [0.6.0] - 2026-10-28
 
 ### Added
