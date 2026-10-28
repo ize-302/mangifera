@@ -14,6 +14,11 @@ git pull
 
 ## [Unreleased]
 
+### Added
+
+- Pomodoro key bindings: Super+P starts or pauses the timer, Super+Shift+P
+  skips to the next phase and Super+Ctrl+P resets it.
+
 ## [0.5.0] - 2026-10-28
 
 ### Added
