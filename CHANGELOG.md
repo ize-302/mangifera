@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-10-28
+
 ### Breaking
 
 - `~/.local/bin/bar-tags` is gone. Remove its leftover link with
@@ -96,7 +98,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.2.1...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.3.0...HEAD
+[0.3.0]: https://github.com/ize-302/mangifera/releases/tag/v0.3.0
 [0.2.1]: https://github.com/ize-302/mangifera/releases/tag/v0.2.1
 [0.2.0]: https://github.com/ize-302/mangifera/releases/tag/v0.2.0
 [0.1.4]: https://github.com/ize-302/mangifera/releases/tag/v0.1.4
