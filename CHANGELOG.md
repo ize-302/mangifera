@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-10-28
+
 ### Added
 
 - Pomodoro key bindings: Super+P starts or pauses the timer, Super+Shift+P
@@ -146,7 +148,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.5.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.6.0...HEAD
+[0.6.0]: https://github.com/ize-302/mangifera/releases/tag/v0.6.0
 [0.5.0]: https://github.com/ize-302/mangifera/releases/tag/v0.5.0
 [0.4.0]: https://github.com/ize-302/mangifera/releases/tag/v0.4.0
 [0.3.0]: https://github.com/ize-302/mangifera/releases/tag/v0.3.0
