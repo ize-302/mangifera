@@ -266,7 +266,7 @@ Singleton {
     readonly property color tagUrgentTextColor: "#15161e"
     readonly property int scratchpadPadding: 8
     readonly property int modePadding: 6
-    readonly property color modeColor: "#ff5555"
+    readonly property color modeColor: "#ffffff"
 
     // Volume popup
     readonly property int osdWidth: 40

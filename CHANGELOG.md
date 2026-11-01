@@ -14,6 +14,10 @@ git pull
 
 ## [Unreleased]
 
+### Changed
+
+- The key mode badge on the bar (e.g. "scroll") is white instead of red.
+
 ## [0.6.1] - 2026-10-28
 
 ### Changed
