@@ -18,6 +18,11 @@ git pull
 
 - The key mode badge on the bar (e.g. "scroll") is white instead of red.
 
+### Fixed
+
+- A window brought back from the scratchpad menu tiles again, instead of
+  floating at the scratchpad's size.
+
 ## [0.6.1] - 2026-10-28
 
 ### Changed

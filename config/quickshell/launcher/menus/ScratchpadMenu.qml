@@ -125,10 +125,16 @@ Scope {
         Quickshell.execDetached(["mmsg", "dispatch", "killclient", `client,${entry.id}`]);
     }
 
-    // focusid un-minimizes it; `tag` follows, `tagsilent` stays here
+    // focusid un-minimizes it, but as a floating scratchpad sized by
+    // scratchpad_width_ratio; togglefloating drops that so it tiles again.
+    // `tag` follows, `tagsilent` stays here
     function bringOut(entry, workspace, follow) {
         const back = follow ? "" : `; mmsg dispatch view,${root.workspaces.focused},0`;
-        Quickshell.execDetached(["sh", "-c", `mmsg dispatch focusid client,$1 && mmsg dispatch ${follow ? "tag" : "tagsilent"},$2,0 client,$1${back}`, "sh", String(entry.id), String(workspace)]);
+        Quickshell.execDetached(["sh", "-c", `mmsg dispatch focusid client,$1 &&
+            if mmsg get all-clients | jq -e --argjson id "$1" '.clients[] | select(.id == $id) | .is_scratchpad' >/dev/null; then
+                mmsg dispatch togglefloating
+            fi
+            mmsg dispatch ${follow ? "tag" : "tagsilent"},$2,0 client,$1${back}`, "sh", String(entry.id), String(workspace)]);
     }
 
     function icon(entry) {
