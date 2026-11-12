@@ -239,10 +239,6 @@ Singleton {
     readonly property int capsLockFontSize: 9
     readonly property int capsLockTimeout: 1200
     readonly property int capsLockPoll: 150
-    // Tag number flashed when switching tag
-    readonly property int tagNumberSize: 60
-    readonly property int tagNumberFontSize: 24
-    readonly property int tagNumberTimeout: 600
     // Caps lock and volume popups' glass
     readonly property color popupColor: Qt.rgba(0, 0, 0, 0.5)
     readonly property color popupEdgeColor: Qt.rgba(1, 1, 1, 0.08)
@@ -264,6 +260,9 @@ Singleton {
     readonly property int tagIconSize: 18
     // Between the tag number and its first icon
     readonly property int tagNumberSpacing: 4
+    // How long a tag with windows shows its number, in place of its icons,
+    // after switching to it
+    readonly property int tagFlashTimeout: 800
     readonly property int tagIconSpacing: 4
     readonly property color tagColor: Qt.rgba(1, 1, 1, 0.03)
     readonly property color tagFocusedColor: Qt.rgba(1, 1, 1, 0.15)

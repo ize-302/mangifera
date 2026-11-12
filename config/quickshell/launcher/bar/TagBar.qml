@@ -59,6 +59,31 @@ Scope {
 
             onTagsKeyChanged: tags = JSON.parse(tagsKey)
 
+            // The tag just switched to on this monitor, whose number briefly
+            // shows in place of its icons, as a tag with windows has no number
+            // otherwise. 0 when none
+            property int flashTag: 0
+            readonly property int activeTag: monitor?.tags?.find(tag => tag.is_active)?.index ?? 0
+            // The first tag seen, at startup or when mango restarts, isn't a
+            // switch
+            property int lastTag: 0
+
+            onActiveTagChanged: {
+                if (!activeTag)
+                    return;
+                if (lastTag) {
+                    flashTag = activeTag;
+                    flash.restart();
+                }
+                lastTag = activeTag;
+            }
+
+            Timer {
+                id: flash
+                interval: Theme.tagFlashTimeout
+                onTriggered: strip.flashTag = 0
+            }
+
             screen: modelData
             visible: !Compositor.remapping && !fullscreen
             color: "transparent"
@@ -91,6 +116,7 @@ Scope {
 
                         required property var modelData
                         readonly property bool empty: modelData.apps.length === 0
+                        readonly property bool flashing: !empty && modelData.index === strip.flashTag
 
                         width: content.implicitWidth + Theme.tagPadding + (empty ? Theme.tagPadding : Theme.tagEndPadding)
                         height: row.height
@@ -115,9 +141,18 @@ Scope {
                                 font.weight: Theme.fontWeight
                             }
 
+                            // Hidden rather than gone while the number
+                            // shows, so the tag keeps its width
                             Row {
                                 anchors.verticalCenter: parent.verticalCenter
                                 spacing: Theme.tagIconSpacing
+                                opacity: tag.flashing ? 0 : 1
+
+                                Behavior on opacity {
+                                    NumberAnimation {
+                                        duration: Theme.animationDuration
+                                    }
+                                }
 
                                 Repeater {
                                     model: tag.modelData.apps
@@ -129,6 +164,24 @@ Scope {
                                         implicitSize: Theme.tagIconSize
                                         source: root.iconFor(modelData)
                                     }
+                                }
+                            }
+                        }
+
+                        // The number over the icons, just after switching to
+                        // this tag
+                        Text {
+                            anchors.centerIn: content
+                            opacity: tag.flashing ? 1 : 0
+                            text: tag.modelData.index
+                            color: tag.modelData.urgent ? Theme.tagUrgentTextColor : Theme.textColor
+                            font.family: Theme.barFontFamily
+                            font.pointSize: Theme.barFontSize
+                            font.weight: Theme.fontWeight
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.animationDuration
                                 }
                             }
                         }
