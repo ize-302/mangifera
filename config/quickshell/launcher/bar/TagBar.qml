@@ -23,11 +23,12 @@ Scope {
     }
 
     // Shown tags (active, or with windows) on a monitor: { index, focused,
-    // visible, urgent, apps: [appid] }
+    // visible, urgent, apps: [appid] }. Global windows (picture-in-picture)
+    // follow onto every tag, so they don't count
     function tagsOf(monitor) {
         const tags = [];
         for (const tag of monitor?.tags ?? []) {
-            const windows = Compositor.clients.filter(client => client.monitor === monitor.name && !client.is_minimized && client.tags.includes(tag.index)).sort((a, b) => a.id - b.id);
+            const windows = Compositor.clients.filter(client => client.monitor === monitor.name && !client.is_minimized && !client.is_global && client.tags.includes(tag.index)).sort((a, b) => a.id - b.id);
             if (!tag.is_active && windows.length === 0)
                 continue;
             tags.push({
@@ -102,7 +103,10 @@ Scope {
                             anchors.verticalCenter: parent.verticalCenter
                             spacing: Theme.tagNumberSpacing
 
+                            // The number only on an empty tag; one with
+                            // windows shows their icons
                             Text {
+                                visible: tag.empty
                                 anchors.verticalCenter: parent.verticalCenter
                                 text: tag.modelData.index
                                 color: tag.modelData.urgent ? Theme.tagUrgentTextColor : Theme.textColor

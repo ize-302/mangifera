@@ -1,0 +1,37 @@
+#!/bin/bash
+# Goes to a tag, or moves the focused window there and follows it. An empty
+# tag is never further than the first empty one: with windows on tags 1-4,
+# going to 9 lands on 5. Left and right are the previous and next tag, and stop
+# there too.
+#
+#   goto-tag view|tag <number>|left|right
+. ~/.local/lib/mangifera/tags.sh
+
+action=$1
+case "$action:$2" in
+view:* | tag:*) ;;
+*)
+	echo "Usage: ${0##*/} view|tag <number>|left|right" >&2
+	exit 1
+	;;
+esac
+
+case "$2" in
+left) target=$((tag - 1)) ;;
+right) target=$((tag + 1)) ;;
+*[!0-9]* | '') exit 1 ;;
+*) target=$2 ;;
+esac
+[ "$target" -ge 1 ] && [ "$target" -le "$last" ] || exit 0
+
+skip=0
+if [ "$action" = tag ]; then
+	skip=$(mmsg get focusing-client | jq --arg m "$monitor" 'select(.monitor == $m and .is_visible) | .id' 2>/dev/null)
+	[ -n "$skip" ] || exit 0
+fi
+
+target=$(capped_tag "$target" "$skip")
+# Capped back to where it is, as stepping right from the first empty tag
+[ "$target" = "$tag" ] && [ "$target" != "$2" ] && exit 0
+
+mmsg dispatch "$action,$target,0" >/dev/null

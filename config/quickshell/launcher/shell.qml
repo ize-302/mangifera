@@ -276,6 +276,8 @@ ShellRoot {
 
     CapsLock {}
 
+    TagNumber {}
+
     BarVolume {}
 
     TagBar {

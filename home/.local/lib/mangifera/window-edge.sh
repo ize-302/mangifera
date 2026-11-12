@@ -1,11 +1,10 @@
 # Sourced by focus-window and move-window, with left or right as $1. Sets:
 #   dir        left or right
-#   monitor    the focused monitor
-#   tag        its tag, read from it rather than the focused window, as an
-#              empty tag has none
+#   monitor, tag, last  as tags.sh sets them
 #   focused    the focused window as mmsg prints it, if it's on this tag
 #   neighbour  how many tiled windows are on that side of it
-#   target     the tag on that side, or empty past the first or last
+#   target     the tag on that side, or empty past the first or last, or
+#              past the first empty tag (see capped_tag)
 
 dir=$1
 case "$dir" in
@@ -16,9 +15,7 @@ left | right) ;;
 	;;
 esac
 
-read -r monitor tag last < <(mmsg get all-monitors | jq -r '
-	[.monitors[] | select(.active)][0] |
-	"\(.name) \([.tags[] | select(.is_active)][0].index) \(.tag_num)"')
+. ~/.local/lib/mangifera/tags.sh
 
 focused=$(mmsg get focusing-client | jq -c --arg m "$monitor" 'select(.monitor == $m and .is_visible)' 2>/dev/null)
 
@@ -34,3 +31,10 @@ neighbour=0
 
 [ "$dir" = right ] && target=$((tag + 1)) || target=$((tag - 1))
 [ "$target" -ge 1 ] && [ "$target" -le "$last" ] || target=
+
+# A window being moved doesn't count towards its tag, so moving the only one
+# on a tag right doesn't leave that tag empty behind it
+skip=0
+[ "${0##*/}" = move-window ] && [ -n "$focused" ] && skip=$(jq .id <<<"$focused")
+[ -n "$target" ] && target=$(capped_tag "$target" "$skip")
+[ "$target" = "$tag" ] && target=

@@ -239,6 +239,10 @@ Singleton {
     readonly property int capsLockFontSize: 9
     readonly property int capsLockTimeout: 1200
     readonly property int capsLockPoll: 150
+    // Tag number flashed when switching tag
+    readonly property int tagNumberSize: 60
+    readonly property int tagNumberFontSize: 24
+    readonly property int tagNumberTimeout: 600
     // Caps lock and volume popups' glass
     readonly property color popupColor: Qt.rgba(0, 0, 0, 0.5)
     readonly property color popupEdgeColor: Qt.rgba(1, 1, 1, 0.08)

@@ -14,8 +14,20 @@ git pull
 
 ## [Unreleased]
 
+### Added
+
+- The tag's number flashes in the middle of the screen when you switch tag.
+
 ### Changed
 
+- Going to an empty tag lands on the first empty one, so there are no gaps:
+  with windows on tags 1-4, Super+9 goes to 5. This covers Super+number,
+  Super+Shift+number, Super+mouse side buttons, four-finger swipes, and
+  focusing or moving a window past the screen edge.
+- The bar shows a tag's number only when the tag is empty; a tag with windows
+  shows just their icons. Picture-in-picture windows no longer count as being
+  on a tag.
+- The bar is more opaque.
 - The key mode badge on the bar (e.g. "scroll") is white instead of red.
 
 ### Fixed
