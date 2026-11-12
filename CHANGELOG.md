@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.7.0] - 2026-11-12
+
 ### Added
 
 - Switching tag briefly shows its number on the bar, in place of its icons.
@@ -174,7 +176,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.6.1...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/ize-302/mangifera/releases/tag/v0.7.0
 [0.6.1]: https://github.com/ize-302/mangifera/releases/tag/v0.6.1
 [0.6.0]: https://github.com/ize-302/mangifera/releases/tag/v0.6.0
 [0.5.0]: https://github.com/ize-302/mangifera/releases/tag/v0.5.0
