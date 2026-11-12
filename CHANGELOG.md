@@ -17,6 +17,7 @@ git pull
 ### Changed
 
 - The key mode badge on the bar (e.g. "scroll") is white instead of red.
+- The bar no longer blurs what's behind it.
 
 ### Fixed
 
