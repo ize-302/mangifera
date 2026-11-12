@@ -118,61 +118,47 @@ Scope {
                         readonly property bool empty: modelData.apps.length === 0
                         readonly property bool flashing: !empty && modelData.index === strip.flashTag
 
-                        width: content.implicitWidth + Theme.tagPadding + (empty ? Theme.tagPadding : Theme.tagEndPadding)
+                        width: (empty ? number.implicitWidth : content.implicitWidth) + Theme.tagPadding + (empty ? Theme.tagPadding : Theme.tagEndPadding)
                         height: row.height
                         color: modelData.urgent ? Theme.closeColor : modelData.focused ? Theme.tagFocusedColor : Theme.tagColor
 
+                        // Hidden rather than gone while the number shows, so
+                        // the tag keeps its width
                         Row {
                             id: content
 
                             x: Theme.tagPadding
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.tagNumberSpacing
+                            spacing: Theme.tagIconSpacing
+                            opacity: tag.flashing ? 0 : 1
 
-                            // The number only on an empty tag; one with
-                            // windows shows their icons
-                            Text {
-                                visible: tag.empty
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: tag.modelData.index
-                                color: tag.modelData.urgent ? Theme.tagUrgentTextColor : Theme.textColor
-                                font.family: Theme.barFontFamily
-                                font.pointSize: Theme.barFontSize
-                                font.weight: Theme.fontWeight
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.animationDuration
+                                }
                             }
 
-                            // Hidden rather than gone while the number
-                            // shows, so the tag keeps its width
-                            Row {
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.tagIconSpacing
-                                opacity: tag.flashing ? 0 : 1
+                            Repeater {
+                                model: tag.modelData.apps
 
-                                Behavior on opacity {
-                                    NumberAnimation {
-                                        duration: Theme.animationDuration
-                                    }
-                                }
+                                IconImage {
+                                    required property string modelData
 
-                                Repeater {
-                                    model: tag.modelData.apps
-
-                                    IconImage {
-                                        required property string modelData
-
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        implicitSize: Theme.tagIconSize
-                                        source: root.iconFor(modelData)
-                                    }
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    implicitSize: Theme.tagIconSize
+                                    source: root.iconFor(modelData)
                                 }
                             }
                         }
 
-                        // The number over the icons, just after switching to
-                        // this tag
+                        // The number: always on an empty tag, and over the
+                        // icons just after switching to one with windows
                         Text {
-                            anchors.centerIn: content
-                            opacity: tag.flashing ? 1 : 0
+                            id: number
+
+                            x: Theme.tagPadding + (tag.empty ? 0 : (content.implicitWidth - width) / 2)
+                            anchors.verticalCenter: parent.verticalCenter
+                            opacity: tag.empty || tag.flashing ? 1 : 0
                             text: tag.modelData.index
                             color: tag.modelData.urgent ? Theme.tagUrgentTextColor : Theme.textColor
                             font.family: Theme.barFontFamily

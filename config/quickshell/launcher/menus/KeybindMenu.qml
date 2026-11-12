@@ -76,10 +76,6 @@ Scope {
                 const move = args.join(",").match(/(focus|move)-window (\w+)$/);
                 if (move)
                     return move[1] + " " + move[2];
-                // goto-tag stands in for view and tag
-                const tag = args.join(",").match(/goto-tag (view|tag) (\w+)$/);
-                if (tag)
-                    return root.describe(tag[1], [tag[2]]);
                 return args.join(",");
             }
         case "focusdir":

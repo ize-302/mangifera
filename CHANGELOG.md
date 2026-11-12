@@ -16,14 +16,10 @@ git pull
 
 ### Added
 
-- The tag's number flashes in the middle of the screen when you switch tag.
+- Switching tag briefly shows its number on the bar, in place of its icons.
 
 ### Changed
 
-- Going to an empty tag lands on the first empty one, so there are no gaps:
-  with windows on tags 1-4, Super+9 goes to 5. This covers Super+number,
-  Super+Shift+number, Super+mouse side buttons, four-finger swipes, and
-  focusing or moving a window past the screen edge.
 - The bar shows a tag's number only when the tag is empty; a tag with windows
   shows just their icons. Picture-in-picture windows no longer count as being
   on a tag.
