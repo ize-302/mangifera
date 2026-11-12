@@ -258,8 +258,9 @@ Singleton {
     // After the last icon
     readonly property int tagEndPadding: 10
     readonly property int tagIconSize: 18
-    // Between the tag number and its first icon
-    readonly property int tagNumberSpacing: 4
+    // How long a tag with windows shows its number, in place of its icons,
+    // after switching to it
+    readonly property int tagFlashTimeout: 800
     readonly property int tagIconSpacing: 4
     readonly property color tagColor: Qt.rgba(1, 1, 1, 0.03)
     readonly property color tagFocusedColor: Qt.rgba(1, 1, 1, 0.15)

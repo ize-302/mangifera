@@ -23,11 +23,12 @@ Scope {
     }
 
     // Shown tags (active, or with windows) on a monitor: { index, focused,
-    // visible, urgent, apps: [appid] }
+    // visible, urgent, apps: [appid] }. Global windows (picture-in-picture)
+    // follow onto every tag, so they don't count
     function tagsOf(monitor) {
         const tags = [];
         for (const tag of monitor?.tags ?? []) {
-            const windows = Compositor.clients.filter(client => client.monitor === monitor.name && !client.is_minimized && client.tags.includes(tag.index)).sort((a, b) => a.id - b.id);
+            const windows = Compositor.clients.filter(client => client.monitor === monitor.name && !client.is_minimized && !client.is_global && client.tags.includes(tag.index)).sort((a, b) => a.id - b.id);
             if (!tag.is_active && windows.length === 0)
                 continue;
             tags.push({
@@ -57,6 +58,31 @@ Scope {
             readonly property string tagsKey: JSON.stringify(root.tagsOf(monitor))
 
             onTagsKeyChanged: tags = JSON.parse(tagsKey)
+
+            // The tag just switched to on this monitor, whose number briefly
+            // shows in place of its icons, as a tag with windows has no number
+            // otherwise. 0 when none
+            property int flashTag: 0
+            readonly property int activeTag: monitor?.tags?.find(tag => tag.is_active)?.index ?? 0
+            // The first tag seen, at startup or when mango restarts, isn't a
+            // switch
+            property int lastTag: 0
+
+            onActiveTagChanged: {
+                if (!activeTag)
+                    return;
+                if (lastTag) {
+                    flashTag = activeTag;
+                    flash.restart();
+                }
+                lastTag = activeTag;
+            }
+
+            Timer {
+                id: flash
+                interval: Theme.tagFlashTimeout
+                onTriggered: strip.flashTag = 0
+            }
 
             screen: modelData
             visible: !Compositor.remapping && !fullscreen
@@ -90,41 +116,58 @@ Scope {
 
                         required property var modelData
                         readonly property bool empty: modelData.apps.length === 0
+                        readonly property bool flashing: !empty && modelData.index === strip.flashTag
 
-                        width: content.implicitWidth + Theme.tagPadding + (empty ? Theme.tagPadding : Theme.tagEndPadding)
+                        width: (empty ? number.implicitWidth : content.implicitWidth) + Theme.tagPadding + (empty ? Theme.tagPadding : Theme.tagEndPadding)
                         height: row.height
                         color: modelData.urgent ? Theme.closeColor : modelData.focused ? Theme.tagFocusedColor : Theme.tagColor
 
+                        // Hidden rather than gone while the number shows, so
+                        // the tag keeps its width
                         Row {
                             id: content
 
                             x: Theme.tagPadding
                             anchors.verticalCenter: parent.verticalCenter
-                            spacing: Theme.tagNumberSpacing
+                            spacing: Theme.tagIconSpacing
+                            opacity: tag.flashing ? 0 : 1
 
-                            Text {
-                                anchors.verticalCenter: parent.verticalCenter
-                                text: tag.modelData.index
-                                color: tag.modelData.urgent ? Theme.tagUrgentTextColor : Theme.textColor
-                                font.family: Theme.barFontFamily
-                                font.pointSize: Theme.barFontSize
-                                font.weight: Theme.fontWeight
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.animationDuration
+                                }
                             }
 
-                            Row {
-                                anchors.verticalCenter: parent.verticalCenter
-                                spacing: Theme.tagIconSpacing
+                            Repeater {
+                                model: tag.modelData.apps
 
-                                Repeater {
-                                    model: tag.modelData.apps
+                                IconImage {
+                                    required property string modelData
 
-                                    IconImage {
-                                        required property string modelData
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    implicitSize: Theme.tagIconSize
+                                    source: root.iconFor(modelData)
+                                }
+                            }
+                        }
 
-                                        anchors.verticalCenter: parent.verticalCenter
-                                        implicitSize: Theme.tagIconSize
-                                        source: root.iconFor(modelData)
-                                    }
+                        // The number: always on an empty tag, and over the
+                        // icons just after switching to one with windows
+                        Text {
+                            id: number
+
+                            x: Theme.tagPadding + (tag.empty ? 0 : (content.implicitWidth - width) / 2)
+                            anchors.verticalCenter: parent.verticalCenter
+                            opacity: tag.empty || tag.flashing ? 1 : 0
+                            text: tag.modelData.index
+                            color: tag.modelData.urgent ? Theme.tagUrgentTextColor : Theme.textColor
+                            font.family: Theme.barFontFamily
+                            font.pointSize: Theme.barFontSize
+                            font.weight: Theme.fontWeight
+
+                            Behavior on opacity {
+                                NumberAnimation {
+                                    duration: Theme.animationDuration
                                 }
                             }
                         }

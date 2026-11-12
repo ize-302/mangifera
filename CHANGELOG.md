@@ -14,8 +14,16 @@ git pull
 
 ## [Unreleased]
 
+### Added
+
+- Switching tag briefly shows its number on the bar, in place of its icons.
+
 ### Changed
 
+- The bar shows a tag's number only when the tag is empty; a tag with windows
+  shows just their icons. Picture-in-picture windows no longer count as being
+  on a tag.
+- The bar is more opaque.
 - The key mode badge on the bar (e.g. "scroll") is white instead of red.
 
 ### Fixed
