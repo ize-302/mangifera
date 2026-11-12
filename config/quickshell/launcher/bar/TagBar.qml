@@ -23,7 +23,8 @@ Scope {
     }
 
     // Shown tags (active, or with windows) on a monitor: { index, focused,
-    // visible, urgent, apps: [appid] }. Global windows (picture-in-picture)
+    // visible, urgent, apps: [{ appid, count }] }, one entry per app in the
+    // order their first window opened. Global windows (picture-in-picture)
     // follow onto every tag, so they don't count
     function tagsOf(monitor) {
         const tags = [];
@@ -36,7 +37,18 @@ Scope {
                 focused: tag.is_active && monitor.active,
                 visible: tag.is_active,
                 urgent: tag.is_urgent,
-                apps: windows.map(client => client.appid ?? "")
+                apps: windows.reduce((apps, client) => {
+                    const appid = client.appid ?? "";
+                    const app = apps.find(app => app.appid === appid);
+                    if (app)
+                        app.count++;
+                    else
+                        apps.push({
+                            appid: appid,
+                            count: 1
+                        });
+                    return apps;
+                }, [])
             });
         }
         return tags;
@@ -141,12 +153,35 @@ Scope {
                             Repeater {
                                 model: tag.modelData.apps
 
+                                // One icon per app, with a dot under it per
+                                // window when it has more than one
                                 IconImage {
-                                    required property string modelData
+                                    id: app
+
+                                    required property var modelData
 
                                     anchors.verticalCenter: parent.verticalCenter
                                     implicitSize: Theme.tagIconSize
-                                    source: root.iconFor(modelData)
+                                    source: root.iconFor(modelData.appid)
+
+                                    Row {
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        anchors.top: parent.bottom
+                                        anchors.topMargin: Theme.tagDotGap
+                                        spacing: Theme.tagDotSpacing
+                                        visible: app.modelData.count > 1
+
+                                        Repeater {
+                                            model: Math.min(app.modelData.count, Theme.tagDotMax)
+
+                                            Rectangle {
+                                                width: Theme.tagDotSize
+                                                height: Theme.tagDotSize
+                                                radius: width / 2
+                                                color: tag.modelData.urgent ? Theme.tagUrgentTextColor : Theme.textColor
+                                            }
+                                        }
+                                    }
                                 }
                             }
                         }

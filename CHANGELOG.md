@@ -14,6 +14,11 @@ git pull
 
 ## [Unreleased]
 
+### Changed
+
+- The bar shows each app's icon once per tag, with a dot under it for each
+  window when it has more than one (up to three).
+
 ## [0.7.0] - 2026-11-12
 
 ### Added
