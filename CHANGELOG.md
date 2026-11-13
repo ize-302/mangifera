@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.7.1] - 2026-11-13
+
 ### Changed
 
 - The bar shows each app's icon once per tag, with a dot under it for each
@@ -184,7 +186,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/ize-302/mangifera/releases/tag/v0.7.1
 [0.7.0]: https://github.com/ize-302/mangifera/releases/tag/v0.7.0
 [0.6.1]: https://github.com/ize-302/mangifera/releases/tag/v0.6.1
 [0.6.0]: https://github.com/ize-302/mangifera/releases/tag/v0.6.0
