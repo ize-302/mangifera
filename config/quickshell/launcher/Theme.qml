@@ -262,6 +262,12 @@ Singleton {
     // after switching to it
     readonly property int tagFlashTimeout: 800
     readonly property int tagIconSpacing: 4
+    // Dots under an app's icon, one per window when it has more than one, up
+    // to tagDotMax
+    readonly property int tagDotSize: 3
+    readonly property int tagDotSpacing: 2
+    readonly property int tagDotGap: 2
+    readonly property int tagDotMax: 3
     readonly property color tagColor: Qt.rgba(1, 1, 1, 0.03)
     readonly property color tagFocusedColor: Qt.rgba(1, 1, 1, 0.15)
     readonly property color tagUrgentTextColor: "#15161e"
