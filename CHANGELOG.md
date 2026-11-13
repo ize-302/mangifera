@@ -18,6 +18,9 @@ git pull
 
 - The bar shows each app's icon once per tag, with a dot under it for each
   window when it has more than one (up to three).
+- The bar's scratchpad shows the icons of the apps parked in it, stacked and
+  set apart from the tags in a bordered pill, instead of dots. Hovering it
+  spreads them out into a row.
 
 ## [0.7.0] - 2026-11-12
 
