@@ -1,4 +1,5 @@
 import QtQuick
+import QtQuick.Effects
 import Quickshell
 import Quickshell.Widgets
 import Quickshell.Wayland
@@ -8,13 +9,16 @@ import qs.services
 // The bar's tags, scratchpad count and key mode, drawn over the left end of
 // waybar on each screen: waybar's custom modules can only show text, and these
 // show each window's real app icon. Clicking a tag views it there; clicking
-// the scratchpad count opens the scratchpad menu.
+// the scratchpad's icons opens the scratchpad menu.
 Scope {
     id: root
 
     required property var scratchpadMenu
 
     readonly property int parked: Compositor.parked.length
+    // Apps with windows in the scratchpad, once each, the last parked on top
+    // of the stack
+    readonly property var parkedApps: Compositor.parked.map(client => client.appid ?? "").filter((appid, index, all) => all.lastIndexOf(appid) === index)
     readonly property string mode: Compositor.focusedMonitor?.keymode ?? "default"
 
     function iconFor(appId) {
@@ -214,27 +218,114 @@ Scope {
                     }
                 }
 
-                // Dots for windows parked in the scratchpad
-                Rectangle {
+                // Icons of the apps parked in the scratchpad, stacked like
+                // cards, each a little to the right of the one behind it. In
+                // a pill set apart from the tags, bordered like waybar's
+                // tooltips, rather than a full-height block like a tag
+                Item {
                     visible: root.parked > 0
-                    width: dots.implicitWidth + Theme.scratchpadPadding * 2
+                    width: pill.width + Theme.scratchpadGap * 2
                     height: row.height
-                    color: Theme.tagColor
 
-                    Text {
-                        id: dots
+                    Rectangle {
+                        id: pill
 
                         anchors.centerIn: parent
-                        text: ["•", "••", "•••", "••••", "••••+"][Math.min(root.parked, 5) - 1] ?? ""
-                        color: Theme.textColor
-                        font.family: Theme.barFontFamily
-                        font.pointSize: Theme.barFontSize
-                        font.weight: Theme.fontWeight
-                    }
+                        width: stack.width + Theme.scratchpadPadding * 2
+                        height: Theme.scratchpadPillHeight
+                        radius: Theme.scratchpadPillRadius
+                        color: Theme.tagColor
+                        border.width: 1
+                        border.color: Theme.scratchpadPillBorderColor
 
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: root.scratchpadMenu.open = !root.scratchpadMenu.open
+                        // Hovered, the stack spreads into a row like a tag's
+                        // icons, and closes back up after
+                        readonly property bool spread: hover.containsMouse
+                        property real offset: spread ? Theme.tagIconSize + Theme.tagIconSpacing : Theme.scratchpadStackOffset
+                        property real backBrightness: spread ? 0 : Theme.scratchpadStackBackBrightness
+
+                        Behavior on offset {
+                            NumberAnimation {
+                                duration: Theme.scratchpadSpreadDuration
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+
+                        Behavior on backBrightness {
+                            NumberAnimation {
+                                duration: Theme.scratchpadSpreadDuration
+                            }
+                        }
+
+                        Item {
+                            id: stack
+
+                            anchors.centerIn: parent
+                            width: Theme.tagIconSize + Math.max(0, root.parkedApps.length - 1) * pill.offset
+                            height: Theme.tagIconSize
+
+                            Repeater {
+                                model: root.parkedApps
+
+                                Item {
+                                    id: card
+
+                                    required property string modelData
+                                    required property int index
+                                    readonly property bool front: index === root.parkedApps.length - 1
+
+                                    x: index * pill.offset
+                                    z: index
+                                    width: Theme.tagIconSize
+                                    height: Theme.tagIconSize
+
+                                    // The ones behind are darkened, and have the
+                                    // one in front, plus a ring, cut out of them,
+                                    // so each edge stays clear of the next
+                                    IconImage {
+                                        anchors.fill: parent
+                                        source: root.iconFor(card.modelData)
+                                        layer.enabled: !card.front
+                                        layer.effect: MultiEffect {
+                                            brightness: pill.backBrightness
+                                            maskEnabled: true
+                                            maskInverted: true
+                                            maskSource: cutout
+                                            maskThresholdMin: 0.5
+                                            maskSpreadAtMin: 1
+                                        }
+                                    }
+
+                                    // The mask: where the next icon and its ring
+                                    // sit over this one
+                                    Item {
+                                        id: cutout
+
+                                        width: parent.width
+                                        height: parent.height
+                                        visible: false
+                                        layer.enabled: !card.front
+
+                                        Rectangle {
+                                            x: pill.offset - Theme.scratchpadStackRing
+                                            y: -Theme.scratchpadStackRing
+                                            width: parent.width + Theme.scratchpadStackRing * 2
+                                            height: parent.height + Theme.scratchpadStackRing * 2
+                                            radius: Theme.scratchpadStackRadius
+                                            color: "black"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        MouseArea {
+                            id: hover
+
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: root.scratchpadMenu.open = !root.scratchpadMenu.open
+                        }
                     }
                 }
 

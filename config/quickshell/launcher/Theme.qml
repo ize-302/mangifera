@@ -271,7 +271,23 @@ Singleton {
     readonly property color tagColor: Qt.rgba(1, 1, 1, 0.03)
     readonly property color tagFocusedColor: Qt.rgba(1, 1, 1, 0.15)
     readonly property color tagUrgentTextColor: "#15161e"
-    readonly property int scratchpadPadding: 8
+    // The scratchpad's pill on the bar: its space from the tags and from
+    // the bar's next module, its padding, height and corners
+    readonly property int scratchpadGap: 6
+    readonly property int scratchpadPadding: 6
+    readonly property int scratchpadPillHeight: 24
+    readonly property int scratchpadPillRadius: 3
+    // As bright as waybar's line beside the clock
+    readonly property color scratchpadPillBorderColor: Qt.rgba(1, 1, 1, 0.25)
+    // How long the stack takes to spread on hover, and to close back up
+    readonly property int scratchpadSpreadDuration: 40
+    // The bar's stack of scratchpad app icons: how far each is offset from
+    // the one behind it, and how darkened the ones behind are
+    readonly property int scratchpadStackOffset: 9
+    readonly property real scratchpadStackBackBrightness: -0.15
+    // The gap cut around each icon in the one behind it, and its corners
+    readonly property int scratchpadStackRing: 1
+    readonly property int scratchpadStackRadius: 6
     readonly property int modePadding: 6
     readonly property color modeColor: "#ffffff"
 
