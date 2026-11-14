@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-11-14
+
 ### Breaking
 
 - `btop-toggle` is built from source: until `./install.sh` runs after
@@ -222,7 +224,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.8.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/ize-302/mangifera/releases/tag/v0.9.0
 [0.8.0]: https://github.com/ize-302/mangifera/releases/tag/v0.8.0
 [0.7.1]: https://github.com/ize-302/mangifera/releases/tag/v0.7.1
 [0.7.0]: https://github.com/ize-302/mangifera/releases/tag/v0.7.0
