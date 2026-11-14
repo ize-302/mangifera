@@ -18,6 +18,8 @@ git pull
 
 - `screenshot` is built from source: until `./install.sh` runs after
   `git pull`, Super+S and the toolbox's Screenshot do nothing.
+- `cam-toggle` is built from source too: until `./install.sh` runs, it
+  doesn't show, hide, rotate or zoom the webcam bubble.
 
 ### Added
 
@@ -28,6 +30,8 @@ git pull
 
 - `screenshot` (Super+S and the toolbox's Screenshot) is written in Go
   instead of bash.
+- `cam-toggle` (shows, hides, rotates and zooms the recording's webcam
+  bubble) is written in Go instead of bash.
 
 ## [0.9.0] - 2026-11-14
 
