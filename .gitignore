@@ -18,3 +18,5 @@ home/.local/bin/wallpaper
 home/.local/bin/record-toggle
 # Built by install.sh from src/window; move-window and focus-urgent link to it
 home/.local/bin/focus-window
+# Built by install.sh from src/display; laptop-screen links to it
+home/.local/bin/primary-output
