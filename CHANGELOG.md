@@ -25,6 +25,7 @@ git pull
 
 - The Wi-Fi helper behind the control panel (`network-info`) is written in
   Go instead of bash. `./install.sh` installs `go` and builds it.
+- The Bluetooth pairing agent's source moved to `src/bluetooth-agent/`.
 
 ## [0.7.1] - 2026-11-13
 
