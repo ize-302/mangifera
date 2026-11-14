@@ -14,6 +14,18 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- `btop-toggle` is built from source: until `./install.sh` runs after
+  `git pull`, clicking the bar's CPU or memory module doesn't open btop.
+
+### Changed
+
+- `btop-toggle` (btop as a scratchpad, from the bar's CPU and memory
+  modules) is written in Go instead of bash, and opens btop in `$TERMINAL`
+  when that's alacritty, kitty, foot, wezterm or ghostty. Without `$TERMINAL`, it
+  uses the first of them that's installed (alacritty, as before).
+
 ## [0.8.0] - 2026-11-14
 
 ### Breaking
