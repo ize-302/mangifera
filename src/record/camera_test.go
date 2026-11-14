@@ -8,16 +8,6 @@ import (
 	"testing"
 )
 
-// Run as cam-toggle (see runCamToggle): run main instead of the tests
-func TestMain(m *testing.M) {
-	if os.Getenv("CAM_TOGGLE_MAIN") == "1" {
-		os.Args = append([]string{"cam-toggle"}, os.Args[1:]...)
-		main()
-		return
-	}
-	os.Exit(m.Run())
-}
-
 // The same calls the bash script made
 func TestCameraCall(t *testing.T) {
 	tests := map[string]string{
@@ -49,13 +39,13 @@ func runCamToggle(t *testing.T, code string, args ...string) (got string, exitCo
 	}
 
 	cmd := exec.Command(os.Args[0], args...)
-	cmd.Env = append(os.Environ(), "CAM_TOGGLE_MAIN=1", "HOME="+home)
+	cmd.Env = append(os.Environ(), "RECORD_RUN=cam-toggle", "HOME="+home)
 	cmd.Run()
 	out, _ := os.ReadFile(log)
 	return strings.TrimSpace(string(out)), cmd.ProcessState.ExitCode()
 }
 
-func TestRunsLauncherCall(t *testing.T) {
+func TestCamToggle(t *testing.T) {
 	if got, _ := runCamToggle(t, "0", "zoom-in"); got != "camera zoomIn" {
 		t.Errorf("launcher-call got %q, want %q", got, "camera zoomIn")
 	}
@@ -65,15 +55,15 @@ func TestRunsLauncherCall(t *testing.T) {
 }
 
 // launcher-call's exit code comes back, like with bash's exec
-func TestExitCode(t *testing.T) {
+func TestCamToggleExitCode(t *testing.T) {
 	if _, code := runCamToggle(t, "3"); code != 3 {
 		t.Errorf("exit code %d, want 3", code)
 	}
 }
 
-func TestLauncherCallMissing(t *testing.T) {
+func TestCamToggleLauncherCallMissing(t *testing.T) {
 	cmd := exec.Command(os.Args[0])
-	cmd.Env = append(os.Environ(), "CAM_TOGGLE_MAIN=1", "HOME="+t.TempDir())
+	cmd.Env = append(os.Environ(), "RECORD_RUN=cam-toggle", "HOME="+t.TempDir(), "GORACE=atexit_sleep_ms=0")
 	out, _ := cmd.CombinedOutput()
 	if code := cmd.ProcessState.ExitCode(); code != 1 {
 		t.Errorf("exit code %d, want 1", code)

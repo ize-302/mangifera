@@ -12,7 +12,7 @@ home/.local/bin/launcher-call
 home/.local/bin/btop-toggle
 # Built by install.sh from src/screenshot
 home/.local/bin/screenshot
-# Built by install.sh from src/cam-toggle
-home/.local/bin/cam-toggle
 # Built by install.sh from src/wallpaper
 home/.local/bin/wallpaper
+# Built by install.sh from src/record; record-status and cam-toggle link to it
+home/.local/bin/record-toggle
