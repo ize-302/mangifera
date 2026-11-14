@@ -8,3 +8,5 @@ home/.local/bin/bluetooth-agent
 home/.local/bin/network-info
 # Built by install.sh from src/launcher; app-menu and the rest link to it
 home/.local/bin/launcher-call
+# Built by install.sh from src/btop-toggle
+home/.local/bin/btop-toggle
