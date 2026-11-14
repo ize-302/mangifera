@@ -131,8 +131,15 @@ func TestMatchers(t *testing.T) {
 	if !isLocker(process{uid: me, cmdline: []string{"qs", "-c", "lock", "-d"}}) {
 		t.Error("should match the locker")
 	}
-	if isLocker(process{uid: me, cmdline: []string{"qs", "-c", "launcher", "-d"}}) {
-		t.Error("the launcher isn't the locker")
+	for _, p := range []process{
+		{uid: me, cmdline: []string{"qs", "-c", "launcher", "-d"}},
+		{uid: me, cmdline: []string{"bash", "-c", "echo qs -c lock -d"}},
+		{uid: me, cmdline: []string{"qs", "-c", "locker", "-d"}},
+		{uid: me + 1, cmdline: []string{"qs", "-c", "lock", "-d"}},
+	} {
+		if isLocker(p) {
+			t.Errorf("shouldn't match %+v (exact command, your own)", p)
+		}
 	}
 }
 

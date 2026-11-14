@@ -253,9 +253,11 @@ func isLauncherDaemon(p process) bool {
 	return p.uid == os.Getuid() && strings.Join(p.cmdline, " ") == "qs -c launcher -d"
 }
 
-// Your locker (pgrep -u $UID -f 'qs -c lock')
+// Your locker, as lockScreen starts it. An exact match: the bash version's
+// `pgrep -f 'qs -c lock'` also matched any command line that merely
+// mentioned it, and then didn't lock.
 func isLocker(p process) bool {
-	return p.uid == os.Getuid() && strings.Contains(strings.Join(p.cmdline, " "), "qs -c lock")
+	return p.uid == os.Getuid() && strings.Join(p.cmdline, " ") == "qs -c lock -d"
 }
 
 // Whether a screen recording is running (pgrep -x wf-recorder)

@@ -33,6 +33,8 @@ git pull
   `power-menu`, `lock-screen` and the rest) are one Go program instead of
   bash scripts, so a key press reaches the menu about twice as fast.
   `./install.sh` no longer installs `socat`.
+- `lock-screen` counts the screen as already locked only when the locker
+  itself is running, not any program whose command line mentions it.
 
 ## [0.7.1] - 2026-11-13
 
