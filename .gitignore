@@ -6,3 +6,5 @@ config/quickshell/*/.qmlls.ini
 home/.local/bin/bluetooth-agent
 # Built by install.sh from src/network-info
 home/.local/bin/network-info
+# Built by install.sh from src/launcher; app-menu and the rest link to it
+home/.local/bin/launcher-call

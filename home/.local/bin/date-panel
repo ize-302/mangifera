@@ -1,10 +1,1 @@
-#!/bin/bash
-# date-panel [--pointer]
-# Toggles the Quickshell calendar and pomodoro panel.
-if [ "$1" = "--pointer" ]; then
-	toggle=(datePanel toggleDatePanelAtPointer)
-else
-	toggle=(datePanel toggleDatePanel)
-fi
-
-exec ~/.local/bin/launcher-call "${toggle[@]}"
+launcher-call

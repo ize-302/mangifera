@@ -1,5 +1,1 @@
-#!/bin/bash
-# Toggles the Quickshell key bindings menu, starting its daemon if needed.
-toggle=(keybinds toggleKeybindMenu)
-
-exec ~/.local/bin/launcher-call "${toggle[@]}"
+launcher-call

@@ -45,8 +45,8 @@ run() {
 repo_packages=(
   # Compositor; jq parses mmsg output; wlr-randr turns the laptop screen off
   mangowm jq wlr-randr
-  # Shell, bar, lock, wallpaper; socat calls the launcher daemon
-  quickshell qt6-5compat socat waybar swayidle swaylock awww
+  # Shell, bar, lock, wallpaper
+  quickshell qt6-5compat waybar swayidle swaylock awww
   # Screenshots, recording and the clipboard; qt6-multimedia shows the
   # webcam (CameraWidget.qml)
   grim slurp satty wf-recorder qt6-multimedia qt6-multimedia-ffmpeg
@@ -60,7 +60,7 @@ repo_packages=(
   sound-theme-freedesktop
   libnotify
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
-  # src/network-info
+  # src/network-info and src/launcher
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
   alacritty tmux btop fastfetch
@@ -147,6 +147,9 @@ run cc -std=c11 -D_GNU_SOURCE -O2 -Wall -o home/.local/bin/bluetooth-agent src/b
 
 say "Building the Wi-Fi helper"
 run src/network-info/build.sh
+
+say "Building the launcher commands"
+run src/launcher/build.sh
 
 # --- Links ------------------------------------------------------------------
 
