@@ -14,6 +14,18 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- The control panel's Wi-Fi helper is now built from source, so run
+  `./install.sh` after `git pull`. Until then, network details, connecting
+  with a password and joining a hidden network don't work. With
+  `--no-packages`, install `go` first.
+
+### Changed
+
+- The Wi-Fi helper behind the control panel (`network-info`) is written in
+  Go instead of bash. `./install.sh` installs `go` and builds it.
+
 ## [0.7.1] - 2026-11-13
 
 ### Changed
