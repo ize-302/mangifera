@@ -14,6 +14,13 @@ git pull
 
 ## [Unreleased]
 
+### Added
+
+- A notepad: Super+Shift+M or the note button on the bar opens one note per
+  day, saved as you type to `~/.local/share/mangifera/notes/`. Alt+Left/Right
+  steps through days, Ctrl+T goes back to today, and Ctrl+Return turns a line
+  into a checklist item, then ticks it.
+
 ## [0.7.1] - 2026-11-13
 
 ### Changed

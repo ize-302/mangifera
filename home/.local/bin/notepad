@@ -1,0 +1,10 @@
+#!/bin/bash
+# notepad [--pointer]
+# Toggles the Quickshell notepad panel.
+if [ "$1" = "--pointer" ]; then
+	toggle=(notepad toggleNotepadAtPointer)
+else
+	toggle=(notepad toggleNotepad)
+fi
+
+exec ~/.local/bin/launcher-call "${toggle[@]}"

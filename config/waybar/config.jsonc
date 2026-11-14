@@ -17,6 +17,7 @@
 		"custom/recording",
 		"tray",
 		"custom/volume",
+		"custom/notepad",
 		"custom/toolbox",
 		"backlight",
 		"custom/pomodoro",
@@ -27,6 +28,13 @@
 	],
 
 	// Camera, recording and screenshots (Quickshell, ToolboxMenu.qml)
+	// Notepad (Quickshell, Notepad.qml)
+	"custom/notepad": {
+		"format": "\uf249",
+		"tooltip-format": "Notepad",
+		"on-click": "~/.local/bin/notepad --pointer"
+	},
+
 	"custom/toolbox": {
 		"format": "\udb82\uddac",
 		"tooltip-format": "Toolbox",

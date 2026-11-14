@@ -331,6 +331,9 @@ Singleton {
     // Notifications
     readonly property int notificationWidth: 360
     readonly property int notificationSpacing: 6
+    // Notepad: its height, and how long after typing stops it saves
+    readonly property int notepadHeight: 320
+    readonly property int notepadSaveDelay: 400
     readonly property int notificationIconSize: 32
     readonly property int maxPopups: 3
     // Default timeout; critical ones stay until closed
