@@ -61,7 +61,7 @@ repo_packages=(
   libnotify
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
   # src/network-info, src/launcher, src/btop-toggle, src/screenshot,
-  # src/wallpaper, src/record and src/window
+  # src/wallpaper, src/record, src/window and src/display
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
   alacritty tmux btop fastfetch
@@ -166,6 +166,9 @@ run src/record/build.sh
 
 say "Building the window commands"
 run src/window/build.sh
+
+say "Building the display commands"
+run src/display/build.sh
 
 # --- Links ------------------------------------------------------------------
 

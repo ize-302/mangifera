@@ -20,12 +20,19 @@ git pull
   until `./install.sh` runs after `git pull`, Super+H/L, Super+Shift+H/L
   (and with the arrows) do nothing, and urgent windows aren't focused. Then
   remove the leftover link with `rm ~/.local/lib/mangifera/window-edge.sh`.
+- So are `primary-output` and `laptop-screen`: until `./install.sh` runs,
+  logging in doesn't open a terminal on the external display, and closing
+  the lid doesn't turn the laptop's screen off.
 
 ### Changed
 
 - `focus-window`, `move-window` (Super+H/L, Super+Shift+H/L) and
   `focus-urgent` are written in Go instead of bash, as one program, and no
   longer run `jq`.
+- `primary-output` (focuses the external display at login and as displays
+  are plugged in and out) and `laptop-screen` (the laptop's screen on the lid
+  switch) are written in Go instead of bash, as one program, and no longer
+  run `jq`.
 
 ## [0.10.0] - 2026-11-14
 
