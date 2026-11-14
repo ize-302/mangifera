@@ -14,6 +14,21 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- `screenshot` is built from source: until `./install.sh` runs after
+  `git pull`, Super+S and the toolbox's Screenshot do nothing.
+
+### Added
+
+- Copying a screenshot in satty (Ctrl+C) shows a "Screenshot copied"
+  notification. Before, only saving one did.
+
+### Changed
+
+- `screenshot` (Super+S and the toolbox's Screenshot) is written in Go
+  instead of bash.
+
 ## [0.9.0] - 2026-11-14
 
 ### Breaking
