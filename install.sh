@@ -61,7 +61,7 @@ repo_packages=(
   libnotify
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
   # src/network-info, src/launcher, src/btop-toggle, src/screenshot,
-  # src/wallpaper and src/record
+  # src/wallpaper, src/record and src/window
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
   alacritty tmux btop fastfetch
@@ -163,6 +163,9 @@ run src/wallpaper/build.sh
 
 say "Building the screen recorder"
 run src/record/build.sh
+
+say "Building the window commands"
+run src/window/build.sh
 
 # --- Links ------------------------------------------------------------------
 
