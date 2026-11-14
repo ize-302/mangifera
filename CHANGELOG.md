@@ -23,6 +23,10 @@ git pull
 - So is `wallpaper`: until `./install.sh` runs, the desktop has no wallpaper
   after logging in, and Super+Shift+W and the toolbox's Random Wallpaper do
   nothing.
+- And so are `record-toggle` and `record-status`: until `./install.sh` runs,
+  screen recording doesn't start or stop, and the bar shows no recording
+  timer. After it, restart waybar (Super+Shift+R) so the bar uses the new
+  `record-status`.
 
 ### Added
 
@@ -33,11 +37,14 @@ git pull
 
 - `screenshot` (Super+S and the toolbox's Screenshot) is written in Go
   instead of bash.
-- `cam-toggle` (shows, hides, rotates and zooms the recording's webcam
-  bubble) is written in Go instead of bash.
 - `wallpaper` (sets the wallpaper at login, on Super+Shift+W and from the
   toolbox, and again on each display that turns on) is written in Go instead
   of bash.
+- Screen recording (`record-toggle`, the bar's timer, `record-status`, and
+  `cam-toggle`, which shows, hides, rotates and zooms the webcam bubble) is
+  written in Go instead of bash, as one program. While recording, the bar's
+  timer no longer starts `pgrep` and `ps` every second. If `record-toggle` is
+  stopped mid-recording, it still removes the Recording sound device it made.
 
 ## [0.9.0] - 2026-11-14
 
