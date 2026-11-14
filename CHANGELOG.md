@@ -20,12 +20,19 @@ git pull
   `./install.sh` after `git pull`. Until then, network details, connecting
   with a password and joining a hidden network don't work. With
   `--no-packages`, install `go` first.
+- The commands that open menus and lock the screen are built from source
+  too: until `./install.sh` runs after `git pull`, menu key bindings and bar
+  clicks do nothing, and the screen doesn't lock, not even when idle.
 
 ### Changed
 
 - The Wi-Fi helper behind the control panel (`network-info`) is written in
   Go instead of bash. `./install.sh` installs `go` and builds it.
 - The Bluetooth pairing agent's source moved to `src/bluetooth-agent/`.
+- The commands that open the launcher's menus (`app-menu`, `control-panel`,
+  `power-menu`, `lock-screen` and the rest) are one Go program instead of
+  bash scripts, so a key press reaches the menu about twice as fast.
+  `./install.sh` no longer installs `socat`.
 
 ## [0.7.1] - 2026-11-13
 

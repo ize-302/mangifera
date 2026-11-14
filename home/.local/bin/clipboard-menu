@@ -1,5 +1,1 @@
-#!/bin/bash
-# Toggles the Quickshell clipboard menu, starting its daemon if needed.
-toggle=(clipboard toggleClipboardMenu)
-
-exec ~/.local/bin/launcher-call "${toggle[@]}"
+launcher-call

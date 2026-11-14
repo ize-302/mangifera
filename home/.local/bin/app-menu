@@ -1,5 +1,1 @@
-#!/bin/bash
-# Toggles the Quickshell app launcher, starting its daemon if needed.
-toggle=(launcher toggleAppMenu)
-
-exec ~/.local/bin/launcher-call "${toggle[@]}"
+launcher-call

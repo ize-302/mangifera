@@ -1,10 +1,1 @@
-#!/bin/bash
-# notification-center [--pointer]
-# Toggles the Quickshell notification centre.
-if [ "$1" = "--pointer" ]; then
-	toggle=(notificationCenter toggleNotificationCenterAtPointer)
-else
-	toggle=(notificationCenter toggleNotificationCenter)
-fi
-
-exec ~/.local/bin/launcher-call "${toggle[@]}"
+launcher-call
