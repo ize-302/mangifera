@@ -14,3 +14,5 @@ home/.local/bin/btop-toggle
 home/.local/bin/screenshot
 # Built by install.sh from src/cam-toggle
 home/.local/bin/cam-toggle
+# Built by install.sh from src/wallpaper
+home/.local/bin/wallpaper
