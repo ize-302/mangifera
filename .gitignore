@@ -4,3 +4,5 @@ config/mango/local.conf
 config/quickshell/*/.qmlls.ini
 # Built by install.sh from src/bluetooth-agent.c
 home/.local/bin/bluetooth-agent
+# Built by install.sh from src/network-info
+home/.local/bin/network-info

@@ -59,9 +59,10 @@ repo_packages=(
   noise-suppression-for-voice
   sound-theme-freedesktop
   libnotify
-  # Network, Bluetooth; gcc builds src/bluetooth-agent.c
+  # Network, Bluetooth; gcc builds src/bluetooth-agent.c, go builds
+  # src/network-info
   networkmanager nm-connection-editor bluez bluez-utils blueman
-  gcc pkgconf
+  gcc pkgconf go
   alacritty tmux btop fastfetch
   # Shrinks the wallpaper for the lock screen
   imagemagick
@@ -143,6 +144,9 @@ command -v stow >/dev/null || { note "stow isn't installed (run without --no-pac
 
 say "Building the Bluetooth pairing agent"
 run cc -std=c11 -D_GNU_SOURCE -O2 -Wall -o home/.local/bin/bluetooth-agent src/bluetooth-agent.c $(pkg-config --cflags --libs libsystemd)
+
+say "Building the Wi-Fi helper"
+run src/network-info/build.sh
 
 # --- Links ------------------------------------------------------------------
 
