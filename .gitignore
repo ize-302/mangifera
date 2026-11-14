@@ -16,3 +16,5 @@ home/.local/bin/screenshot
 home/.local/bin/wallpaper
 # Built by install.sh from src/record; record-status and cam-toggle link to it
 home/.local/bin/record-toggle
+# Built by install.sh from src/window; move-window and focus-urgent link to it
+home/.local/bin/focus-window

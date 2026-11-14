@@ -14,6 +14,19 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- `focus-window`, `move-window` and `focus-urgent` are built from source:
+  until `./install.sh` runs after `git pull`, Super+H/L, Super+Shift+H/L
+  (and with the arrows) do nothing, and urgent windows aren't focused. Then
+  remove the leftover link with `rm ~/.local/lib/mangifera/window-edge.sh`.
+
+### Changed
+
+- `focus-window`, `move-window` (Super+H/L, Super+Shift+H/L) and
+  `focus-urgent` are written in Go instead of bash, as one program, and no
+  longer run `jq`.
+
 ## [0.10.0] - 2026-11-14
 
 ### Breaking
