@@ -59,7 +59,7 @@ repo_packages=(
   noise-suppression-for-voice
   sound-theme-freedesktop
   libnotify
-  # Network, Bluetooth; gcc builds src/bluetooth-agent.c, go builds
+  # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
   # src/network-info
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
@@ -143,7 +143,7 @@ command -v stow >/dev/null || { note "stow isn't installed (run without --no-pac
 # --- Build ------------------------------------------------------------------
 
 say "Building the Bluetooth pairing agent"
-run cc -std=c11 -D_GNU_SOURCE -O2 -Wall -o home/.local/bin/bluetooth-agent src/bluetooth-agent.c $(pkg-config --cflags --libs libsystemd)
+run cc -std=c11 -D_GNU_SOURCE -O2 -Wall -o home/.local/bin/bluetooth-agent src/bluetooth-agent/bluetooth-agent.c $(pkg-config --cflags --libs libsystemd)
 
 say "Building the Wi-Fi helper"
 run src/network-info/build.sh
