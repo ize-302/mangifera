@@ -60,7 +60,7 @@ repo_packages=(
   sound-theme-freedesktop
   libnotify
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
-  # src/network-info, src/launcher and src/btop-toggle
+  # src/network-info, src/launcher, src/btop-toggle and src/screenshot
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
   alacritty tmux btop fastfetch
@@ -153,6 +153,9 @@ run src/launcher/build.sh
 
 say "Building the btop toggle"
 run src/btop-toggle/build.sh
+
+say "Building the screenshot tool"
+run src/screenshot/build.sh
 
 # --- Links ------------------------------------------------------------------
 

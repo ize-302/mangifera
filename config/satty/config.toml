@@ -6,8 +6,10 @@ early-exit = ["all"]
 fullscreen = false
 floating-hack = true
 initial-tool = "arrow"
+# ~/.local/bin/screenshot replaces this with itself, to notify on a copy
 copy-command = "wl-copy"
-# The script notifies, with Open and Show in folder
+# The script notifies: with Open and Show in folder once saved, or that
+# it was copied
 disable-notifications = true
 # The save path comes from the script, which knows $HOME
 # Enter saves, Ctrl+C copies, Escape quits without saving
