@@ -158,7 +158,7 @@ Scope {
                                 model: tag.modelData.apps
 
                                 // One icon per app, with a dot under it per
-                                // window when it has more than one
+                                // window
                                 IconImage {
                                     id: app
 
@@ -173,7 +173,6 @@ Scope {
                                         anchors.top: parent.bottom
                                         anchors.topMargin: Theme.tagDotGap
                                         spacing: Theme.tagDotSpacing
-                                        visible: app.modelData.count > 1
 
                                         Repeater {
                                             model: Math.min(app.modelData.count, Theme.tagDotMax)
