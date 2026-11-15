@@ -60,13 +60,14 @@ repo_packages=(
   sound-theme-freedesktop
   libnotify
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
-  # src/network-info, src/launcher, src/btop-toggle, src/screenshot,
+  # src/network-info, src/launcher, src/terminal, src/btop-toggle, src/screenshot,
   # src/wallpaper, src/record, src/window, src/display, src/clock-status,
   # src/bluetooth-audio, src/gtk-radius, src/bar-anchor, src/bar-watchdog and
   # src/mango-reload
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
-  alacritty tmux btop fastfetch
+  # The terminal when $TERMINAL isn't set (see src/terminal)
+  foot tmux btop fastfetch
   # Shrinks the wallpaper for the lock screen
   imagemagick
   # File manager, thumbnailers, archive and media tag plugins
@@ -153,6 +154,9 @@ run src/network-info/build.sh
 
 say "Building the launcher commands"
 run src/launcher/build.sh
+
+say "Building the terminal launcher"
+run src/terminal/build.sh
 
 say "Building the btop toggle"
 run src/btop-toggle/build.sh
