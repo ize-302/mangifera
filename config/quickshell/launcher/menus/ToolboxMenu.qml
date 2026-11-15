@@ -23,10 +23,11 @@ Scope {
     property bool placeWaited: false
     readonly property bool placed: !atPointer || pointerX >= 0 || placeWaited
 
-    // The record menu (which also has the camera), the clipboard menu and the
-    // pomodoro timer
+    // The record menu (which also has the camera), the clipboard menu, the
+    // notes and the pomodoro timer
     required property var recordMenu
     required property var clipboardMenu
+    required property var notesPanel
     required property var pomodoro
     property bool recording: false
 
@@ -45,6 +46,11 @@ Scope {
             id: "clipboard",
             label: "Clipboard History",
             icon: Theme.toolboxClipboardIcon
+        },
+        {
+            id: "notes",
+            label: "Notes",
+            icon: Theme.notesIcon
         },
         {
             id: "pomodoro",
@@ -71,6 +77,8 @@ Scope {
             shotDelay.restart();
         } else if (entry.id === "clipboard") {
             clipboardMenu.open = true;
+        } else if (entry.id === "notes") {
+            notesPanel.open = true;
         } else if (entry.id === "pomodoro") {
             pomodoro.toggle();
         } else if (entry.id === "wallpaper") {

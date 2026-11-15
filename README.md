@@ -71,6 +71,7 @@ Press **Super+,** to see them all.
 | Super+A | Control panel |
 | Super+Shift+N | Notifications |
 | Super+C | Clipboard history |
+| Super+M | Notes |
 | Super+S | Screenshot |
 | Super+Shift+S | Record the screen |
 | Super+Escape | Lock, log out, restart or shut down |

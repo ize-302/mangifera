@@ -9,6 +9,7 @@ import qs.bar
 import qs.controlpanel
 import qs.datepanel
 import qs.menus
+import qs.notes
 import qs.notifications
 import qs.osd
 import qs.prompts
@@ -23,7 +24,7 @@ ShellRoot {
 
     // Desktop entry id -> times launched; most used first
     property var history: ({})
-    readonly property list<QtObject> menus: [appMenu, powerMenu, recordMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, datePanel, toolboxMenu]
+    readonly property list<QtObject> menus: [appMenu, powerMenu, recordMenu, clipboardMenu, scratchpadMenu, keybindMenu, controlPanel, notificationCenter, datePanel, toolboxMenu, notesPanel]
     readonly property bool anyOpen: menus.some(menu => menu.open)
     // Pointer x on its screen when a menu opened, snapped to the bar module's
     // centre (~/.local/bin/bar-anchor); -1 until known
@@ -257,9 +258,16 @@ ShellRoot {
         pointerScreen: root.pointerScreen
         recordMenu: recordMenu
         clipboardMenu: clipboardMenu
+        notesPanel: notesPanel
         pomodoro: pomodoro
         onOpenChanged: if (open)
             root.closeOthers(toolboxMenu)
+    }
+
+    NotesPanel {
+        id: notesPanel
+        onOpenChanged: if (open)
+            root.closeOthers(notesPanel)
     }
 
     Pomodoro {
@@ -292,7 +300,7 @@ ShellRoot {
     }
 
     // Every IpcHandler, for calls over the socket
-    readonly property list<QtObject> handlers: [launcherIpc, powerMenu.ipc, recordMenu.ipc, clipboardMenu.ipc, scratchpadMenu.ipc, keybindMenu.ipc, controlPanel.ipc, notificationCenter.ipc, datePanel.ipc, pomodoro.ipc, notifications.ipc, camera.ipc, toolboxMenu.ipc]
+    readonly property list<QtObject> handlers: [launcherIpc, powerMenu.ipc, recordMenu.ipc, clipboardMenu.ipc, scratchpadMenu.ipc, keybindMenu.ipc, controlPanel.ipc, notificationCenter.ipc, datePanel.ipc, pomodoro.ipc, notifications.ipc, camera.ipc, toolboxMenu.ipc, notesPanel.ipc]
 
     // `line` is "<target> <function> [argument]", as `qs ipc call` takes
     function call(line) {
