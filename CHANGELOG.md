@@ -31,6 +31,8 @@ git pull
 - So are `bar-anchor` and `bar-watchdog`: until `./install.sh` runs, popups
   from the bar open where the pointer is instead of over their module, and
   nothing restarts waybar when it spins.
+- So is `mango-reload`: until `./install.sh` runs, Super+Shift+R does
+  nothing.
 
 ### Changed
 
@@ -49,6 +51,7 @@ git pull
 - `bar-anchor` (places popups over the bar module they're for) and
   `bar-watchdog` (restarts waybar when it spins) are written in Go instead
   of bash and awk, and the watchdog no longer runs `pgrep` or `top`.
+- `mango-reload` (Super+Shift+R) is written in Go instead of bash.
 
 ### Fixed
 

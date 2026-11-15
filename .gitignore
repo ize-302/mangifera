@@ -29,3 +29,5 @@ home/.local/bin/gtk-radius
 # Built by install.sh from src/bar-anchor and src/bar-watchdog
 home/.local/bin/bar-anchor
 home/.local/bin/bar-watchdog
+# Built by install.sh from src/mango-reload
+home/.local/bin/mango-reload
