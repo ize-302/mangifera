@@ -262,8 +262,7 @@ Singleton {
     // after switching to it
     readonly property int tagFlashTimeout: 800
     readonly property int tagIconSpacing: 4
-    // Dots under an app's icon, one per window when it has more than one, up
-    // to tagDotMax
+    // Dots under an app's icon, one per window, up to tagDotMax
     readonly property int tagDotSize: 3
     readonly property int tagDotSpacing: 2
     readonly property int tagDotGap: 2

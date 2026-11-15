@@ -14,6 +14,11 @@ git pull
 
 ## [Unreleased]
 
+### Changed
+
+- The bar's workspaces show a dot under an app's icon for a single window
+  too, not only from two windows up.
+
 ## [0.13.0] - 2026-11-15
 
 ### Breaking
