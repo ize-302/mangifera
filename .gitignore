@@ -10,6 +10,8 @@ home/.local/bin/network-info
 home/.local/bin/launcher-call
 # Built by install.sh from src/btop-toggle
 home/.local/bin/btop-toggle
+# Built by install.sh from src/terminal
+home/.local/bin/terminal
 # Built by install.sh from src/screenshot
 home/.local/bin/screenshot
 # Built by install.sh from src/wallpaper

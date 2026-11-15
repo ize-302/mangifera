@@ -14,6 +14,33 @@ git pull
 
 ## [Unreleased]
 
+### Breaking
+
+- alacritty is no longer the terminal, and its config is gone from
+  mangifera. Your terminal is `$TERMINAL`: add `env=TERMINAL,alacritty` (or
+  foot, kitty, wezterm, ghostty) to `~/.config/mango/local.conf`. Unset, the
+  first installed of foot, kitty, alacritty, wezterm and ghostty opens.
+  install.sh now installs foot, not alacritty.
+- The `~/.config/alacritty/alacritty.toml` link breaks. To keep that config
+  as your own file, remove the link first, then write it out:
+
+  ```sh
+  rm ~/.config/alacritty/alacritty.toml
+  git -C ~/mangifera show b43af82:config/alacritty/alacritty.toml > ~/.config/alacritty/alacritty.toml
+  ```
+- Run `./install.sh` after `git pull`: until then, Super+Return, terminal
+  apps from the launcher, Thunar's Open Terminal Here and Open in Neovim, and
+  btop do nothing.
+
+### Added
+
+- `terminal` (`~/.local/bin/terminal`, built from `src/terminal`) opens
+  `$TERMINAL`, with `--cwd DIR`, `--class NAME` and a command to run. It
+  knows each terminal's flags for these. Super+Return, the launcher, Thunar
+  and btop-toggle open terminals through it.
+- mango passes `$TERMINAL` on to apps started by D-Bus, so Thunar's actions
+  use it when another app opened Thunar.
+
 ## [0.12.0] - 2026-11-15
 
 ### Added

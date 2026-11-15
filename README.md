@@ -59,7 +59,7 @@ Press **Super+,** to see them all.
 | Keys | Does |
 |---|---|
 | Super+Space | Open apps |
-| Super+Return | Terminal |
+| Super+Return | Terminal (`$TERMINAL`) |
 | Super+E | Files |
 | Super+X | Close window |
 | Super+1–9 | Go to workspace |
@@ -93,6 +93,18 @@ xkb_rules_layout=us,de
 
 Run `mmsg get all-monitors` to find your display names. Press
 Super+Shift+R to reload.
+
+**Terminal:** Super+Return, the app launcher, Thunar's terminal actions and
+btop open `$TERMINAL`. Set it in `~/.config/mango/local.conf`:
+
+```
+env=TERMINAL,kitty
+```
+
+foot, kitty, alacritty, wezterm and ghostty are known. Another terminal works
+too, but can't run btop. With `$TERMINAL` unset, the first installed one of
+those opens (install.sh installs foot). mangifera ships no terminal config:
+keep yours in your own dotfiles.
 
 ## Update
 

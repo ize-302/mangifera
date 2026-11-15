@@ -377,6 +377,7 @@ Singleton {
     readonly property int launcherSlide: 40
     readonly property int launcherSlideDuration: 140
 
-    // For entries with Terminal=true
-    readonly property list<string> terminal: ["alacritty", "-e"]
+    // For entries with Terminal=true: the terminal launcher (src/terminal),
+    // so $TERMINAL; the entry's command goes after --
+    readonly property list<string> terminal: [Quickshell.env("HOME") + "/.local/bin/terminal", "--"]
 }

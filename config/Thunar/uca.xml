@@ -5,7 +5,7 @@
 	<name>Open Terminal Here</name>
 	<submenu></submenu>
 	<unique-id>1753069503245949-1</unique-id>
-	<command>sh -c 'exec alacritty --working-directory "$1" -e "${SHELL:-bash}"' _ %f</command>
+	<command>sh -c 'exec ~/.local/bin/terminal --cwd "$1" -- "${SHELL:-bash}"' _ %f</command>
 	<description>A terminal in this folder, outside tmux</description>
 	<range></range>
 	<patterns>*</patterns>
@@ -33,7 +33,7 @@
 	<name>Open in Neovim</name>
 	<submenu></submenu>
 	<unique-id>1760795000000002-1</unique-id>
-	<command>alacritty -e nvim %F</command>
+	<command>sh -c 'exec ~/.local/bin/terminal -- nvim "$@"' _ %F</command>
 	<description>Edit in Neovim in a new terminal</description>
 	<range></range>
 	<patterns>*</patterns>

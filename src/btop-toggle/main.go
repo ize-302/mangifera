@@ -1,10 +1,10 @@
 // btop-toggle: shows or hides btop as mango's named scratchpad. Run by the
 // bar's CPU and memory modules.
 //
-// btop opens in $TERMINAL when it's one of the terminals below, else in the
-// first of them that's installed. mango finds the scratchpad by its app_id,
-// "btop" (see the window rule in config/mango/config.conf), and each
-// terminal sets that with a different flag.
+// btop opens through the terminal launcher beside this one
+// (~/.local/bin/terminal, see src/terminal), so in $TERMINAL. mango finds
+// the scratchpad by its app_id, "btop" (see the window rule in
+// config/mango/config.conf), which the launcher sets with --class.
 //
 // install.sh builds this into ~/.local/bin/btop-toggle (see build.sh).
 package main
@@ -15,23 +15,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
-	"strings"
 )
-
-// A terminal and its arguments to run btop with app_id "btop"
-type terminal struct {
-	name string
-	args []string
-}
-
-// In order of preference when $TERMINAL isn't set
-var terminals = []terminal{
-	{"alacritty", []string{"--class", "btop", "-e", "btop"}},
-	{"kitty", []string{"--class", "btop", "btop"}},
-	{"foot", []string{"--app-id", "btop", "btop"}},
-	{"wezterm", []string{"start", "--class", "btop", "--", "btop"}},
-	{"ghostty", []string{"--class=btop", "-e", "btop"}},
-}
 
 func main() {
 	code := run()
@@ -39,14 +23,14 @@ func main() {
 }
 
 func run() int {
-	term, err := pickTerminal(os.Getenv("TERMINAL"), isInstalled)
+	launcher, err := terminalLauncher()
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "btop-toggle:", err)
 		return 1
 	}
 
 	// Toggles the "btop" scratchpad, starting the terminal if it isn't open
-	cmd := exec.Command("mmsg", mmsgArgs(term)...)
+	cmd := exec.Command("mmsg", mmsgArgs(launcher)...)
 	cmd.Stdin, cmd.Stdout, cmd.Stderr = os.Stdin, os.Stdout, os.Stderr
 	err = cmd.Run()
 
@@ -65,40 +49,21 @@ func run() int {
 // mmsg dispatch toggle_named_scratchpad,<app_id>,<title>,<command> ...
 // The command's first word goes after the last comma, its arguments follow
 // as mmsg's own arguments.
-func mmsgArgs(term terminal) []string {
-	return append([]string{"dispatch", "toggle_named_scratchpad,btop,none," + term.name}, term.args...)
+func mmsgArgs(launcher string) []string {
+	return []string{"dispatch", "toggle_named_scratchpad,btop,none," + launcher, "--class", "btop", "btop"}
 }
 
-// $TERMINAL when it's one we know (a path or arguments after it are fine),
-// else the first installed one
-func pickTerminal(env string, installed func(string) bool) (terminal, error) {
-	fields := strings.Fields(env)
-	if len(fields) > 0 {
-		name := filepath.Base(fields[0])
-		for _, term := range terminals {
-			if term.name == name && installed(name) {
-				return term, nil
-			}
-		}
-		fmt.Fprintf(os.Stderr, "btop-toggle: $TERMINAL is %q, which can't open btop as a scratchpad; trying %s\n", env, terminalNames())
-	}
-	for _, term := range terminals {
-		if installed(term.name) {
-			return term, nil
+// The terminal launcher in this program's folder, else the one in PATH
+func terminalLauncher() (string, error) {
+	if self, err := os.Executable(); err == nil {
+		launcher := filepath.Join(filepath.Dir(self), "terminal")
+		if info, err := os.Stat(launcher); err == nil && !info.IsDir() && info.Mode()&0o111 != 0 {
+			return launcher, nil
 		}
 	}
-	return terminal{}, fmt.Errorf("no terminal for btop: install one of %s", terminalNames())
-}
-
-func isInstalled(name string) bool {
-	_, err := exec.LookPath(name)
-	return err == nil
-}
-
-func terminalNames() string {
-	var list []string
-	for _, term := range terminals {
-		list = append(list, term.name)
+	launcher, err := exec.LookPath("terminal")
+	if err != nil {
+		return "", errors.New("no terminal launcher: run ./install.sh to build ~/.local/bin/terminal")
 	}
-	return strings.Join(list[:len(list)-1], ", ") + " or " + list[len(list)-1]
+	return launcher, nil
 }
