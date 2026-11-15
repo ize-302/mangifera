@@ -1,8 +1,0 @@
-#!/bin/sh
-# The bar's two-line clock as waybar JSON.
-
-# Taller line heights push the date out of the bar
-time="<span size='10pt' line_height='0.85' weight='600'>$(date '+%H:%M')</span>"
-day="<span size='7.5pt' alpha='80%' line_height='0.85'>$(date '+%a %b %-d')</span>"
-printf '{"text": "%s\\n%s", "tooltip": "%s"}\n' \
-	"$time" "$day" "$(date '+%A, %d %B %Y')"

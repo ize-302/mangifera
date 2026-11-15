@@ -20,3 +20,5 @@ home/.local/bin/record-toggle
 home/.local/bin/focus-window
 # Built by install.sh from src/display; laptop-screen links to it
 home/.local/bin/primary-output
+# Built by install.sh from src/clock-status
+home/.local/bin/clock-status

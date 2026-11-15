@@ -23,6 +23,7 @@ git pull
 - So are `primary-output` and `laptop-screen`: until `./install.sh` runs,
   logging in doesn't open a terminal on the external display, and closing
   the lid doesn't turn the laptop's screen off.
+- So is `clock-status`: until `./install.sh` runs, the bar's clock is blank.
 
 ### Changed
 
@@ -33,6 +34,7 @@ git pull
   are plugged in and out) and `laptop-screen` (the laptop's screen on the lid
   switch) are written in Go instead of bash, as one program, and no longer
   run `jq`.
+- `clock-status` (the bar's two-line clock) is written in Go instead of sh.
 
 ## [0.10.0] - 2026-11-14
 
