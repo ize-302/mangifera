@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.12.0] - 2026-11-15
+
 ### Added
 
 - Notes: Super+M (or Notes in the toolbox) opens a panel listing every
@@ -319,7 +321,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.11.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.12.0...HEAD
+[0.12.0]: https://github.com/ize-302/mangifera/releases/tag/v0.12.0
 [0.11.0]: https://github.com/ize-302/mangifera/releases/tag/v0.11.0
 [0.10.0]: https://github.com/ize-302/mangifera/releases/tag/v0.10.0
 [0.9.0]: https://github.com/ize-302/mangifera/releases/tag/v0.9.0
