@@ -26,6 +26,8 @@ git pull
 - So is `clock-status`: until `./install.sh` runs, the bar's clock is blank.
 - So is `bluetooth-audio`: until `./install.sh` runs, a Bluetooth device's
   page in the control panel shows no audio profiles to pick.
+- So is `gtk-radius`: run `./install.sh` before rerunning it after an
+  adw-gtk-theme update.
 
 ### Changed
 
@@ -39,6 +41,16 @@ git pull
 - `clock-status` (the bar's two-line clock) is written in Go instead of sh.
 - `bluetooth-audio` (the audio profiles on a Bluetooth device's page in the
   control panel) is written in Go instead of bash.
+- `gtk-radius` (caps adw-gtk3's corner radii at 4px in
+  `~/.config/gtk-3.0/radius.css`) is written in Go instead of bash and awk.
+
+### Fixed
+
+- `gtk-radius` writes the repo's `config/gtk-3.0/radius.css` through stow's
+  link, instead of replacing the link with a file of its own.
+- GTK3 apps' corners like the ends of linked buttons and entries are capped
+  at 4px too: `gtk-radius` now copies `border-top-left-radius` and the other
+  corners, which it missed. `config/gtk-3.0/radius.css` has 40 more rules.
 
 ## [0.10.0] - 2026-11-14
 

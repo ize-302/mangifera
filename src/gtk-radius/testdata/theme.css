@@ -1,0 +1,28 @@
+/* A theme comment { border-radius: 9px; } */
+button {
+  color: red;
+  border-radius: 6px;
+}
+
+entry,
+spinbutton:not(.vertical)   >   text {
+  border-radius : 5.5px 4px 0 3px;
+  padding: 2px;
+}
+
+.circular { border-radius: 9999px; }
+.pill { border-radius: 99px; }
+.edge { border-radius: 98px; }
+.small { border-radius: 4.5px; }
+.zero { border-radius: 0; }
+.corner { border-top-left-radius: 8px; border-bottom-radius: 7px; }
+.plain { margin: 6px; }
+
+@media (prefers-reduced-motion) {
+  popover.menu /* inline */ contents { border-radius: 12px; outline-radius: 3px; }
+}
+
+{ border-radius: 7px; }
+.last { border-radius: 10px }
+.after { border-radius: 20px; }
+/* left open { border-radius: 5px; }
