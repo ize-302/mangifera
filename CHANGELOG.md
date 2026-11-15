@@ -28,6 +28,9 @@ git pull
   page in the control panel shows no audio profiles to pick.
 - So is `gtk-radius`: run `./install.sh` before rerunning it after an
   adw-gtk-theme update.
+- So are `bar-anchor` and `bar-watchdog`: until `./install.sh` runs, popups
+  from the bar open where the pointer is instead of over their module, and
+  nothing restarts waybar when it spins.
 
 ### Changed
 
@@ -43,6 +46,9 @@ git pull
   control panel) is written in Go instead of bash.
 - `gtk-radius` (caps adw-gtk3's corner radii at 4px in
   `~/.config/gtk-3.0/radius.css`) is written in Go instead of bash and awk.
+- `bar-anchor` (places popups over the bar module they're for) and
+  `bar-watchdog` (restarts waybar when it spins) are written in Go instead
+  of bash and awk, and the watchdog no longer runs `pgrep` or `top`.
 
 ### Fixed
 
@@ -51,6 +57,9 @@ git pull
 - GTK3 apps' corners like the ends of linked buttons and entries are capped
   at 4px too: `gtk-radius` now copies `border-top-left-radius` and the other
   corners, which it missed. `config/gtk-3.0/radius.css` has 40 more rules.
+- `bar-watchdog`'s log lists the threads that used over half a core during
+  the minute, measured from `/proc`. It listed lines of `top`'s header
+  instead (`top(user,%) Threads:(d-sleep,%) ...`).
 
 ## [0.10.0] - 2026-11-14
 
