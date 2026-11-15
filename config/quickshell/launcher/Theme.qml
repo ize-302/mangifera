@@ -313,6 +313,19 @@ Singleton {
         return muted ? volumeMutedIcon : Math.round(volume * 100) > 50 ? volumeHighIcon : volumeLowIcon;
     }
 
+    // Notes (notes/NotesPanel.qml): fractions of the screen, the list's of
+    // the panel
+    readonly property real notesWidth: 0.5
+    readonly property real notesHeight: 0.6
+    readonly property real notesListWidth: 0.3
+    readonly property int notesRowHeight: 48
+    readonly property int notesFontSize: 15
+    readonly property string notesSearchText: "Search notes…"
+    readonly property string notesPlaceholder: "Start typing. The first line is the title."
+    readonly property string notesEmptyText: "No notes yet"
+    readonly property string notesNoMatchText: "No notes found"
+    readonly property string notesIcon: String.fromCodePoint(0xf039a)
+
     // Pomodoro, in minutes
     readonly property int pomodoroFocus: 25
     readonly property int pomodoroShortBreak: 5

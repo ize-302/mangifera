@@ -14,6 +14,15 @@ git pull
 
 ## [Unreleased]
 
+### Added
+
+- Notes: Super+M (or Notes in the toolbox) opens a panel listing every
+  Markdown note in `~/Notes`, subfolders too, newest first, beside an editor.
+  It saves as you type, and a note's first line is its title. Ctrl+N starts a
+  new note, the search box (Ctrl+F) looks through titles and text, Alt+Up/Down
+  switches notes, and Ctrl+Shift+Backspace moves one to the trash after
+  asking. Run `./install.sh` after `git pull` to link the new panel.
+
 ## [0.11.0] - 2026-11-15
 
 ### Breaking
