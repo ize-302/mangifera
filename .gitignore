@@ -24,3 +24,5 @@ home/.local/bin/primary-output
 home/.local/bin/clock-status
 # Built by install.sh from src/bluetooth-audio
 home/.local/bin/bluetooth-audio
+# Built by install.sh from src/gtk-radius
+home/.local/bin/gtk-radius
