@@ -22,3 +22,5 @@ home/.local/bin/focus-window
 home/.local/bin/primary-output
 # Built by install.sh from src/clock-status
 home/.local/bin/clock-status
+# Built by install.sh from src/bluetooth-audio
+home/.local/bin/bluetooth-audio

@@ -24,6 +24,8 @@ git pull
   logging in doesn't open a terminal on the external display, and closing
   the lid doesn't turn the laptop's screen off.
 - So is `clock-status`: until `./install.sh` runs, the bar's clock is blank.
+- So is `bluetooth-audio`: until `./install.sh` runs, a Bluetooth device's
+  page in the control panel shows no audio profiles to pick.
 
 ### Changed
 
@@ -35,6 +37,8 @@ git pull
   switch) are written in Go instead of bash, as one program, and no longer
   run `jq`.
 - `clock-status` (the bar's two-line clock) is written in Go instead of sh.
+- `bluetooth-audio` (the audio profiles on a Bluetooth device's page in the
+  control panel) is written in Go instead of bash.
 
 ## [0.10.0] - 2026-11-14
 
