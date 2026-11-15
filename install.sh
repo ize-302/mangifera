@@ -61,7 +61,8 @@ repo_packages=(
   libnotify
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
   # src/network-info, src/launcher, src/btop-toggle, src/screenshot,
-  # src/wallpaper, src/record, src/window, src/display and src/clock-status
+  # src/wallpaper, src/record, src/window, src/display, src/clock-status and
+  # src/bluetooth-audio
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
   alacritty tmux btop fastfetch
@@ -172,6 +173,9 @@ run src/display/build.sh
 
 say "Building the clock status"
 run src/clock-status/build.sh
+
+say "Building the Bluetooth audio command"
+run src/bluetooth-audio/build.sh
 
 # --- Links ------------------------------------------------------------------
 
