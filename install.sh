@@ -62,7 +62,7 @@ repo_packages=(
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
   # src/network-info, src/launcher, src/btop-toggle, src/screenshot,
   # src/wallpaper, src/record, src/window, src/display, src/clock-status,
-  # src/bluetooth-audio and src/gtk-radius
+  # src/bluetooth-audio, src/gtk-radius, src/bar-anchor and src/bar-watchdog
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
   alacritty tmux btop fastfetch
@@ -179,6 +179,10 @@ run src/bluetooth-audio/build.sh
 
 say "Building gtk-radius"
 run src/gtk-radius/build.sh
+
+say "Building the bar's anchor and watchdog"
+run src/bar-anchor/build.sh
+run src/bar-watchdog/build.sh
 
 # --- Links ------------------------------------------------------------------
 
