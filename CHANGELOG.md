@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.11.0] - 2026-11-15
+
 ### Breaking
 
 - `focus-window`, `move-window` and `focus-urgent` are built from source:
@@ -308,7 +310,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.10.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.11.0...HEAD
+[0.11.0]: https://github.com/ize-302/mangifera/releases/tag/v0.11.0
 [0.10.0]: https://github.com/ize-302/mangifera/releases/tag/v0.10.0
 [0.9.0]: https://github.com/ize-302/mangifera/releases/tag/v0.9.0
 [0.8.0]: https://github.com/ize-302/mangifera/releases/tag/v0.8.0
