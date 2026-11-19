@@ -377,6 +377,8 @@ Rectangle {
             text: {
                 if (root.context.unlockInProgress)
                     return Theme.spinnerText;
+                if (root.context.faceScanning && root.context.currentText === "")
+                    return Theme.faceText;
                 if (root.context.message !== "")
                     return root.context.message;
                 return root.context.showPrompt ? " " : Theme.hintText;

@@ -79,6 +79,9 @@ Singleton {
     readonly property int messageFontSize: 13
     readonly property string hintText: "Type to unlock"
     readonly property string spinnerText: "waking the penguin"
+    // Face unlock, with howdy
+    readonly property string faceText: "Looking for you"
+    readonly property string faceFailedText: "Face not recognised, type your password"
 
     // Battery, bottom right
     readonly property int statusFontSize: 14

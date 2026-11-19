@@ -106,6 +106,18 @@ too, but can't run btop. With `$TERMINAL` unset, the first installed one of
 those opens (install.sh installs foot). mangifera ships no terminal config:
 keep yours in your own dotfiles.
 
+**Face unlock:** with an IR camera (most Windows Hello webcams and many
+laptops), the lock screen can unlock when it sees your face. Install
+[howdy](https://github.com/boltgolt/howdy) 3 (from source or the AUR's
+`howdy-beta-git`), set `device_path` in `/etc/howdy/config.ini` to the IR
+camera, then run `sudo howdy add`. The lock looks for you when the password
+field shows; press Enter on the empty field to look again. Your password
+always works too. Only the lock screen uses it: login and `sudo` stay
+password-only.
+
+Face unlock is a convenience, not a strong lock. Someone who looks like you,
+or who holds the laptop up to you while you sleep, can unlock it.
+
 ## Update
 
 ```sh
