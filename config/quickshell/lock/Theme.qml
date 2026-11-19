@@ -83,6 +83,7 @@ Singleton {
     readonly property string faceText: "Looking for you"
     readonly property string faceFailedText: "Face not recognised, type your password"
     // Ring around the avatar
+    readonly property color faceRingColor: "white"
     readonly property int faceRingWidth: 3
     readonly property int faceRingGap: 4
     readonly property real faceRingDimOpacity: 0.25

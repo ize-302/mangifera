@@ -15,7 +15,7 @@ Item {
     property bool matched: false
 
     readonly property real stroke: Theme.faceRingWidth
-    readonly property color clear: Qt.rgba(Theme.selectedColor.r, Theme.selectedColor.g, Theme.selectedColor.b, 0)
+    readonly property color clear: Qt.rgba(Theme.faceRingColor.r, Theme.faceRingColor.g, Theme.faceRingColor.b, 0)
 
     Shape {
         id: sweep
@@ -43,7 +43,7 @@ Item {
 
                 GradientStop {
                     position: 0
-                    color: Theme.selectedColor
+                    color: Theme.faceRingColor
                 }
                 GradientStop {
                     position: Theme.faceSweepLength
@@ -86,7 +86,7 @@ Item {
         radius: ring.radius
         color: "transparent"
         border.width: ring.stroke
-        border.color: Theme.selectedColor
+        border.color: Theme.faceRingColor
         opacity: ring.matched ? 1 : ring.hinted && !ring.scanning ? Theme.faceRingHintOpacity : 0
 
         Behavior on opacity {
