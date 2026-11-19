@@ -18,8 +18,9 @@ git pull
 
 - Face unlock on the lock screen, with [howdy](https://github.com/boltgolt/howdy)
   3 and an IR camera. When the password field shows, the lock looks for your
-  face while you can still type your password. Enter on an empty field looks
-  again. Without howdy or a face added (`sudo howdy add`), nothing changes.
+  face while you can still type your password. A blue ring sweeps around your
+  avatar while it looks and closes when it knows you; a soft shake means it
+  didn't. Click the avatar, or press Enter on an empty field, to look again. Without howdy or a face added (`sudo howdy add`), nothing changes.
   Run `./install.sh` after `git pull` to link the lock's new `pam/face` file.
 
 ## [0.13.1] - 2026-11-15

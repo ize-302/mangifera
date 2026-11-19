@@ -10,6 +10,7 @@ Scope {
 
     signal unlocked
     signal failed
+    signal faceFailed
 
     property string currentText: ""
     property bool showPrompt: false
@@ -21,7 +22,11 @@ Scope {
     property bool capsLock: false
     // howdy is installed and has this user's face
     property bool faceAvailable: false
+    // test.qml turns this off to show face states without a real scan
+    property bool faceEnabled: true
     property bool faceScanning: false
+    // howdy knew the face; the lock goes after Theme.faceMatchHold
+    property bool faceMatched: false
     // Set once either check passes, so the other can't unlock twice
     property bool done: false
 
@@ -58,7 +63,7 @@ Scope {
     }
 
     function startFace() {
-        if (!faceAvailable || faceScanning || done)
+        if (!faceAvailable || !faceEnabled || faceScanning || done)
             return;
         message = "";
         faceScanning = facePam.start();
@@ -70,7 +75,7 @@ Scope {
         faceScanning = false;
     }
 
-    function succeed() {
+    function succeed(byFace) {
         if (done)
             return;
         done = true;
@@ -78,7 +83,19 @@ Scope {
         if (pam.active)
             pam.abort();
         unlockInProgress = false;
-        unlocked();
+        if (byFace) {
+            // Long enough to see the ring close
+            faceMatched = true;
+            matchTimer.start();
+        } else {
+            unlocked();
+        }
+    }
+
+    Timer {
+        id: matchTimer
+        interval: Theme.faceMatchHold
+        onTriggered: root.unlocked()
     }
 
     function fail(text) {
@@ -148,10 +165,13 @@ Scope {
         onCompleted: result => {
             root.faceScanning = false;
             if (result === PamResult.Success) {
-                root.succeed();
-            } else if (!root.done && root.showPrompt && root.message === "") {
-                root.message = Theme.faceFailedText;
-                root.messageIsError = false;
+                root.succeed(true);
+            } else if (!root.done && root.showPrompt) {
+                if (root.message === "") {
+                    root.message = Theme.faceFailedText;
+                    root.messageIsError = false;
+                }
+                root.faceFailed();
             }
         }
 

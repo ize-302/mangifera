@@ -82,6 +82,18 @@ Singleton {
     // Face unlock, with howdy
     readonly property string faceText: "Looking for you"
     readonly property string faceFailedText: "Face not recognised, type your password"
+    // Ring around the avatar
+    readonly property int faceRingWidth: 3
+    readonly property int faceRingGap: 4
+    readonly property real faceRingDimOpacity: 0.25
+    readonly property real faceRingHintOpacity: 0.3
+    // ms per turn, and the lit share of the ring
+    readonly property int faceSweepDuration: 1100
+    readonly property real faceSweepLength: 0.45
+    // ms the full ring shows before the lock goes
+    readonly property int faceMatchHold: 300
+    readonly property real faceBounceScale: 1.08
+    readonly property int faceShakeDistance: 5
 
     // Battery, bottom right
     readonly property int statusFontSize: 14

@@ -117,6 +117,96 @@ Rectangle {
             radius: Theme.avatarRadius
             color: "transparent"
 
+            transform: Translate {
+                id: avatarShake
+            }
+
+            // Small bounce as the face ring closes
+            SequentialAnimation {
+                id: bounceAnimation
+
+                NumberAnimation {
+                    target: avatar
+                    property: "scale"
+                    to: Theme.faceBounceScale
+                    duration: Theme.faceMatchHold / 2
+                    easing.type: Easing.OutQuad
+                }
+                NumberAnimation {
+                    target: avatar
+                    property: "scale"
+                    to: 1
+                    duration: Theme.faceMatchHold / 2
+                    easing.type: Easing.InQuad
+                }
+            }
+
+            // One soft shake when the face isn't known, gentler than the
+            // field's wrong-password shake
+            SequentialAnimation {
+                id: avatarShakeAnimation
+
+                NumberAnimation {
+                    target: avatarShake
+                    property: "x"
+                    to: -Theme.faceShakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: avatarShake
+                    property: "x"
+                    to: Theme.faceShakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: avatarShake
+                    property: "x"
+                    to: 0
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.OutQuad
+                }
+            }
+
+            Connections {
+                target: root.context
+                function onFaceMatchedChanged() {
+                    if (root.context.faceMatched)
+                        bounceAnimation.restart();
+                }
+                function onFaceFailed() {
+                    avatarShakeAnimation.restart();
+                }
+            }
+
+            FaceRing {
+                anchors.centerIn: parent
+                width: parent.width + 2 * (Theme.faceRingGap + Theme.faceRingWidth)
+                height: width
+                radius: avatar.radius + Theme.faceRingGap + Theme.faceRingWidth
+                scanning: root.context.faceScanning
+                dimmed: root.context.currentText !== ""
+                hinted: avatarArea.containsMouse && root.context.faceAvailable
+                matched: root.context.faceMatched
+            }
+
+            // Click the avatar to look again
+            MouseArea {
+                id: avatarArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: root.context.faceAvailable ? Qt.PointingHandCursor : Qt.ArrowCursor
+                onClicked: {
+                    password.forceActiveFocus();
+                    if (root.context.showPrompt)
+                        root.context.startFace();
+                    else
+                        root.context.showPrompt = true;
+                }
+            }
+
             // SDDM's avatar paths, then the penguin
             readonly property list<url> sources: [
                 "file:///usr/share/sddm/faces/" + Quickshell.env("USER") + ".face.icon",
