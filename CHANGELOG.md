@@ -22,6 +22,8 @@ git pull
   avatar while it looks and closes when it knows you; a soft shake means it
   didn't. Click the avatar, or press Enter on an empty field, to look again. Without howdy or a face added (`sudo howdy add`), nothing changes.
   Run `./install.sh` after `git pull` to link the lock's new `pam/face` file.
+  With more than one IR camera, the README shows a udev rule that points
+  howdy at whichever one is plugged in.
 
 ## [0.13.1] - 2026-11-15
 

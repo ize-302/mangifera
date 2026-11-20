@@ -115,6 +115,32 @@ field shows; press Enter on the empty field to look again. Your password
 always works too. Only the lock screen uses it: login and `sudo` stay
 password-only.
 
+*More than one IR camera* (say a laptop's own and a webcam you plug in):
+howdy takes one `device_path`, so give it a udev link that follows whichever
+camera is there. Find each IR camera's node with
+`for d in /dev/video*; do echo "$d $(cat /sys/class/video4linux/${d#/dev/}/name)"; done`,
+then read its vendor, product and index with
+`udevadm info -a -n /dev/videoN | grep -E 'ATTR\{(name|index)\}|ATTRS\{id(Vendor|Product)\}'`.
+Put one line per camera in `/etc/udev/rules.d/90-howdy-ir.rules`. The highest
+`link_priority` wins while plugged in. This example prefers a Logitech BRIO
+and falls back to a laptop's built-in IR:
+
+```
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="046d", ATTRS{idProduct}=="085e", ATTR{index}=="2", SYMLINK+="howdy-ir", OPTIONS+="link_priority=10"
+SUBSYSTEM=="video4linux", ATTRS{idVendor}=="13d3", ATTRS{idProduct}=="5405", ATTR{index}=="0", SYMLINK+="howdy-ir", OPTIONS+="link_priority=0"
+```
+
+Then load it and point howdy at the link:
+
+```sh
+sudo udevadm control --reload
+sudo udevadm trigger --subsystem-match=video4linux
+sudo sed -i 's|^device_path = .*|device_path = /dev/howdy-ir|' /etc/howdy/config.ini
+```
+
+Run `sudo howdy add` once with each camera active (unplug the preferred one
+for the other), since a face learned on one sensor may not match on another.
+
 Face unlock is a convenience, not a strong lock. Someone who looks like you,
 or who holds the laptop up to you while you sleep, can unlock it.
 
