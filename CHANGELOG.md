@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.14.0] - 2026-11-20
+
 ### Added
 
 - Face unlock on the lock screen, with [howdy](https://github.com/boltgolt/howdy)
@@ -371,7 +373,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.13.1...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.14.0...HEAD
+[0.14.0]: https://github.com/ize-302/mangifera/releases/tag/v0.14.0
 [0.13.1]: https://github.com/ize-302/mangifera/releases/tag/v0.13.1
 [0.13.0]: https://github.com/ize-302/mangifera/releases/tag/v0.13.0
 [0.12.0]: https://github.com/ize-302/mangifera/releases/tag/v0.12.0
