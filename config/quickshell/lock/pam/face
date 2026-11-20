@@ -1,0 +1,6 @@
+#%PAM-1.0
+# Face check for the lock screen, run beside the password check (LockContext.qml).
+# Needs howdy 3 with a face added (`sudo howdy add`). A missing module or face
+# just fails this stack, and the password still works.
+auth     required  pam_howdy.so
+account  required  pam_permit.so

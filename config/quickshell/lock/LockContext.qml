@@ -10,6 +10,7 @@ Scope {
 
     signal unlocked
     signal failed
+    signal faceFailed
 
     property string currentText: ""
     property bool showPrompt: false
@@ -19,6 +20,17 @@ Scope {
     // Last PAM message this attempt, e.g. pam_faillock's lockout notice
     property string pamInfo: ""
     property bool capsLock: false
+    // howdy is installed and has this user's face
+    property bool faceAvailable: false
+    // test.qml turns this off to show face states without a real scan
+    property bool faceEnabled: true
+    property bool faceScanning: false
+    // howdy knew the face; the lock goes after Theme.faceMatchHold
+    property bool faceMatched: false
+    // Set once either check passes, so the other can't unlock twice
+    property bool done: false
+    // The surfaces slide away for Theme.exitDuration, then the lock goes
+    property bool leaving: false
 
     onCurrentTextChanged: {
         if (currentText !== "")
@@ -27,20 +39,71 @@ Scope {
     }
 
     onShowPromptChanged: {
-        if (!showPrompt) {
+        if (showPrompt) {
+            startFace();
+        } else {
             currentText = "";
             message = "";
+            // Turn the camera off with the field
+            stopFace();
         }
     }
 
     function tryUnlock() {
-        if (currentText === "" || unlockInProgress)
+        if (unlockInProgress)
             return;
+        // Enter on an empty field looks again
+        if (currentText === "") {
+            startFace();
+            return;
+        }
 
         unlockInProgress = true;
         message = "";
         pamInfo = "";
         pam.start();
+    }
+
+    function startFace() {
+        if (!faceAvailable || !faceEnabled || faceScanning || done)
+            return;
+        message = "";
+        faceScanning = facePam.start();
+    }
+
+    function stopFace() {
+        if (facePam.active)
+            facePam.abort();
+        faceScanning = false;
+    }
+
+    function succeed(byFace) {
+        if (done)
+            return;
+        done = true;
+        stopFace();
+        if (pam.active)
+            pam.abort();
+        unlockInProgress = false;
+        if (byFace) {
+            // Long enough to see the smile
+            faceMatched = true;
+            matchTimer.start();
+        } else {
+            leaving = true;
+        }
+    }
+
+    Timer {
+        id: matchTimer
+        interval: Theme.faceMatchHold
+        onTriggered: root.leaving = true
+    }
+
+    Timer {
+        interval: Theme.exitDuration
+        running: root.leaving
+        onTriggered: root.unlocked()
     }
 
     function fail(text) {
@@ -76,8 +139,9 @@ Scope {
 
         onCompleted: result => {
             if (result === PamResult.Success) {
-                root.unlockInProgress = false;
-                root.unlocked();
+                root.succeed();
+            } else if (root.done) {
+                return;
             } else if (result === PamResult.MaxTries) {
                 root.fail("Too many attempts");
             } else if (result === PamResult.Error) {
@@ -90,6 +154,48 @@ Scope {
         }
 
         onError: error => root.fail("Authentication error: " + PamError.toString(error))
+    }
+
+    // Face check beside the password one, from pam/face. A failed scan only
+    // leaves a note: the typed password stays and nothing shakes.
+    PamContext {
+        id: facePam
+
+        configDirectory: Quickshell.shellPath("pam")
+        config: "face"
+
+        onPamMessage: {
+            // howdy never asks for input; answering keeps PAM from waiting
+            if (responseRequired)
+                respond("");
+        }
+
+        onCompleted: result => {
+            root.faceScanning = false;
+            if (result === PamResult.Success) {
+                root.succeed(true);
+            } else if (!root.done && root.showPrompt) {
+                if (root.message === "") {
+                    root.message = Theme.faceFailedText;
+                    root.messageIsError = false;
+                }
+                root.faceFailed();
+            }
+        }
+
+        onError: () => root.faceScanning = false
+    }
+
+    // Face unlock is on when howdy is installed and has this user's face
+    Process {
+        command: ["sh", "-c", 'test -e /usr/lib/security/pam_howdy.so && test -r "/etc/howdy/models/$USER.dat"']
+        running: true
+        onExited: code => {
+            root.faceAvailable = code === 0;
+            // The field can be up before this answers
+            if (root.faceAvailable && root.showPrompt)
+                root.startFace();
+        }
     }
 
     // Caps lock lights, same loop as the launcher's CapsLock.qml

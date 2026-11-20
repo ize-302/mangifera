@@ -67,6 +67,12 @@ Rectangle {
         opacity: Theme.wallpaperTint
     }
 
+    // Where the pointer is, for the face's eyes. A handler, so the buttons
+    // and avatar above still get their own hover.
+    HoverHandler {
+        id: hover
+    }
+
     MouseArea {
         anchors.fill: parent
         onClicked: {
@@ -78,6 +84,26 @@ Rectangle {
     Column {
         anchors.horizontalCenter: parent.horizontalCenter
         y: Math.round(root.height * Theme.clockTop)
+
+        // Slides up and fades as the lock goes
+        opacity: root.context.leaving ? 0 : 1
+        transform: Translate {
+            y: root.context.leaving ? -Theme.exitDistance : 0
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: Theme.exitDuration
+                    easing.type: Easing.InCubic
+                }
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.exitDuration
+                easing.type: Easing.InCubic
+            }
+        }
 
         Text {
             anchors.horizontalCenter: parent.horizontalCenter
@@ -109,6 +135,26 @@ Rectangle {
         spacing: Theme.promptSpacing
         visible: root.active
 
+        // Slides up and fades as the lock goes
+        opacity: root.context.leaving ? 0 : 1
+        transform: Translate {
+            y: root.context.leaving ? -Theme.exitDistance : 0
+
+            Behavior on y {
+                NumberAnimation {
+                    duration: Theme.exitDuration
+                    easing.type: Easing.InCubic
+                }
+            }
+        }
+
+        Behavior on opacity {
+            NumberAnimation {
+                duration: Theme.exitDuration
+                easing.type: Easing.InCubic
+            }
+        }
+
         Rectangle {
             id: avatar
             anchors.horizontalCenter: parent.horizontalCenter
@@ -116,6 +162,90 @@ Rectangle {
             height: Theme.avatarSize
             radius: Theme.avatarRadius
             color: "transparent"
+
+            // The face stands in for the avatar while howdy looks, smiles or
+            // frowns
+            readonly property bool showFace: root.context.faceScanning || root.context.faceMatched || faceGlyph.failed
+
+            transform: Translate {
+                id: avatarShake
+            }
+
+            // Small bounce as the face smiles
+            SequentialAnimation {
+                id: bounceAnimation
+
+                NumberAnimation {
+                    target: avatar
+                    property: "scale"
+                    to: Theme.faceBounceScale
+                    duration: Theme.faceBounceDuration / 2
+                    easing.type: Easing.OutQuad
+                }
+                NumberAnimation {
+                    target: avatar
+                    property: "scale"
+                    to: 1
+                    duration: Theme.faceBounceDuration / 2
+                    easing.type: Easing.InQuad
+                }
+            }
+
+            // One soft shake when the face isn't known, gentler than the
+            // field's wrong-password shake
+            SequentialAnimation {
+                id: avatarShakeAnimation
+
+                NumberAnimation {
+                    target: avatarShake
+                    property: "x"
+                    to: -Theme.faceShakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: avatarShake
+                    property: "x"
+                    to: Theme.faceShakeDistance
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.InOutQuad
+                }
+                NumberAnimation {
+                    target: avatarShake
+                    property: "x"
+                    to: 0
+                    duration: Theme.shakeDuration
+                    easing.type: Easing.OutQuad
+                }
+            }
+
+            Connections {
+                target: root.context
+                function onFaceMatchedChanged() {
+                    if (root.context.faceMatched)
+                        bounceAnimation.restart();
+                }
+                function onFaceFailed() {
+                    avatarShakeAnimation.restart();
+                    faceGlyph.fail();
+                }
+            }
+
+            // Click the avatar to look again
+            MouseArea {
+                id: avatarArea
+
+                anchors.fill: parent
+                hoverEnabled: true
+                cursorShape: root.context.faceAvailable ? Qt.PointingHandCursor : Qt.ArrowCursor
+                onClicked: {
+                    password.forceActiveFocus();
+                    if (root.context.showPrompt)
+                        root.context.startFace();
+                    else
+                        root.context.showPrompt = true;
+                }
+            }
 
             // SDDM's avatar paths, then the penguin
             readonly property list<url> sources: [
@@ -160,6 +290,46 @@ Rectangle {
                 source: avatarImage
                 maskEnabled: true
                 maskSource: avatarMask
+                opacity: avatar.showFace ? 0 : 1
+                scale: avatar.showFace ? Theme.faceSwapScale : 1
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.faceSwapDuration
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: Theme.faceSwapDuration
+                        easing.type: Easing.OutCubic
+                    }
+                }
+            }
+
+            FaceGlyph {
+                id: faceGlyph
+
+                anchors.fill: parent
+                anchors.margins: Theme.faceGlyphPadding
+                opacity: avatar.showFace ? (root.context.currentText !== "" && !root.context.faceMatched ? Theme.faceDimOpacity : 1) : 0
+                scale: avatar.showFace ? 1 : Theme.faceSwapScale
+                scanning: root.context.faceScanning
+                matched: root.context.faceMatched
+                hovered: avatarArea.containsMouse
+                tracking: hover.hovered
+                pointer: mapFromItem(root, hover.point.position.x, hover.point.position.y)
+
+                Behavior on opacity {
+                    NumberAnimation {
+                        duration: Theme.faceSwapDuration
+                    }
+                }
+                Behavior on scale {
+                    NumberAnimation {
+                        duration: Theme.faceSwapDuration
+                        easing.type: Easing.OutBack
+                    }
+                }
             }
         }
 
@@ -375,8 +545,12 @@ Rectangle {
             anchors.horizontalCenter: parent.horizontalCenter
             // Keeps its height when empty so nothing jumps
             text: {
+                if (root.context.faceMatched)
+                    return Theme.faceWelcomeText;
                 if (root.context.unlockInProgress)
                     return Theme.spinnerText;
+                if (root.context.faceScanning && root.context.currentText === "")
+                    return Theme.faceText;
                 if (root.context.message !== "")
                     return root.context.message;
                 return root.context.showPrompt ? " " : Theme.hintText;
