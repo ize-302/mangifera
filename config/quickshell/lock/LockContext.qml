@@ -29,6 +29,8 @@ Scope {
     property bool faceMatched: false
     // Set once either check passes, so the other can't unlock twice
     property bool done: false
+    // The surfaces slide away for Theme.exitDuration, then the lock goes
+    property bool leaving: false
 
     onCurrentTextChanged: {
         if (currentText !== "")
@@ -84,17 +86,23 @@ Scope {
             pam.abort();
         unlockInProgress = false;
         if (byFace) {
-            // Long enough to see the ring close
+            // Long enough to see the smile
             faceMatched = true;
             matchTimer.start();
         } else {
-            unlocked();
+            leaving = true;
         }
     }
 
     Timer {
         id: matchTimer
         interval: Theme.faceMatchHold
+        onTriggered: root.leaving = true
+    }
+
+    Timer {
+        interval: Theme.exitDuration
+        running: root.leaving
         onTriggered: root.unlocked()
     }
 

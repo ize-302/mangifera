@@ -82,19 +82,41 @@ Singleton {
     // Face unlock, with howdy
     readonly property string faceText: "Looking for you"
     readonly property string faceFailedText: "Face not recognised, type your password"
-    // Ring around the avatar
-    readonly property color faceRingColor: "white"
-    readonly property int faceRingWidth: 3
-    readonly property int faceRingGap: 4
-    readonly property real faceRingDimOpacity: 0.25
-    readonly property real faceRingHintOpacity: 0.3
-    // ms per turn, and the lit share of the ring
-    readonly property int faceSweepDuration: 1100
-    readonly property real faceSweepLength: 0.45
-    // ms the full ring shows before the lock goes
-    readonly property int faceMatchHold: 300
+    readonly property string faceWelcomeText: "Welcome back"
+    readonly property color faceColor: "white"
+    // Faint while you type, so it doesn't pull your eye off the field
+    readonly property real faceDimOpacity: 0.25
+    // ms per breath of the brackets while looking
+    readonly property int facePulseDuration: 1100
+    // ms the smile shows before the lock goes
+    readonly property int faceMatchHold: 750
     readonly property real faceBounceScale: 1.08
+    readonly property int faceBounceDuration: 300
     readonly property int faceShakeDistance: 5
+    // The face that stands in for the avatar while scanning
+    readonly property real faceGlyphStroke: 3.5
+    readonly property real faceGlyphPadding: 10
+    // How far the eyes move, as a share of the face
+    readonly property real faceGlanceReach: 0.1
+    // Eye travel per second, in reaches
+    readonly property real faceEyeVelocity: 8
+    // ms
+    readonly property int faceGlanceDuration: 320
+    readonly property int faceGlancePause: 160
+    readonly property int faceBlinkInterval: 4000
+    readonly property int faceBlinkDuration: 160
+    readonly property int faceMoodDuration: 380
+    readonly property int faceFrownHold: 1400
+    // The avatar and face swap places
+    readonly property int faceSwapDuration: 220
+    readonly property real faceSwapScale: 0.85
+    readonly property real faceBracketsPulseScale: 0.9
+    readonly property real faceBracketsMatchScale: 0.86
+    readonly property real faceBracketsHoverScale: 1.08
+
+    // Unlock: the clock and prompt slide up and fade, in ms and px
+    readonly property int exitDuration: 320
+    readonly property int exitDistance: 48
 
     // Battery, bottom right
     readonly property int statusFontSize: 14
