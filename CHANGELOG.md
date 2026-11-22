@@ -14,6 +14,11 @@ git pull
 
 ## [Unreleased]
 
+### Fixed
+
+- Lid switch binds use mango 0.18.6's `lid_on`/`lid_off` states. The old
+  `fold`/`unfold` names now fail to parse, so closing the lid did nothing.
+
 ## [0.15.0] - 2026-11-22
 
 ### Added
