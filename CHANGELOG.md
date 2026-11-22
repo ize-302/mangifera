@@ -14,6 +14,14 @@ git pull
 
 ## [Unreleased]
 
+### Added
+
+- USB drives, SD cards and discs are noticed as they're plugged in: they're
+  mounted and a notification says so, with **Open** (in Files) and **Eject**
+  buttons. Unplugging one notifies too. Encrypted drives aren't mounted:
+  unlock them in Files. Run `./install.sh` after `git pull` to build the new
+  `drive-watch`, then log out and back in.
+
 ## [0.14.0] - 2026-11-20
 
 ### Added

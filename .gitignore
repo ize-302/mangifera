@@ -33,3 +33,5 @@ home/.local/bin/bar-anchor
 home/.local/bin/bar-watchdog
 # Built by install.sh from src/mango-reload
 home/.local/bin/mango-reload
+# Built by install.sh from src/drive-watch
+home/.local/bin/drive-watch
