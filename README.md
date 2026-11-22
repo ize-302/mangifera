@@ -29,7 +29,8 @@ bar and a [Quickshell](https://quickshell.org) shell.
 
 Also: screenshots, an overview of all your windows, a matching login
 screen, a noise-canceling mic, a pomodoro timer in the bar, scratchpad
-windows, and Bluetooth audio that switches over as soon as it connects.
+windows, Bluetooth audio that switches over as soon as it connects, and USB
+drives that mount when plugged in, with Open and Eject in the notification.
 
 ## Install
 

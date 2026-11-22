@@ -62,8 +62,8 @@ repo_packages=(
   # Network, Bluetooth; gcc builds src/bluetooth-agent, go builds
   # src/network-info, src/launcher, src/terminal, src/btop-toggle, src/screenshot,
   # src/wallpaper, src/record, src/window, src/display, src/clock-status,
-  # src/bluetooth-audio, src/gtk-radius, src/bar-anchor, src/bar-watchdog and
-  # src/mango-reload
+  # src/bluetooth-audio, src/gtk-radius, src/bar-anchor, src/bar-watchdog,
+  # src/mango-reload and src/drive-watch
   networkmanager nm-connection-editor bluez bluez-utils blueman
   gcc pkgconf go
   # The terminal when $TERMINAL isn't set (see src/terminal)
@@ -71,7 +71,8 @@ repo_packages=(
   # Shrinks the wallpaper for the lock screen
   imagemagick
   # File manager, thumbnailers, archive and media tag plugins
-  thunar gvfs tumbler ffmpegthumbnailer poppler-glib webp-pixbuf-loader libgsf
+  # udisks2 mounts drives for src/drive-watch
+  udisks2 thunar gvfs tumbler ffmpegthumbnailer poppler-glib webp-pixbuf-loader libgsf
   thunar-archive-plugin xarchiver thunar-media-tags-plugin
   # tpm
   git
@@ -191,6 +192,9 @@ run src/bar-watchdog/build.sh
 
 say "Building mango-reload"
 run src/mango-reload/build.sh
+
+say "Building drive-watch"
+run src/drive-watch/build.sh
 
 # --- Links ------------------------------------------------------------------
 
