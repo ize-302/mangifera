@@ -14,6 +14,8 @@ git pull
 
 ## [Unreleased]
 
+## [0.15.1] - 2026-11-22
+
 ### Fixed
 
 - Lid switch binds use mango 0.18.6's `lid_on`/`lid_off` states. The old
@@ -388,7 +390,8 @@ First release.
 - `uninstall.sh` undoes only what the installer changed and restores
   backed-up files.
 
-[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.15.0...HEAD
+[Unreleased]: https://github.com/ize-302/mangifera/compare/v0.15.1...HEAD
+[0.15.1]: https://github.com/ize-302/mangifera/releases/tag/v0.15.1
 [0.15.0]: https://github.com/ize-302/mangifera/releases/tag/v0.15.0
 [0.14.0]: https://github.com/ize-302/mangifera/releases/tag/v0.14.0
 [0.13.1]: https://github.com/ize-302/mangifera/releases/tag/v0.13.1
