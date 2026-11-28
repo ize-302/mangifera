@@ -168,10 +168,18 @@ Scope {
     LazyLoader {
         id: loader
 
-        active: root.open || root.needDevices
+        // Built in the background, so opening the record menu doesn't wait
+        // on the camera scan; the device list and bubble follow a moment later
+        activeAsync: root.open || root.needDevices
 
         Scope {
             id: loaded
+
+            // Set once every binding here has its value, so the camera turns
+            // on with the picked device and format, not the default first
+            property bool ready: false
+
+            Component.onCompleted: ready = true
 
             // Cameras to pick from: only those with a 720p mode, which leaves out IR
             // and metadata nodes
@@ -187,7 +195,7 @@ Scope {
                     id: camera
 
                     // Only while shown, so the camera's light goes off with it
-                    active: root.open
+                    active: root.open && loaded.ready
                     // The picked one while it's plugged in, else an external camera
                     // over the built-in one
                     cameraDevice: loaded.devices.find(input => input.description === root.device) ?? loaded.devices.find(input => !input.description.startsWith("Integrated")) ?? loaded.devices[0] ?? mediaDevices.defaultVideoInput
