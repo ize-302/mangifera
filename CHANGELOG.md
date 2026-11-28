@@ -14,6 +14,12 @@ git pull
 
 ## [Unreleased]
 
+### Changed
+
+- The webcam bubble's camera code (Qt Multimedia) only loads while the
+  bubble shows or the record menu is open, and is freed after, so it no
+  longer sits in memory the rest of the time.
+
 ## [0.15.1] - 2026-11-22
 
 ### Fixed

@@ -276,6 +276,8 @@ ShellRoot {
 
     CameraWidget {
         id: camera
+        // The record menu lists the cameras
+        needDevices: recordMenu.open
     }
 
     BluetoothAgent {}
